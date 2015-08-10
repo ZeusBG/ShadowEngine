@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/gameObjects/Projectile.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/test/Player.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/gameObjects/StaticGameObject.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/engine/Core.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/components/ObjectManager.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/gameObjects/PlayerObject.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/test/Game.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/test/Wall.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/engine/Renderer.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/utils/GeometryUtil.java</file>
+            <file>file:/C:/Users/Zeus/Documents/NetBeansProjects/GameEngine/src/gameObjects/NPC.java</file>
+        </group>
+    </open-files>
+</project-private>
