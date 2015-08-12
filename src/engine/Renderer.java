@@ -308,6 +308,6 @@ public class Renderer {
             }
         if(tmpPoint!=null)
             g2d.drawLine(x1, y1, (int)tmpPoint.x, (int)tmpPoint.y);
-        else g2d.drawLine(x1, y1, x2, y2 + 20);
+        else g2d.drawLine(x1, y1, x2, y2);
     }
 }
