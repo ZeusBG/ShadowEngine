@@ -12,6 +12,7 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import utils.ObjectType;
+import utils.Sounds;
 
 /**
  *
@@ -39,18 +40,27 @@ public class Player extends LivingObject{
         if(core.getInput().isKeyPressed(KeyEvent.VK_W)){
             
             this.setY(this.getY()-2);
+            core.getSoundManager().play(Sounds.MOVEMENT);
         }
         if(core.getInput().isKeyPressed(KeyEvent.VK_S)){
             this.setY(this.getY()+2);
+            core.getSoundManager().play(Sounds.MOVEMENT);
         }
         if(core.getInput().isKeyPressed(KeyEvent.VK_A)){
             this.setX(this.getX()-2);
+            core.getSoundManager().play(Sounds.MOVEMENT);
         }
         if(core.getInput().isKeyPressed(KeyEvent.VK_D)){
             this.setX(this.getX()+2);
+            core.getSoundManager().play(Sounds.MOVEMENT);
         }
         
-        
+        if(core.getInput().isKeyReleased(KeyEvent.VK_A) &&
+           core.getInput().isKeyReleased(KeyEvent.VK_D) &&
+           core.getInput().isKeyReleased(KeyEvent.VK_W) &&
+           core.getInput().isKeyReleased(KeyEvent.VK_S)){
+            core.getSoundManager().stop(Sounds.MOVEMENT);
+        }
     }
 
     @Override

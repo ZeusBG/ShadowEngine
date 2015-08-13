@@ -1,0 +1,5 @@
+*.class
+*.properties
+build/classes/.netbeans_update_resources
+*.jar
+dist/README.TXT

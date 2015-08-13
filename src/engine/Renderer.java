@@ -6,6 +6,7 @@
 package engine;
 
 import components.ObjectManager;
+import components.SoundClip;
 import gameObjects.DynamicGameObject;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
@@ -308,7 +309,7 @@ public class Renderer {
             }
         if(tmpPoint!=null){
             g2d.drawLine(x1, y1, (int)tmpPoint.x, (int)tmpPoint.y);
-            System.out.println("testing github");
+            //System.out.println("testing github");
         }
         else g2d.drawLine(x1, y1, x2, y2);
     }

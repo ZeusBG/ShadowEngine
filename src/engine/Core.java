@@ -7,6 +7,7 @@ package engine;
 
 import components.ObjectManager;
 import components.Physics;
+import components.SoundManager;
 import gameObjects.GameObject;
 import java.awt.geom.Point2D;
 import java.util.logging.Level;
@@ -29,6 +30,7 @@ public class Core implements Runnable{
     private String title = "My engine v1.0";
     private ObjectManager objManager;
     private Renderer renderer;
+    private SoundManager soundManager;
     
     private double frameCap = 1.0/60.0;
     private boolean isRunning = false;
@@ -49,6 +51,7 @@ public class Core implements Runnable{
         physics = new Physics(this);
         objManager = new ObjectManager();
         renderer = new Renderer(this);
+        soundManager = new SoundManager();
         test();
         thread.run();
     }
@@ -192,5 +195,7 @@ public class Core implements Runnable{
         objManager.addObject(obj);
     }
     
-
+    public SoundManager getSoundManager(){
+        return soundManager;
+    }
 }

@@ -49,18 +49,15 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener{
     
     @Override
     public void keyTyped(KeyEvent e) {
-        System.out.println(e.getKeyCode());
     }
 
     @Override
     public void keyPressed(KeyEvent e) {
-        System.out.println(e.getKeyCode());
         keys[e.getKeyCode()] = true;
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
-        System.out.println(e.getKeyCode());
         keys[e.getKeyCode()] = false;
     }
 
