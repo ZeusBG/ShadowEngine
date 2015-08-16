@@ -5,12 +5,9 @@
  */
 package test;
 
-import com.sun.glass.events.KeyEvent;
-import components.SoundClip;
 import engine.AbstractGame;
 import engine.Core;
 import engine.Renderer;
-import utils.Sounds;
 
 /**
  *

@@ -10,5 +10,6 @@ package utils;
  * @author pavelcheto
  */
 public enum Sounds {
-    MOVEMENT;
+    MOVEMENT_PLAYER,
+    MOVEMENT_OTHER;
 }

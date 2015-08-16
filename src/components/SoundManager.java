@@ -14,22 +14,27 @@ import utils.Sounds;
  * @author pavelcheto
  */
 public class SoundManager {
+
     private HashMap<Sounds, SoundClip> sounds;
-    
-    public SoundManager(){
+
+    public SoundManager() {
         sounds = new HashMap<>();
-        sounds.put(Sounds.MOVEMENT, new SoundClip("res/a.wav"));
+        sounds.put(Sounds.MOVEMENT_PLAYER, new SoundClip("res/walking_player.wav"));
     }
-    
-    public void play(Sounds type){
-        if (type == Sounds.MOVEMENT && !sounds.get(type).isRunning()) {
+
+    public void play(Sounds type) {
+        if (type == Sounds.MOVEMENT_PLAYER && !sounds.get(type).isRunning()) {
             sounds.get(type).loop();
         }
     }
-    
-    public void stop(Sounds type){
-        if (type == Sounds.MOVEMENT && sounds.get(type).isRunning()) {
+
+    public void stop(Sounds type) {
+        if (type == Sounds.MOVEMENT_PLAYER && sounds.get(type).isRunning()) {
             sounds.get(type).stop();
         }
+    }
+
+    public void changeVolume(Sounds type, float value) {
+            sounds.get(type).setVolume(sounds.get(type).getVolume() + value);
     }
 }

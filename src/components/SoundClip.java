@@ -6,10 +6,14 @@
 package components;
 
 import java.io.File;
+import java.io.IOException;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.FloatControl;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  *
@@ -18,6 +22,7 @@ import javax.sound.sampled.Clip;
 public class SoundClip {
 
     private Clip clip;
+    private FloatControl gainControl;
 
     public SoundClip(String path) {
         try {
@@ -34,7 +39,8 @@ public class SoundClip {
 
             clip = AudioSystem.getClip();
             clip.open(dais);
-        } catch (Exception e) {
+            gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.out.println("Failed at SoundClip open.");
         }
     }
@@ -66,6 +72,16 @@ public class SoundClip {
         clip.loop(Clip.LOOP_CONTINUOUSLY);
         while (!clip.isRunning()) {
             clip.start();
+        }
+    }
+
+    public float getVolume() {
+        return gainControl.getValue();
+    }
+
+    public void setVolume(float value) {
+        if (value >= gainControl.getMinimum() && value <= gainControl.getMaximum()) {
+            gainControl.setValue(value);
         }
     }
 
