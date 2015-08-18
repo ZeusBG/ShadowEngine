@@ -48,7 +48,7 @@ public class Renderer {
         //render objects
         
         clear();
-        castShadows();
+        castShadows(objectsToRender.getPlayer().getCurrentPosition());
         
         //setClip
         if(core.getObjectManager().getPlayer()!=null)
@@ -76,15 +76,7 @@ public class Renderer {
         g2d.setColor(Color.BLACK);
     }
     
-    public void castShadows(){
-        
-        //getPlayer
-        Point2D.Double lightSource;
-        double x= core.getObjectManager().getPlayer().getX();
-        double y= core.getObjectManager().getPlayer().getY();
-        lightSource = new Point2D.Double(x,y);
-        
-        //ot Player-a pravq vsi4ko
+    public void castShadows(Point2D.Double lightSource){
         
         ArrayList<Point2D.Double> points = core.getObjectManager().getPoints();
         ArrayList<Line2D.Double> walls = core.getObjectManager().getLines();

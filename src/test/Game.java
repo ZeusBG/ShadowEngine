@@ -20,8 +20,11 @@ public class Game extends AbstractGame{
     public static void main(String[] args) {
         
         Core core = new Core(new Game());
+        core.init();
         Player p = new Player();
  
+        
+        
         core.start();
         core.addObject(p);
     }

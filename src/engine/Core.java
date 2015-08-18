@@ -41,10 +41,7 @@ public class Core implements Runnable{
     }
 
    
-    public void start(){
-        if(isRunning)
-            return;
-        
+    public void init(){
         window = new Window(this);
         thread = new Thread(this);
         input = new Input(this);
@@ -52,12 +49,21 @@ public class Core implements Runnable{
         objManager = new ObjectManager();
         renderer = new Renderer(this);
         soundManager = new SoundManager();
+    }
+    
+    public void start(){
+        if(isRunning)
+            return;
+        
         test();
         thread.run();
     }
     
     private void test(){
-        addObject(new Player());
+        Player player = new Player();
+        player.setCurrentPosition(new Point2D.Double(10,10));
+        addObject(player);
+        
         Wall w = new Wall(0,0);
         w.addPoint(new Point2D.Double(60,30));
         w.addPoint(new Point2D.Double(100,160));
@@ -90,12 +96,12 @@ public class Core implements Runnable{
         double passedTime = 0;
         double unprocessedTime = 0;
         
-        
+       
         while(isRunning)
         {
             //System.out.println("asdasd");
             boolean render = false;
-            
+           
             firstTime = System.nanoTime()/1000000000.0;
             passedTime = firstTime - lastTime;
             lastTime = firstTime;
@@ -107,8 +113,9 @@ public class Core implements Runnable{
                 //System.out.printf("inner While - %d\n",count++);
                 
                 //game.update(this,(float) frameCap);
-                physics.update((float)1.0);
                 game.update(this, (float)frameCap);
+                physics.update((float)1.0);
+                
                 
                 unprocessedTime-=frameCap;
                 render = true;

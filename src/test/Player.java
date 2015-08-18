@@ -23,6 +23,7 @@ public class Player extends LivingObject{
     
     public Player(int x, int y, ObjectType type) {
         super(x, y, type);
+        speed = 500;
     }
     
     public Player(){
@@ -37,20 +38,20 @@ public class Player extends LivingObject{
         crosshair.y = core.getInput().getMouseY();
         
         if(core.getInput().isKeyPressed(KeyEvent.VK_W)){
-            
-            this.setY(this.getY()-2);
+          
+            nextPosition.y = currentPosition.y-2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(KeyEvent.VK_S)){
-            this.setY(this.getY()+2);
+            nextPosition.y = currentPosition.y+2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(KeyEvent.VK_A)){
-            this.setX(this.getX()-2);
+            nextPosition.x = currentPosition.x-2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(KeyEvent.VK_D)){
-            this.setX(this.getX()+2);
+            nextPosition.x = currentPosition.x+2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         
@@ -72,8 +73,8 @@ public class Player extends LivingObject{
 
     @Override
     public void render(Core gc, Renderer r) {
-        r.drawCircle(x,y,20);
-        r.requestLine(x, y,crosshair.x, crosshair.y);
+        r.drawCircle((int)currentPosition.x,(int)currentPosition.y,20);
+        r.requestLine((int)currentPosition.x, (int)currentPosition.y,crosshair.x, crosshair.y);
         //r.drawLine(x, y,crosshair.x, crosshair.y);
     }
     

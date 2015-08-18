@@ -7,6 +7,9 @@ package components;
 
 import engine.Core;
 import gameObjects.DynamicGameObject;
+import gameObjects.StaticGameObject;
+import java.awt.geom.Line2D;
+import utils.GeometryUtil;
 
 /**
  *
@@ -15,6 +18,7 @@ import gameObjects.DynamicGameObject;
 public class Physics {
     private Core core;
     //private ObjectManager OM;
+    boolean canMoveFlag;//absolutely only for testing !
     
     public Physics (Core core){
         this.core = core;
@@ -22,10 +26,14 @@ public class Physics {
     
     public void moveObjects(float dt){
         core.getObjectManager().getPlayer().update(core, dt);
+        //if(canMoveFlag)
+            core.getObjectManager().getPlayer().moveToNextPoint();
         
         for(DynamicGameObject obj : core.getObjectManager().getDynamicObjects()){
             obj.update(core, dt);
-            //System.out.printf("Moved obj of type %s to (%d,%d)",obj.getType(),obj.getX(),obj.getY());
+        }
+        for(DynamicGameObject obj : core.getObjectManager().getDynamicObjects()){
+            obj.move(dt);
         }
     }
     
@@ -34,12 +42,30 @@ public class Physics {
     }
     
     public void collisionObjects(){
-        //shte chekva collision mejdu objekti moje i da ne trqbva
+        ObjectManager OM = core.getObjectManager();
+        Line2D.Double playerLine = new Line2D.Double(OM.getPlayer().getCurrentPosition(),OM.getPlayer().getNextPosition());
+        System.out.printf("%s -- %s\n",playerLine.getP1(),playerLine.getP2());
+        if(!playerLine.getP1().equals(playerLine.getP2())){
+            System.out.println("in if");
+            for(Line2D.Double wall:OM.getLines()){
+                if(GeometryUtil.getIntersectionLines(playerLine, wall)!=null){
+                    canMoveFlag = false;
+                    System.out.println("collision");
+                }
+            }
+        }
+        
+        
+        
     }
     
     public void update(float dt){
+        
+        //uncomment for collision
+        //(buggy intersection between lines !!)
+        //canMoveFlag = true;
         checkHits();
-        collisionObjects();
+        //collisionObjects();
         moveObjects(dt);
     }
     
