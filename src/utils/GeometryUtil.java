@@ -17,8 +17,30 @@ public class GeometryUtil {
 
    
     
-    public static Point2D.Double getIntersection2(Line2D.Double ray, Line2D.Double segment){
-        double r_px = ray.x1;
+    public static Point2D.Double getIntersection2(Line2D.Double ray, Line2D.Double line){
+        double s1_x, s1_y, s2_x, s2_y;
+        s1_x = ray.x2 - ray.x1;     s1_y = ray.y2 - ray.y1;
+        s2_x = line.x2 - line.x1;     s2_y = line.y2 - line.y1;
+
+        double s, t;
+        s = (-s1_y * (ray.x1 - line.x1) + s1_x * (ray.y1 - line.y1)) / (-s2_x * s1_y + s1_x * s2_y);
+        t = ( s2_x * (ray.y1 - line.y1) - s2_y * (ray.x1 - line.x1)) / (-s2_x * s1_y + s1_x * s2_y);
+
+        
+        if (s >= 0 && s<=1 && t >= 0)
+        {
+            // Collision detected
+            Point2D.Double intersection = new Point2D.Double();
+            intersection.x = ray.x1 + (t * s1_x);
+            intersection.y = ray.y1 + (t * s1_y);
+            return intersection;
+        }
+       
+        
+        return null;
+        
+        
+        /*double r_px = ray.x1;
 	double r_py = ray.y1;
 	double r_dx = ray.x2-ray.x1;
 	double r_dy = ray.y2-ray.y1;
@@ -54,7 +76,7 @@ public class GeometryUtil {
         Point2D.Double intersection = new Point2D.Double();
         intersection.x = r_px+r_dx*T1;
 	intersection.y = r_py+r_dy*T1;
-        return intersection;
+        return intersection;*/
     }
     
     public static Point2D.Double getIntersectionLines(Line2D.Double ray, Line2D.Double segment){

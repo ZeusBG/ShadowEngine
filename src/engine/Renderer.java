@@ -266,8 +266,8 @@ public class Renderer {
     public void addSecondaryPoints(Point2D.Double p,Point2D.Double lightSource,ArrayList<Point2D.Double> sPoints){
         double x,y;
             
-            x = lightSource.x-p.x;
-            y = lightSource.x-p.y;
+            y = p.x-lightSource.x;
+            x = p.x-lightSource.y;
             double newX,newY;
             newX = p.x - x*0.0001;
             newY = p.y + y*0.0001;
