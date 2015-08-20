@@ -109,6 +109,7 @@ public class Renderer {
         
         Polygon light1 = findIntersectionPoints(lightSource,points,segments);
         //System.out.println("sight size: "+light1.npoints);
+        g2d.setColor(Color.white);
         g2d.fillPolygon(light1);
         
         Polygon screen = new Polygon();
@@ -156,7 +157,7 @@ public class Renderer {
             //g2d.draw(new Line2D.Double(150,150,450,150));
             
             //g2d.setClip(null);
-            g2d.setColor(Color.gray);
+            g2d.setColor(Color.black);
             g2d.fill(mask);
             //drawMap(g2d);
         }
@@ -202,9 +203,9 @@ public class Renderer {
                 }
             }
             
-            if(tmpPoint!=null && tmpPoint.equals(cPoint)){
+            //if(tmpPoint!=null && tmpPoint.equals(cPoint)){
                 addSecondaryPoints(cPoint,lightSource,sPoints);
-            }
+            //}
             
         }
         

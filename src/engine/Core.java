@@ -61,7 +61,8 @@ public class Core implements Runnable{
     
     private void test(){
         Player player = new Player();
-        player.setCurrentPosition(new Point2D.Double(10,10));
+        player.setCurrentPosition(new Point2D.Double(50,50));
+        player.setNextPosition(new Point2D.Double(50,50));
         addObject(player);
         
         Wall w = new Wall(0,0);
