@@ -59,36 +59,10 @@ public class Core implements Runnable{
             return;
         
         timeStarted = System.currentTimeMillis();
-        test();
         thread.run();
     }
     
-    private void test(){
-        Player player = new Player();
-        player.setCurrentPosition(new Point2D.Double(50,50));
-        player.setNextPosition(new Point2D.Double(50,50));
-        addObject(player);
-        
-        Weapon wep = new AK(0,0,null);
-        addObject(wep);
-        player.addWeapon(wep);
-        
-        
-        Wall w = new Wall(0,0);
-        w.addPoint(new Point2D.Double(60,30));
-        w.addPoint(new Point2D.Double(100,160));
-        w.addPoint(new Point2D.Double(100,200));
-        w.addPoint(new Point2D.Double(200,200));
-        
-        addObject(w);
-        w = new Wall(0,0);
-        w.addPoint(new Point2D.Double(0,0));
-        w.addPoint(new Point2D.Double(width+100,0));
-        w.addPoint(new Point2D.Double(width+100,height+100));
-        w.addPoint(new Point2D.Double(0,height+100)); 
-        w.addPoint(new Point2D.Double(0,0));
-        addObject(w);
-    }
+    
     
     public void stop(){
         if(!isRunning)

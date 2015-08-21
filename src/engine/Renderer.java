@@ -76,7 +76,7 @@ public class Renderer {
     
     public void clear(){
         g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, core.getWidth()+100, core.getHeight()+100);
+        g2d.fillRect(0, 0, core.getWidth(), core.getHeight());
         g2d.setColor(Color.BLACK);
     }
     
@@ -101,9 +101,9 @@ public class Renderer {
         Polygon screen = new Polygon();
         
         screen.addPoint(0,0);
-        screen.addPoint(0,600);
-        screen.addPoint(600,400);
-        screen.addPoint(600,0);
+        screen.addPoint(0,core.getHeight());
+        screen.addPoint(core.getWidth(),core.getHeight());
+        screen.addPoint(core.getWidth(),0);
         Area mask = new Area(screen);
         //if(light1.npoints>0){
             g2d.setColor(Color.BLACK);

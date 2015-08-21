@@ -5,3 +5,4 @@ build/classes/.netbeans_update_resources
 dist/README.TXT
 /dist/
 /build/
+/nbproject/private/

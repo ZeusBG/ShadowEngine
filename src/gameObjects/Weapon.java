@@ -5,10 +5,12 @@
  */
 package gameObjects;
 
+import engine.Core;
 import java.util.ArrayList;
 import math.Vector;
 import test.Bullet;
 import utils.ObjectType;
+import utils.Sounds;
 
 /**
  *
@@ -96,7 +98,12 @@ public abstract class Weapon extends DynamicGameObject{
         //System.out.printf("%f vs %f\n",System.currentTimeMillis()-timeLastFired,timePerProjectile);
         return System.currentTimeMillis()-timeLastFired>timePerProjectile && System.currentTimeMillis()-timeStartedReloading>reloadTime*1000;
     }
-    public Projectile fire() {
+    
+    public void fireSound(){
+        
+    }
+    
+    public void fire(Core core) {
         
         if(canFire()){
             
@@ -105,17 +112,19 @@ public abstract class Weapon extends DynamicGameObject{
                 p.setCurrentPosition(currentPosition);
                 orientation.normalize();
                 p.setDirection(orientation);
+                
+                core.addObject(p);
+                
                 ammonition.remove(ammonition.size()-1);
                 timeLastFired = System.currentTimeMillis();
-                return p;
+                
+                core.getSoundManager().play(Sounds.AK47_SHOT);
+ 
             }
             else{
                 reload();
-                return null;
             }
         }
-        
-        return null;
         
         
     }
@@ -137,7 +146,6 @@ public abstract class Weapon extends DynamicGameObject{
             currentAmmo-=30;
         }
         for(int i=0;i<bullets;i++){
-            System.out.println(i);
             ammonition.add(new Bullet(0,0));
         }
     }

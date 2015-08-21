@@ -8,6 +8,8 @@ package test;
 import engine.AbstractGame;
 import engine.Core;
 import engine.Renderer;
+import gameObjects.Weapon;
+import java.awt.geom.Point2D;
 
 /**
  *
@@ -18,17 +20,40 @@ public class Game extends AbstractGame{
 
     
     public static void main(String[] args) {
-        
-        Core core = new Core(new Game());
+        Game game = new Game();
+        Core core = new Core(game);
         core.init();
-        Player p = new Player();
- 
-        
-        
+        game.test(core);
         core.start();
-        core.addObject(p);
     }
 
+    private void test(Core core){
+        Player player = new Player();
+        player.setCurrentPosition(new Point2D.Double(50,50));
+        player.setNextPosition(new Point2D.Double(50,50));
+        core.addObject(player);
+        
+        Weapon wep = new AK(0,0,null);
+        core.addObject(wep);
+        player.addWeapon(wep);
+        
+        
+        Wall w = new Wall(0,0);
+        w.addPoint(new Point2D.Double(60,30));
+        w.addPoint(new Point2D.Double(100,160));
+        w.addPoint(new Point2D.Double(100,200));
+        w.addPoint(new Point2D.Double(200,200));
+        
+        core.addObject(w);
+        w = new Wall(0,0);
+        w.addPoint(new Point2D.Double(0,0));
+        w.addPoint(new Point2D.Double(core.getWidth(),0));
+        w.addPoint(new Point2D.Double(core.getWidth(),core.getHeight()));
+        w.addPoint(new Point2D.Double(0,core.getHeight())); 
+        w.addPoint(new Point2D.Double(0,0));
+        core.addObject(w);
+    }
+    
     @Override
     public void update(Core gc, float dt) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

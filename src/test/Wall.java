@@ -35,7 +35,7 @@ public class Wall extends StaticGameObject{
 
     @Override
     public void render(Core gc, Renderer r) {
-        r.setColor(Color.WHITE);
+        r.setColor(Color.RED);
         for(int i=0;i<points.size()-1;i++){
             r.drawLine((int)points.get(i).x,(int) points.get(i).y, (int)points.get(i+1).x, (int)points.get(i+1).y);
         }

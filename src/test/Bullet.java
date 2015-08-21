@@ -14,7 +14,7 @@ import java.awt.Color;
  *
  * @author Zeus
  */
-public class Bullet extends Projectile{
+public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
@@ -22,15 +22,15 @@ public class Bullet extends Projectile{
 
     @Override
     public void update(Core gc, float dt) {
-        
-        nextPosition.x = currentPosition.x+800*dt*direction.x;
-        nextPosition.y = currentPosition.y+800*dt*direction.y;
+
+        nextPosition.x = currentPosition.x + 800 * dt * direction.x;
+        nextPosition.y = currentPosition.y + 800 * dt * direction.y;
     }
 
     @Override
     public void render(Core gc, Renderer r) {
         r.setColor(Color.BLACK);
-        r.drawCircle((int)currentPosition.x, (int)currentPosition.y, 2);
+        r.drawCircle((int) currentPosition.x, (int) currentPosition.y, 2);
     }
-    
+
 }
