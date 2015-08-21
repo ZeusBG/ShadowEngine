@@ -16,7 +16,7 @@ import utils.ObjectType;
 
 /*This is the class for all the dynamic game objects - player, npc, etc.*/
 public abstract class DynamicGameObject extends GameObject{
-    
+    protected Vector orientation;
     protected Vector direction;
     protected int speed;
     protected Point2D.Double currentPosition;
@@ -27,6 +27,7 @@ public abstract class DynamicGameObject extends GameObject{
         currentPosition = new Point2D.Double();
         nextPosition = new Point2D.Double();
         direction = new Vector(0,0);
+        orientation = new Vector(1,0);
     }
     public DynamicGameObject(int x, int y, ObjectType type,Vector _direction,int _speed) {
         super(x, y, type);
@@ -42,6 +43,22 @@ public abstract class DynamicGameObject extends GameObject{
 
     public Point2D.Double getCurrentPosition() {
         return currentPosition;
+    }
+
+    public Vector getOrientation() {
+        return orientation;
+    }
+
+    public void setOrientation(Vector orientation) {
+        this.orientation = orientation;
+    }
+
+    public int getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
     }
     
     public Point2D.Double getNextPosition() {
@@ -70,8 +87,13 @@ public abstract class DynamicGameObject extends GameObject{
         currentPosition.y = nextPosition.y;
     }
     
-    public void changeDirection(Point2D.Double p){
+    public void setDirection(Point2D.Double p){
         direction = new Vector(currentPosition,p);
+        direction.normalize();
+        
+    }
+    public void setDirection(Vector dir){
+        direction = new Vector(dir);
         direction.normalize();
         
     }

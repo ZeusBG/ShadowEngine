@@ -6,8 +6,8 @@
 package engine;
 
 import components.ObjectManager;
-import components.SoundClip;
 import gameObjects.DynamicGameObject;
+import gameObjects.Projectile;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -57,8 +57,12 @@ public class Renderer {
         for(DynamicGameObject obj : core.getObjectManager().getDynamicObjects()){
             obj.render(core,this);
         }
+        for(Projectile obj : core.getObjectManager().getProjectiles()){
+            obj.render(core,this);
+        }
         
         for(StaticGameObject obj : core.getObjectManager().getStaticObjects()){
+            
             obj.render(core,this);
         }
         
@@ -72,7 +76,7 @@ public class Renderer {
     
     public void clear(){
         g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, core.getWidth(), core.getHeight());
+        g2d.fillRect(0, 0, core.getWidth()+100, core.getHeight()+100);
         g2d.setColor(Color.BLACK);
     }
     
@@ -86,31 +90,13 @@ public class Renderer {
     
     private void drawSight(Point2D.Double lightSource,ArrayList<Point2D.Double> points,ArrayList<Line2D.Double> segments){
         
-        
+        Area light1 = new Area(findIntersectionPoints(lightSource,points,segments));
         //g2d.setColor(Color.white);
         
-        //Point2D.Double center = new Point2D.Double(player.getX(),player.getY());
-        //Point2D.Double center2 = new Point2D.Double(140,140);
-        
-        //Polygon light2 = findIntersectionPoints(center2);
-
-        
-        
-        //float radius = 400;
-        //float[] dist = {0.0f, 0.4f};
-        //Color[] colors = {new Color(1.0f,1.0f,1.0f,1.0f),new Color(1.0f,1.0f,1.0f,0.0f)};
-        //Color[] colors2 = {new Color(1.0f,1.0f,1.0f,1.0f),new Color(1.0f,1.0f,1.0f,0.0f)};
-        
-        //float[] dist2 = {0.1f, 0.3f};
-        //g2d.setPaint(new RadialGradientPaint(center2,radius,dist2,colors));
-        //g2d.fillPolygon(light2);
-        
-        //g2d.setPaint(new RadialGradientPaint(center,radius,dist,colors));
-        
-        Polygon light1 = findIntersectionPoints(lightSource,points,segments);
-        //System.out.println("sight size: "+light1.npoints);
-        g2d.setColor(Color.white);
-        g2d.fillPolygon(light1);
+        float radius = 400;
+        float[] dist = {0.0f, 0.4f};
+        Color[] colors = {new Color(1.0f, 1.0f, 1.0f, 1.0f), new Color(0.0f, 0.0f, 0.0f, 1.0f)};
+        float[] dist2 = {0.1f, 0.3f};
         
         Polygon screen = new Polygon();
         
@@ -119,7 +105,7 @@ public class Renderer {
         screen.addPoint(600,400);
         screen.addPoint(600,0);
         Area mask = new Area(screen);
-        if(light1.npoints>0){
+        //if(light1.npoints>0){
             g2d.setColor(Color.BLACK);
             /*Path2D.Double sight = new Path2D.Double();
             sight.moveTo(intersectionPoints.get(0).x, intersectionPoints.get(0).y);
@@ -128,57 +114,19 @@ public class Renderer {
             }
             */
             mask.subtract(new Area(light1));
-            
-            //g2d.fill(mask);
-            
-            
-            
-            /*Polygon wholeMap = new Polygon();
-            wholeMap.addPoint(0,0);
-            wholeMap.addPoint(600,0);
-            wholeMap.addPoint(600,400);
-            wholeMap.addPoint(0,400);*/
-            //Area a = new Area(light1);
-            //Area a2 = new Area(light1);
-            //a2.intersect(new Area(new Ellipse2D.Double(center.x-150,center.y-150,300,300)));
-            //a.intersect(new Area(new Ellipse2D.Double(center2.x-120,center2.y-120,240,240)));
-            //a.add(a2);
-            
-            
-            //Graphics g = (Graphics) g2d;
-            
-            
-            //g2d.setClip(a);
-            //g2d.setClip(new Ellipse2D.Double(center.x-100,center.y-100,200,200));
-            
-            //g2d.draw(new Line2D.Double(10,10,400,10));
-            //g2d.draw(new Line2D.Double(10,10,150,150));
-            //g2d.draw(new Line2D.Double(300,300,450,150));
-            //g2d.draw(new Line2D.Double(150,150,450,150));
-            
-            //g2d.setClip(null);
             g2d.setColor(Color.black);
             g2d.fill(mask);
-            //drawMap(g2d);
-        }
-        else{
             
-            /*mask.moveTo(0,0);
-            mask.lineTo(0,600);
-            mask.lineTo(600,400);
-            mask.lineTo(600,0);
-            mask.lineTo(0,0);
-            g2d.fill(mask);
-            drawMap(g2d);*/
-        }
-        g2d.setColor(Color.red);
-        //for(Point2D.Double point : intersectionPoints){
-           
-           //g2d.draw(new Line2D.Double(player.getX(), player.getY(), point.x, point.y));
-        //}
-        //g2d.setColor(Color.black);
-        
-        
+            g2d.setColor(Color.WHITE);
+            //g2d.setPaint(new RadialGradientPaint(lightSource, radius, dist2, colors));
+            
+            Area lightRadius = new Area(new Ellipse2D.Double(lightSource.x-radius,lightSource.y-radius,2*radius,2*radius));
+            light1.intersect(lightRadius);
+            //g2d.setColor(Color.black);
+            g2d.fill(light1);
+            g2d.setPaint(null);
+            //g2d.setClip(light1);
+
     }
     
     
@@ -305,5 +253,17 @@ public class Renderer {
             //System.out.println("testing github");
         }
         else g2d.drawLine(x1, y1, x2, y2);
+    }
+    
+    public void setColor(Color c){
+        g2d.setColor(c);
+    }
+    
+    public void drawTriangle(Point2D.Double a,Point2D.Double b,Point2D.Double c){
+        Polygon p = new Polygon();
+        p.addPoint((int)a.x, (int)a.y);
+        p.addPoint((int)b.x, (int)b.y);
+        p.addPoint((int)c.x, (int)c.y);
+        g2d.fill(p);
     }
 }

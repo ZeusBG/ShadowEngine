@@ -8,6 +8,7 @@ package test;
 import engine.Core;
 import engine.Renderer;
 import gameObjects.StaticGameObject;
+import java.awt.Color;
 import java.awt.geom.Point2D;
 
 /**
@@ -34,8 +35,12 @@ public class Wall extends StaticGameObject{
 
     @Override
     public void render(Core gc, Renderer r) {
+        r.setColor(Color.WHITE);
+        for(int i=0;i<points.size()-1;i++){
+            r.drawLine((int)points.get(i).x,(int) points.get(i).y, (int)points.get(i+1).x, (int)points.get(i+1).y);
+        }
         
-        r.drawLine((int)points.get(0).x,(int) points.get(0).y, (int)points.get(1).x, (int)points.get(1).y);
+        r.setColor(null);
     }
     
     public void addPoint(Point2D.Double p){

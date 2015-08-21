@@ -9,9 +9,11 @@ import components.ObjectManager;
 import components.Physics;
 import components.SoundManager;
 import gameObjects.GameObject;
+import gameObjects.Weapon;
 import java.awt.geom.Point2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import test.AK;
 import test.Player;
 import test.Wall;
 
@@ -25,12 +27,13 @@ public class Core implements Runnable{
     private Window window;
     private Input input;
     private Physics physics;
-    private int width = 320,height = 240;
+    private int width = 640,height = 480;
     private float scale = 2.0f;
     private String title = "My engine v1.0";
     private ObjectManager objManager;
     private Renderer renderer;
     private SoundManager soundManager;
+    private long timeStarted;
     
     private double frameCap = 1.0/60.0;
     private boolean isRunning = false;
@@ -55,6 +58,7 @@ public class Core implements Runnable{
         if(isRunning)
             return;
         
+        timeStarted = System.currentTimeMillis();
         test();
         thread.run();
     }
@@ -65,6 +69,11 @@ public class Core implements Runnable{
         player.setNextPosition(new Point2D.Double(50,50));
         addObject(player);
         
+        Weapon wep = new AK(0,0,null);
+        addObject(wep);
+        player.addWeapon(wep);
+        
+        
         Wall w = new Wall(0,0);
         w.addPoint(new Point2D.Double(60,30));
         w.addPoint(new Point2D.Double(100,160));
@@ -74,9 +83,9 @@ public class Core implements Runnable{
         addObject(w);
         w = new Wall(0,0);
         w.addPoint(new Point2D.Double(0,0));
-        w.addPoint(new Point2D.Double(300,0));
-        w.addPoint(new Point2D.Double(300,300));
-        w.addPoint(new Point2D.Double(0,300)); 
+        w.addPoint(new Point2D.Double(width+100,0));
+        w.addPoint(new Point2D.Double(width+100,height+100));
+        w.addPoint(new Point2D.Double(0,height+100)); 
         w.addPoint(new Point2D.Double(0,0));
         addObject(w);
     }
@@ -92,6 +101,8 @@ public class Core implements Runnable{
     {
         isRunning = true;
         
+        double FPSCounter;
+        
         double firstTime = 0;
         double lastTime = System.nanoTime()/1000000000.0;
         double passedTime = 0;
@@ -100,6 +111,7 @@ public class Core implements Runnable{
        
         while(isRunning)
         {
+            FPSCounter = System.currentTimeMillis();
             //System.out.println("asdasd");
             boolean render = false;
            
@@ -115,7 +127,7 @@ public class Core implements Runnable{
                 
                 //game.update(this,(float) frameCap);
                 game.update(this, (float)frameCap);
-                physics.update((float)1.0);
+                physics.update((float)frameCap);
                 
                 
                 unprocessedTime-=frameCap;
@@ -141,6 +153,8 @@ public class Core implements Runnable{
                     Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            //System.out.println("Time for a frame : " + (System.currentTimeMillis()-FPSCounter));
+            
             
         }
         cleanUp();
@@ -200,6 +214,7 @@ public class Core implements Runnable{
     }
     
     public void addObject(GameObject obj){
+        System.out.println("adding "+obj.getType());
         objManager.addObject(obj);
     }
     

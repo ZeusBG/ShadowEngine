@@ -19,6 +19,8 @@ import utils.ObjectType;
 
 public abstract class StaticGameObject extends GameObject{
     
+    protected boolean visible;
+    protected boolean collidable;
     
     protected ArrayList<Point2D.Double> points;
     

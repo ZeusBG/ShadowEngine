@@ -63,16 +63,21 @@ public class Vector {
         return this;
     }
 
+    public Vector getPerpendicular(){
+        return new Vector(y,-x);
+    }
+    
+    public Vector getPerpendicular2(){
+        return new Vector(-y,x);
+    }
+    
     public Vector getPerpendicularCloserTo(Point2D.Double p,Point2D.Double startPoint) {
 
         Point2D.Double tmp = new Point2D.Double(startPoint.x + y, startPoint.y - x);
         Point2D.Double tmp2 = new Point2D.Double(startPoint.x - y, startPoint.y + x);
-        System.out.printf("%s\n%s vs %s\n",p,tmp,tmp2);
         if (GeometryUtil.getDistance(p, tmp) < GeometryUtil.getDistance(p, tmp2)) {
-            System.out.println("if");
             return new Vector(y, -x);
         } else {
-            System.out.printf("%.8f vs %.8f\n",GeometryUtil.getDistance(p, tmp),GeometryUtil.getDistance(p, tmp2));
             return new Vector(-y, x);
         }
     }

@@ -52,6 +52,10 @@ public class ObjectManager {
     public ArrayList<DynamicGameObject> getBodies() {
         return bodies;
     }
+
+    public ArrayList<Projectile> getProjectiles() {
+        return projectiles;
+    }
     
     public LivingObject getPlayer(){
         return player;
@@ -84,12 +88,11 @@ public class ObjectManager {
         if(obj.getType()==ObjectType.PLAYER)
             player = (LivingObject) obj;
         else if(obj.getType()==ObjectType.PROJECTILE)
-            dynamicObjects.add((Projectile)obj);
+            projectiles.add((Projectile)obj);
         else if(obj.getType()==ObjectType.NPC)
             dynamicObjects.add((LivingObject)obj);
-        else if(obj.getType()==ObjectType.ITEM);
-            //dynamicObjects.add((DynamicGameObject)obj);
-            //location unknown ?
+        else if(obj.getType()==ObjectType.ITEM)
+            dynamicObjects.add((DynamicGameObject)obj);
         else if(obj.getType()==ObjectType.ENVIRONMENT)
             addStaticObject(obj);
     }
