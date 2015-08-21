@@ -47,11 +47,7 @@ public class Player extends LivingObject{
         orientation.normalize();
         
         if(core.getInput().isMouseButtonPressed(MouseEvent.BUTTON1)){
-            Projectile p = weapon.fire();
-            if(p!=null){
-                core.addObject(p);
-                core.getSoundManager().play(Sounds.AK47_SHOT);
-            }
+            weapon.fire(core);
         }
         
         if(core.getInput().isKeyPressed(KeyEvent.VK_W)){
