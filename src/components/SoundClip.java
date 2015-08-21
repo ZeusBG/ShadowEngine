@@ -23,6 +23,7 @@ public class SoundClip {
 
     private Clip clip;
     private FloatControl gainControl;
+    private float volume;
 
     public SoundClip(String path) {
         try {
@@ -40,6 +41,7 @@ public class SoundClip {
             clip = AudioSystem.getClip();
             clip.open(dais);
             gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
+            volume = Math.abs(gainControl.getMinimum()) + Math.abs(gainControl.getMaximum());
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.out.println("Failed at SoundClip open.");
         }
@@ -49,7 +51,7 @@ public class SoundClip {
         if (clip == null) {
             return;
         }
-        stop();
+        //stop();
         clip.setFramePosition(0);
         while (!clip.isRunning()) {
             clip.start();
@@ -80,8 +82,13 @@ public class SoundClip {
     }
 
     public void setVolume(float value) {
-        if (value >= gainControl.getMinimum() && value <= gainControl.getMaximum()) {
-            gainControl.setValue(value);
+        if (value < 0 || value > 1) {
+            return;
+        }
+        float newVolume = gainControl.getMinimum() + volume * value;
+        if (newVolume >= gainControl.getMinimum() && newVolume <= gainControl.getMaximum()) {
+            gainControl.setValue(newVolume);
+            System.out.println(newVolume);
         }
     }
 

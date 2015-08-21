@@ -11,5 +11,6 @@ package utils;
  */
 public enum Sounds {
     MOVEMENT_PLAYER,
-    MOVEMENT_OTHER;
+    MOVEMENT_OTHER,
+    AK47_SHOT;
 }

@@ -50,6 +50,7 @@ public class Player extends LivingObject{
             Projectile p = weapon.fire();
             if(p!=null){
                 core.addObject(p);
+                core.getSoundManager().play(Sounds.AK47_SHOT);
             }
         }
         
@@ -73,11 +74,11 @@ public class Player extends LivingObject{
         
         
         if(core.getInput().isKeyPressed(KeyEvent.VK_O)){
-            core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.5f);
+            core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.8f);
         }
         
         if(core.getInput().isKeyPressed(KeyEvent.VK_P)){
-            core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, -0.5f);
+            core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 1.0f);
         }
         
         if(core.getInput().isKeyReleased(KeyEvent.VK_A) &&
