@@ -3,25 +3,29 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Renderer.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/test/Game.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Window.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Core.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Input.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/components/SoundClip.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/test/Wall.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/test/Bullet.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/utils/GeometryUtil.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Renderer.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/Weapon.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/DynamicGameObject.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/components/Component.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/AbstractGame.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/test/Player.java</file>
-            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Core.java</file>
-            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Window.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/test/AK.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/components/SoundManager.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/components/Physics.java</file>
-            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/engine/Input.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/LivingObject.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/GameObject.java</file>
-            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/test/Wall.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/math/Vector.java</file>
+            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/components/ObjectManager.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/NPC.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/StaticGameObject.java</file>
-            <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/utils/GeometryUtil.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/PlayerObject.java</file>
             <file>file:/C:/Users/Zeus/Desktop/ShadowEngine/ShadowEngine/src/gameObjects/Projectile.java</file>
         </group>
