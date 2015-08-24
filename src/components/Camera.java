@@ -27,7 +27,7 @@ public class Camera {
         height=0;
         cameraCenter = new Point2D.Double(0,0);
         isTargetMoving = false;
-        cameraSpeed = 20;
+        cameraSpeed = 10;
     }
     
     public Camera(int x, int y, int width, int height) {
@@ -36,7 +36,7 @@ public class Camera {
         this.width = width;
         this.height = height;
         isTargetMoving = false;
-        cameraSpeed = 20;
+        cameraSpeed = 10;
     }
 
     public void addOffSetX(int offSet){
@@ -55,10 +55,10 @@ public class Camera {
         double targetX = target.getCurrentPosition().x;
         double targetY = target.getCurrentPosition().y;
        
-        cameraCenter.x += (targetX - cameraCenter.x)/cameraSpeed;
-        cameraCenter.y += (targetY - cameraCenter.y)/cameraSpeed;
-        position.x -= (targetX - cameraCenter.x)/cameraSpeed;
-        position.y -= (targetY - cameraCenter.y)/cameraSpeed;
+        cameraCenter.x += (targetX - cameraCenter.x)*cameraSpeed/100.0;
+        cameraCenter.y += (targetY - cameraCenter.y)*cameraSpeed/100.0;
+        position.x -= (targetX - cameraCenter.x)*cameraSpeed/100.0;
+        position.y -= (targetY - cameraCenter.y)*cameraSpeed/100.0;
     }
 
     public DynamicGameObject getTarget() {
@@ -107,7 +107,8 @@ public class Camera {
     }
 
     public void setCameraSpeed(double cameraSpeed) {
-        this.cameraSpeed = cameraSpeed;
+        if(cameraSpeed<=100 && cameraSpeed>=0)
+            this.cameraSpeed = cameraSpeed;
     }
     
    
