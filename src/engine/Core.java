@@ -9,13 +9,8 @@ import components.ObjectManager;
 import components.Physics;
 import components.SoundManager;
 import gameObjects.GameObject;
-import gameObjects.Weapon;
-import java.awt.geom.Point2D;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import test.AK;
-import test.Player;
-import test.Wall;
 
 /**
  *
@@ -27,13 +22,16 @@ public class Core implements Runnable{
     private Window window;
     private Input input;
     private Physics physics;
-    private int width = 640,height = 480;
-    private float scale = 2.0f;
+    private int width = 800,height = 600;
+    private float widthScale = 1.0f;
+    private float heightScale = 1.0f;
     private String title = "My engine v1.0";
     private ObjectManager objManager;
     private Renderer renderer;
     private SoundManager soundManager;
     private long timeStarted;
+    private final int defaultWidthForScale = 800;
+    private final int defaultHeightForScale = 600;
     
     private double frameCap = 1.0/60.0;
     private boolean isRunning = false;
@@ -52,6 +50,8 @@ public class Core implements Runnable{
         objManager = new ObjectManager();
         renderer = new Renderer(this);
         soundManager = new SoundManager();
+        widthScale=width/defaultWidthForScale;
+        heightScale = height/defaultHeightForScale;
     }
     
     public void start(){
@@ -143,17 +143,18 @@ public class Core implements Runnable{
         window.cleanUp();
     }
     
-     public void setWidth(int width) {
+    public void setSize(int width, int height){
+        widthScale = width/defaultWidthForScale;
+        heightScale = height/defaultHeightForScale;
+        //window.setSize(width, height);
+        
         this.width = width;
-    }
-
-    public void setHeight(int height) {
         this.height = height;
+        //window = new Window(this);
+        //input = new Input(this);
+        //renderer = new Renderer(this);
     }
 
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
 
     public void setTitle(String title) {
         this.title = title;
@@ -167,9 +168,14 @@ public class Core implements Runnable{
         return height;
     }
 
-    public float getScale() {
-        return scale;
+    public float getWidthScale() {
+        return widthScale;
     }
+
+    public float getHeightScale() {
+        return heightScale;
+    }
+
 
     public String getTitle() {
         return title;

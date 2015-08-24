@@ -23,6 +23,7 @@ public class Game extends AbstractGame{
         Game game = new Game();
         Core core = new Core(game);
         core.init();
+        //core.setSize(1920, 1080);
         game.test(core);
         core.start();
     }
@@ -51,6 +52,22 @@ public class Game extends AbstractGame{
         w.addPoint(new Point2D.Double(core.getWidth(),core.getHeight()));
         w.addPoint(new Point2D.Double(0,core.getHeight())); 
         w.addPoint(new Point2D.Double(0,0));
+        core.addObject(w);
+        
+        w = new Wall(0,0);
+        w.addPoint(new Point2D.Double(300,300));
+        w.addPoint(new Point2D.Double(400,300));
+        w.addPoint(new Point2D.Double(400,400));
+        w.addPoint(new Point2D.Double(300,400));
+        w.addPoint(new Point2D.Double(300,300));
+        core.addObject(w);
+        
+        w = new Wall(0,0);
+        w.addPoint(new Point2D.Double(500, 100));
+        w.addPoint(new Point2D.Double(600,100));
+        w.addPoint(new Point2D.Double(600,200));
+        w.addPoint(new Point2D.Double(500,200));
+        w.addPoint(new Point2D.Double(500,100));
         core.addObject(w);
     }
     

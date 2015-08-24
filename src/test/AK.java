@@ -54,7 +54,7 @@ public class AK extends Weapon {
 
     @Override
     public void render(Core gc, Renderer r) {
-        
+        //orientation.normalize();
         Point2D.Double p1 = new Point2D.Double(currentPosition.x + 10 * orientation.x,
                 currentPosition.y + 10 * orientation.y);
         Point2D.Double p2 = new Point2D.Double(currentPosition.x - 5 * orientation.y,

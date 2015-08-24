@@ -8,7 +8,6 @@ package test;
 import engine.Core;
 import engine.Renderer;
 import gameObjects.LivingObject;
-import gameObjects.Projectile;
 import gameObjects.Weapon;
 import java.awt.Color;
 import java.awt.Point;
@@ -95,7 +94,7 @@ public class Player extends LivingObject{
     }
     
     @Override
-    public void render(Core gc, Renderer r) {
+    public void render(Core core, Renderer r) {
         r.setColor(Color.black);
         r.drawCircle((int)currentPosition.x,(int)currentPosition.y,20);
         r.setColor(Color.red);

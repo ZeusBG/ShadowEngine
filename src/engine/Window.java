@@ -6,12 +6,10 @@
 package engine;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -46,10 +44,12 @@ public class Window {
         frame.add(gameArea,BorderLayout.CENTER);
         frame.pack();
         frame.setLocationRelativeTo(null);
-        frame.setResizable(false);
+        frame.setResizable(true);
         frame.setVisible(true);
         frame.createBufferStrategy(2);
         g = gameArea.getGraphics();
+        gameArea.setIgnoreRepaint(false);
+        frame.setIgnoreRepaint(false);
     }
     public void update()
     {
@@ -76,5 +76,11 @@ public class Window {
         return frame.getBufferStrategy();
     }
     
+    public void setSize(int width, int height){
+        //frame.setSize(width, height);
+        gameArea.setSize(width, height);
+        Dimension s = new Dimension(width,height);
+        gameArea.setPreferredSize(s);
+    }
     
 }
