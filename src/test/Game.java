@@ -30,8 +30,8 @@ public class Game extends AbstractGame{
 
     private void test(Core core){
         Player player = new Player();
-        player.setCurrentPosition(new Point2D.Double(50,50));
-        player.setNextPosition(new Point2D.Double(50,50));
+        player.setCurrentPosition(new Point2D.Double(200,200));
+        player.setNextPosition(new Point2D.Double(200,200));
         core.addObject(player);
         
         Weapon wep = new AK(0,0,null);
@@ -69,6 +69,8 @@ public class Game extends AbstractGame{
         w.addPoint(new Point2D.Double(500,200));
         w.addPoint(new Point2D.Double(500,100));
         core.addObject(w);
+        
+        core.getObjectManager().getCamera().setTarget(player);
     }
     
     @Override

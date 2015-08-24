@@ -28,7 +28,7 @@ public class Window {
     public Window(Core core)
     {
         
-        Dimension s = new Dimension((int)(core.getWidth()),(int)(core.getHeight()));
+        Dimension s = new Dimension((int)(core.getObjectManager().getCamera().getWidth()),(int)(core.getObjectManager().getCamera().getHeight()));
         gameArea = new JPanel();
         gameArea.setPreferredSize(s);
         gameArea.setMaximumSize(s);

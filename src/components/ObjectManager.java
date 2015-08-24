@@ -29,6 +29,7 @@ public class ObjectManager {
     private ArrayList<Projectile> projectiles;
     private ArrayList<Line2D.Double> lines;
     private ArrayList<Point2D.Double> staticObjPoints;
+    private Camera camera;
     
     public ObjectManager(){
         
@@ -38,6 +39,7 @@ public class ObjectManager {
         projectiles = new ArrayList<>();
         lines = new ArrayList<>();
         staticObjPoints = new ArrayList<>();
+        camera = new Camera(0,0,600,500);
     }
     
     public ArrayList<StaticGameObject> getStaticObjects() {
@@ -95,6 +97,18 @@ public class ObjectManager {
             dynamicObjects.add((DynamicGameObject)obj);
         else if(obj.getType()==ObjectType.ENVIRONMENT)
             addStaticObject(obj);
+    }
+
+    public Camera getCamera() {
+        return camera;
+    }
+    
+    public void update(){
+        camera.update();
+    }
+
+    public void setCamera(Camera camera) {
+        this.camera = camera;
     }
     
     

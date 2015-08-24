@@ -89,13 +89,13 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener{
     @Override
     public void mouseDragged(MouseEvent e) {
         mouseX = e.getX();
-        mouseY = e.getY()+22;
+        mouseY = e.getY()+25;
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
         mouseX = e.getX();
-        mouseY = e.getY()+22;
+        mouseY = e.getY()+25;
     }
     
     public boolean isKeyJustPressed(int code){
@@ -124,11 +124,11 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener{
     }
     
     public int getMouseX(){
-        return (int)(mouseX/core.getWidthScale());
+        return (int)(mouseX/core.getWidthScale() - core.getObjectManager().getCamera().getX());
     }
     
     public int getMouseY(){
-        return (int)(mouseY/core.getHeightScale());
+        return (int)(mouseY/core.getHeightScale() - core.getObjectManager().getCamera().getY());
     }
     
     

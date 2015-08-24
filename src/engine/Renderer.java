@@ -31,7 +31,10 @@ public class Renderer {
     //private Graphics2D g2d;
     private Graphics2D g2d;
     private BufferStrategy bs;
-    
+    private double cameraOffSetX;
+    private double cameraOffSetY;
+    private double scaleX;
+    private double scaleY;
     
     public Renderer(Core core){
         this.core = core;
@@ -46,6 +49,14 @@ public class Renderer {
         
         //setvam clip
         //render objects
+        
+        cameraOffSetX = core.getObjectManager().getCamera().getX();
+        cameraOffSetY = core.getObjectManager().getCamera().getY();
+        //cameraOffSetX = 0;
+        //cameraOffSetX = 0;
+        
+        scaleX = core.getWidthScale();
+        scaleY = core.getHeightScale();
         
         clear();
         castShadows(objectsToRender.getPlayer().getCurrentPosition());
@@ -71,7 +82,7 @@ public class Renderer {
     }
     
     public void drawCircle(int x, int y,int r){
-        g2d.draw(new Ellipse2D.Double(core.getWidthScale()*(x-r),core.getHeightScale()*(y-r),core.getWidthScale()*(r*2),core.getHeightScale()*(r*2)));
+        g2d.draw(new Ellipse2D.Double(scaleX*x-r + cameraOffSetX,scaleY*y-r + cameraOffSetY,scaleX*r*2,scaleY*r*2));
     }
     
     public void clear(){
@@ -118,7 +129,7 @@ public class Renderer {
             g2d.setColor(Color.WHITE);
             //g2d.setPaint(new RadialGradientPaint(lightSource, radius, dist2, colors));
             
-            Area lightRadius = new Area(new Ellipse2D.Double(core.getWidthScale()*(lightSource.x-radius),core.getHeightScale()*(lightSource.y-radius),core.getWidthScale()*2*radius,core.getHeightScale()*2*radius));
+            Area lightRadius = new Area(new Ellipse2D.Double(scaleX*(lightSource.x-radius) + cameraOffSetX,scaleY*(lightSource.y-radius) + cameraOffSetY,scaleX*2*radius + cameraOffSetX,scaleY*2*radius + cameraOffSetY));
             light1.intersect(lightRadius);
             //g2d.setColor(Color.black);
             g2d.fill(light1);
@@ -204,7 +215,7 @@ public class Renderer {
         Polygon light = new Polygon();
         //System.out.println("intersectionPoints size: "+intersectionPoints.size());
         for(int i=0;i<intersectionPoints.size();i++){
-            light.addPoint((int)(core.getWidthScale()*intersectionPoints.get(i).x),(int)(core.getHeightScale()*intersectionPoints.get(i).y));
+            light.addPoint((int)(scaleX*intersectionPoints.get(i).x + cameraOffSetX),(int)(scaleY*intersectionPoints.get(i).y + cameraOffSetY));
             
         }
         return light;
@@ -228,7 +239,7 @@ public class Renderer {
     
     public void drawLine(int x1,int y1,int x2, int y2){
         
-        g2d.drawLine((int)(core.getWidthScale()*x1), (int)(core.getHeightScale()*y1), (int)(core.getWidthScale()*x2), (int)(core.getHeightScale()*y2));
+        g2d.drawLine((int)(scaleX*x1 + cameraOffSetX), (int)(scaleY*y1 + cameraOffSetY), (int)(scaleX*x2 + cameraOffSetX), (int)(scaleY*y2 + cameraOffSetY));
         
     }
     
@@ -259,9 +270,9 @@ public class Renderer {
     
     public void drawTriangle(Point2D.Double a,Point2D.Double b,Point2D.Double c){
         Polygon p = new Polygon();
-        p.addPoint((int)(core.getWidthScale()*a.x), (int)(core.getWidthScale()*a.y));
-        p.addPoint((int)(core.getWidthScale()*b.x), (int)(core.getWidthScale()*b.y));
-        p.addPoint((int)(core.getWidthScale()*c.x), (int)(core.getWidthScale()*c.y));
+        p.addPoint((int)(scaleX*a.x + cameraOffSetX), (int)(scaleY*a.y + cameraOffSetY));
+        p.addPoint((int)(scaleX*b.x + cameraOffSetX), (int)(scaleY*b.y + cameraOffSetY));
+        p.addPoint((int)(scaleX*c.x + cameraOffSetX), (int)(scaleY*c.y + cameraOffSetY));
         g2d.fill(p);
     }
 }

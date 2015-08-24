@@ -7,6 +7,7 @@ package components;
 
 import engine.Core;
 import gameObjects.DynamicGameObject;
+import gameObjects.LivingObject;
 import gameObjects.Projectile;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
@@ -53,7 +54,10 @@ public class Physics {
     }
     
     public void collisionObjects(){
-        checkWallCollision(core.getObjectManager().getPlayer());
+        DynamicGameObject p = core.getObjectManager().getPlayer();
+        checkWallCollision(p);
+        p.moveToNextPoint();
+       
 
     }
     
@@ -78,15 +82,15 @@ public class Physics {
                     
                     v.normalize();
                     Vector normal = v.getPerpendicularCloserTo(OM.getPlayer().getCurrentPosition(),nextPoint);
-                    nextPoint.x += normal.x;
-                    nextPoint.y += normal.y;
+                    nextPoint.x += 2*normal.x;
+                    nextPoint.y += 2*normal.y;
                     
                     obj.setNextPosition(nextPoint);
-                    obj.moveToNextPoint();
+                    
                     return;
                 }
             }
-            obj.moveToNextPoint();
+            
         }
     }
     

@@ -43,12 +43,17 @@ public class Core implements Runnable{
 
    
     public void init(){
-        window = new Window(this);
+        
         thread = new Thread(this);
-        input = new Input(this);
-        physics = new Physics(this);
+        
+        
         objManager = new ObjectManager();
+        
+        
+        window = new Window(this);
+        input = new Input(this);
         renderer = new Renderer(this);
+        physics = new Physics(this);
         soundManager = new SoundManager();
         widthScale=width/defaultWidthForScale;
         heightScale = height/defaultHeightForScale;
@@ -102,7 +107,7 @@ public class Core implements Runnable{
                 //game.update(this,(float) frameCap);
                 game.update(this, (float)frameCap);
                 physics.update((float)frameCap);
-                
+                objManager.update();
                 
                 unprocessedTime-=frameCap;
                 render = true;
