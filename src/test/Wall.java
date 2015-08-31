@@ -43,8 +43,4 @@ public class Wall extends StaticGameObject{
         r.setColor(null);
     }
     
-    public void addPoint(Point2D.Double p){
-        points.add(new Point2D.Double(p.x,p.y));
-    }
-    
 }

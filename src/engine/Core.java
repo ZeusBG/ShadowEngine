@@ -47,7 +47,7 @@ public class Core implements Runnable{
         thread = new Thread(this);
         
         
-        objManager = new ObjectManager();
+        objManager = new ObjectManager(this);
         
         
         window = new Window(this);

@@ -25,6 +25,7 @@ public class Game extends AbstractGame{
         core.init();
         //core.setSize(1920, 1080);
         game.test(core);
+        core.getObjectManager().getRayCollisionTree().printTree();
         core.start();
     }
 
@@ -48,9 +49,9 @@ public class Game extends AbstractGame{
         core.addObject(w);
         w = new Wall(0,0);
         w.addPoint(new Point2D.Double(0,0));
-        w.addPoint(new Point2D.Double(core.getWidth(),0));
-        w.addPoint(new Point2D.Double(core.getWidth(),core.getHeight()));
-        w.addPoint(new Point2D.Double(0,core.getHeight())); 
+        w.addPoint(new Point2D.Double(800,0));
+        w.addPoint(new Point2D.Double(800,600));
+        w.addPoint(new Point2D.Double(0,600)); 
         w.addPoint(new Point2D.Double(0,0));
         core.addObject(w);
         
@@ -68,6 +69,30 @@ public class Game extends AbstractGame{
         w.addPoint(new Point2D.Double(600,200));
         w.addPoint(new Point2D.Double(500,200));
         w.addPoint(new Point2D.Double(500,100));
+        core.addObject(w);
+        
+        w = new Wall(0,0);
+        w.addPoint(new Point2D.Double(10, 10));
+        w.addPoint(new Point2D.Double(40,10));
+        w.addPoint(new Point2D.Double(40,40));
+        w.addPoint(new Point2D.Double(10,40));
+        w.addPoint(new Point2D.Double(10,10));
+        
+        core.addObject(w);
+        w = new Wall(0,0);
+        w.addPoint(new Point2D.Double(110, 110));
+        w.addPoint(new Point2D.Double(140,110));
+        w.addPoint(new Point2D.Double(140,140));
+        w.addPoint(new Point2D.Double(110,140));
+        w.addPoint(new Point2D.Double(110,110));
+        core.addObject(w);
+        
+        w = new Wall(0,0);
+        w.addPoint(new Point2D.Double(210, 110));
+        w.addPoint(new Point2D.Double(240,110));
+        w.addPoint(new Point2D.Double(240,140));
+        w.addPoint(new Point2D.Double(210,140));
+        w.addPoint(new Point2D.Double(210,110));
         core.addObject(w);
         
         core.getObjectManager().getCamera().setTarget(player);

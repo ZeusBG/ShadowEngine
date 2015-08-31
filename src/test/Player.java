@@ -46,7 +46,11 @@ public class Player extends LivingObject{
         orientation.normalize();
         
         if(core.getInput().isMouseButtonPressed(MouseEvent.BUTTON1)){
-            weapon.fire(core);
+            weapon.fire();
+        }
+        
+       if(core.getInput().isKeyPressed(KeyEvent.VK_R)){
+           weapon.reload();
         }
         
         if(core.getInput().isKeyPressed(KeyEvent.VK_W)){
@@ -98,7 +102,7 @@ public class Player extends LivingObject{
         r.setColor(Color.black);
         r.drawCircle((int)currentPosition.x,(int)currentPosition.y,20);
         r.setColor(Color.red);
-        r.requestLine((int)currentPosition.x, (int)currentPosition.y,crosshair.x, crosshair.y);
+        r.drawRay((int)currentPosition.x, (int)currentPosition.y,crosshair.x, crosshair.y);
         //r.drawLine(x, y,crosshair.x, crosshair.y);
     }
     

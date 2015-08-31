@@ -5,6 +5,7 @@
  */
 package components;
 
+import engine.Core;
 import gameObjects.DynamicGameObject;
 import gameObjects.GameObject;
 import gameObjects.LivingObject;
@@ -22,6 +23,7 @@ import utils.ObjectType;
 public class ObjectManager {
     
     /*other managares here later */
+    private Core core;
     private LivingObject player;
     private ArrayList<StaticGameObject> staticObjects;
     private ArrayList<DynamicGameObject> dynamicObjects;
@@ -29,17 +31,24 @@ public class ObjectManager {
     private ArrayList<Projectile> projectiles;
     private ArrayList<Line2D.Double> lines;
     private ArrayList<Point2D.Double> staticObjPoints;
+    private QuadTree collisionTree;
+    private QuadTree rayCollisionTree;
+    
     private Camera camera;
     
-    public ObjectManager(){
-        
+    public ObjectManager(Core core){
+        this.core = core;
         staticObjects = new ArrayList<>();
         dynamicObjects = new ArrayList<>();
         bodies = new ArrayList<>();
         projectiles = new ArrayList<>();
         lines = new ArrayList<>();
         staticObjPoints = new ArrayList<>();
+        collisionTree = new QuadTree<GameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
+        rayCollisionTree = new QuadTree<StaticGameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
+        
         camera = new Camera(0,0,600,500);
+
     }
     
     public ArrayList<StaticGameObject> getStaticObjects() {
@@ -64,7 +73,9 @@ public class ObjectManager {
     }
     
     public void addStaticObject(GameObject obj){
+        
         System.out.println("adding static object");
+        
         staticObjects.add((StaticGameObject)obj);
         StaticGameObject tmp = (StaticGameObject) obj;
         Line2D.Double tmpLine = null;
@@ -74,7 +85,8 @@ public class ObjectManager {
             staticObjPoints.add(tmp.getPoints().get(i));
         }
         staticObjPoints.add(tmp.getPoints().get(tmp.getPoints().size()-1));
-        System.out.println(staticObjPoints.size());
+        
+        rayCollisionTree.insert(obj);
     }
     
     public ArrayList<Point2D.Double> getPoints(){
@@ -86,6 +98,8 @@ public class ObjectManager {
     }
     
     public void addObject(GameObject obj){
+        System.out.println("OBJECT ID: "+obj.getID());
+        obj.setCore(core);
         //System.out.println("asdad");
         if(obj.getType()==ObjectType.PLAYER)
             player = (LivingObject) obj;
@@ -110,6 +124,12 @@ public class ObjectManager {
     public void setCamera(Camera camera) {
         this.camera = camera;
     }
+
+    public QuadTree getRayCollisionTree() {
+        return rayCollisionTree;
+    }
+    
+    
     
     
     

@@ -7,7 +7,6 @@ package components;
 
 import gameObjects.DynamicGameObject;
 import java.awt.geom.Point2D;
-import utils.GeometryUtil;
 
 /**
  *
@@ -17,7 +16,6 @@ public class Camera {
     private DynamicGameObject target;
     private Point2D.Double position;
     private Point2D.Double cameraCenter;
-    private boolean isTargetMoving;
     private double cameraSpeed;
     private int width,height;
 
@@ -26,7 +24,6 @@ public class Camera {
         width=0;
         height=0;
         cameraCenter = new Point2D.Double(0,0);
-        isTargetMoving = false;
         cameraSpeed = 10;
     }
     
@@ -35,7 +32,6 @@ public class Camera {
         cameraCenter = new Point2D.Double(x+width/2,y+height/2);
         this.width = width;
         this.height = height;
-        isTargetMoving = false;
         cameraSpeed = 10;
     }
 
@@ -110,8 +106,4 @@ public class Camera {
         if(cameraSpeed<=100 && cameraSpeed>=0)
             this.cameraSpeed = cameraSpeed;
     }
-    
-   
-    
-    
 }

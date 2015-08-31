@@ -103,7 +103,7 @@ public abstract class Weapon extends DynamicGameObject{
         
     }
     
-    public void fire(Core core) {
+    public void fire() {
         
         if(canFire()){
             
@@ -118,7 +118,7 @@ public abstract class Weapon extends DynamicGameObject{
                 ammonition.remove(ammonition.size()-1);
                 timeLastFired = System.currentTimeMillis();
                 
-                core.getSoundManager().play(Sounds.AK47_SHOT);
+                //core.getSoundManager().play(Sounds.AK47_SHOT);
  
             }
             else{
@@ -139,7 +139,7 @@ public abstract class Weapon extends DynamicGameObject{
         int bullets;
         if(currentAmmo<30){
             bullets=currentAmmo;
-            currentAmmo=0;
+            currentAmmo = 0;
         }
         else{ 
             bullets=30;
@@ -147,6 +147,7 @@ public abstract class Weapon extends DynamicGameObject{
         }
         for(int i=0;i<bullets;i++){
             ammonition.add(new Bullet(0,0));
+            
         }
     }
 }

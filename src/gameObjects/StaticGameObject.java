@@ -5,7 +5,6 @@
  */
 package gameObjects;
 
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import utils.ObjectType;
@@ -22,17 +21,16 @@ public abstract class StaticGameObject extends GameObject{
     protected boolean visible;
     protected boolean collidable;
     
-    protected ArrayList<Point2D.Double> points;
     
     
     public StaticGameObject(int x, int y) {
         super(x, y, ObjectType.ENVIRONMENT);
-        points = new ArrayList<>();
+        
     }
+    
+    
 
-    public ArrayList<Point2D.Double> getPoints(){
-        return points;
-    }
+    
     
     
     
