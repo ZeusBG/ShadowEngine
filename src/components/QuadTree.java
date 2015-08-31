@@ -28,6 +28,7 @@ public class QuadTree<T extends GameObject> {
     int capacity;
     Node root;
     private HashMap<GameObject, Point2D.Double> cachedObjects;
+    private int numberOfObjectsChecked;
     
     private class Node<T extends GameObject> {
 
@@ -76,8 +77,8 @@ public class QuadTree<T extends GameObject> {
             children = new Node[4];
             double minX = aabb.getMinX();
             double minY = aabb.getMinY();
-            double halfWidth = minX + (aabb.getMaxX() - minX) / 2;
-            double halfHeight = minY + (aabb.getMaxY() - minY) / 2;
+            double halfWidth = (aabb.getMaxX() - minX) / 2;
+            double halfHeight = (aabb.getMaxY() - minY) / 2;
 
             children[0] = new Node(new AABB(minX, minY, minX + halfWidth, minY + halfHeight), height + 1);
             children[1] = new Node(new AABB(minX + halfWidth, minY, minX + 2 * halfWidth, minY + halfHeight), height + 1);
@@ -175,6 +176,7 @@ public class QuadTree<T extends GameObject> {
                     }
 
                 } else if (r.intersect(obj.getAabb())) {
+                    numberOfObjectsChecked++;
                     for (Line2D.Double line : obj.getLines()) {
                         Point2D.Double tmpPoint = GeometryUtil.getIntersectionRayLine(r, line);
                         if(tmpPoint!=null && !aabb.contains(tmpPoint)){
@@ -236,7 +238,10 @@ public class QuadTree<T extends GameObject> {
 
     public Point2D.Double intersect(Ray r) {
         cachedObjects = new HashMap<>();
-        return root.intersect(r);
+        numberOfObjectsChecked = 0;
+        Point2D.Double result = root.intersect(r);
+        //System.out.println("NumberOfObjectsChecked: "+numberOfObjectsChecked);
+        return result;
     }
 
     public void insert(T object) {
