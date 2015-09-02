@@ -6,7 +6,7 @@
 package test;
 
 import engine.Core;
-import engine.Renderer;
+import render.Renderer;
 import gameObjects.LivingObject;
 import gameObjects.Weapon;
 import java.awt.Color;

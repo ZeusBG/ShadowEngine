@@ -6,9 +6,10 @@
 package test;
 
 import engine.Core;
-import engine.Renderer;
+import render.Renderer;
 import gameObjects.Projectile;
 import java.awt.Color;
+import render.Light;
 
 /**
  *
@@ -18,13 +19,14 @@ public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
+        speed =1200;
+        light = new Light(this);
     }
 
     @Override
     public void update(Core gc, float dt) {
-
-        nextPosition.x = currentPosition.x + 800 * dt * direction.x;
-        nextPosition.y = currentPosition.y + 800 * dt * direction.y;
+        nextPosition.x = currentPosition.x + speed * dt * direction.x;
+        nextPosition.y = currentPosition.y + speed * dt * direction.y;
     }
 
     @Override

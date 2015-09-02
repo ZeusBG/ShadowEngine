@@ -88,14 +88,14 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener{
 
     @Override
     public void mouseDragged(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
+        mouseX = e.getX()+8;
+        mouseY = e.getY()-25;
     }
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX();
-        mouseY = e.getY();
+        mouseX = e.getX()+8;
+        mouseY = e.getY()-25;
     }
     
     public boolean isKeyJustPressed(int code){

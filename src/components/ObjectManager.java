@@ -25,6 +25,7 @@ public class ObjectManager {
     /*other managares here later */
     private Core core;
     private LivingObject player;
+    private ArrayList<GameObject> allObjects;
     private ArrayList<StaticGameObject> staticObjects;
     private ArrayList<DynamicGameObject> dynamicObjects;
     private ArrayList<DynamicGameObject> bodies;
@@ -46,7 +47,7 @@ public class ObjectManager {
         staticObjPoints = new ArrayList<>();
         collisionTree = new QuadTree<GameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
         rayCollisionTree = new QuadTree<StaticGameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
-        
+        allObjects = new ArrayList<>();
         camera = new Camera(0,0,600,500);
         camera.setCore(core);
     }
@@ -99,6 +100,7 @@ public class ObjectManager {
     
     public void addObject(GameObject obj){
         System.out.println("OBJECT ID: "+obj.getID());
+        allObjects.add(obj);
         obj.setCore(core);
         //System.out.println("asdad");
         if(obj.getType()==ObjectType.PLAYER)
@@ -127,6 +129,10 @@ public class ObjectManager {
 
     public QuadTree getRayCollisionTree() {
         return rayCollisionTree;
+    }
+
+    public ArrayList<GameObject> getAllObjects() {
+        return allObjects;
     }
     
     

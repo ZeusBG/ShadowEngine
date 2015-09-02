@@ -18,6 +18,7 @@ public abstract class Projectile extends DynamicGameObject{
 
     public Projectile(int x, int y) {
         super(x, y, ObjectType.PROJECTILE);
+        this.speed = speed;
     }
 
 

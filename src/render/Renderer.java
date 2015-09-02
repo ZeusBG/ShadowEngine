@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package engine;
+package render;
 
 import components.ObjectManager;
+import engine.Core;
 import gameObjects.DynamicGameObject;
+import gameObjects.GameObject;
 import gameObjects.Projectile;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
@@ -16,7 +18,6 @@ import java.awt.RadialGradientPaint;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
@@ -39,15 +40,15 @@ public class Renderer {
     private double cameraOffSetY;
     private double scaleX;
     private double scaleY;
-    private boolean dynamicCamera = false;
+    private boolean dynamicCamera = true;
 
     public Renderer(Core core) {
         this.core = core;
         g2d = (Graphics2D) core.getWindow().getBufferStrategy().getDrawGraphics();
         bs = core.getWindow().getBufferStrategy();
         //g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        //  g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-        //          RenderingHints.VALUE_RENDER_QUALITY);
+         // g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+          //        RenderingHints.VALUE_RENDER_QUALITY);
     }
 
     public void render() {
@@ -71,9 +72,10 @@ public class Renderer {
         scaleX = core.getWidthScale();
         scaleY = core.getHeightScale();
 
-        clear();
+        
+        
         castShadows(objectsToRender.getPlayer().getCurrentPosition());
-
+        
         //setClip
         if (core.getObjectManager().getPlayer() != null) {
             core.getObjectManager().getPlayer().render(core, this);
@@ -92,6 +94,7 @@ public class Renderer {
         }
 
         bs.show();
+       
     }
 
     public void drawCircle(int x, int y, int r) {
@@ -106,23 +109,49 @@ public class Renderer {
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, core.getWidth(), core.getHeight());
         g2d.setColor(Color.BLACK);
+        //g2d.dispose();
+        //bs.dispose();
     }
 
     public void castShadows(Point2D.Double lightSource) {
-        ArrayList<Point2D.Double> points = core.getObjectManager().getPoints();
-        ArrayList<Line2D.Double> walls = core.getObjectManager().getLines();
-        drawSight(lightSource, points, walls);
+        
+        drawSight(lightSource);
 
     }
 
-    private void drawSight(Point2D.Double lightSource, ArrayList<Point2D.Double> points, ArrayList<Line2D.Double> segments) {
+    private void drawSight(Point2D.Double lightSource) {
+        
         g2d.setClip(null);
-        Area light1 = new Area(findIntersectionPoints(lightSource, points, segments));
-
+        
+        Area light1 = new Area(findIntersectionPoints(lightSource));
+        ArrayList<Area> lights = new ArrayList<>();
+        ArrayList<Light> lightDescription = new ArrayList<>();
+        Area visibility = new Area();
+        for(GameObject obj : core.getObjectManager().getAllObjects()){
+            Light light = obj.getLight();
+            if(light==null)
+                continue;
+            Area lightRadius = new Area(findIntersectionPoints(light.getOwner().getCurrentPosition()));
+            lightRadius.intersect(new Area(new Ellipse2D.Double(scaleX * (light.getOwner().getCurrentPosition().x - light.getRadius()) + cameraOffSetX, 
+                    scaleY * (light.getOwner().getCurrentPosition().y - light.getRadius()) + cameraOffSetY, 
+                    scaleX * 2 * light.getRadius(), 
+                    scaleY * 2 * light.getRadius())));
+            
+            lights.add(lightRadius);
+            visibility.add(lightRadius);
+            lightDescription.add(light);
+            
+            
+            
+            
+        }
+        
+        visibility.intersect(light1);
+        
         float radius = 640;
         float[] dist = {0.0f, 0.4f};
         Color[] colors = {new Color(1.0f, 1.0f, 1.0f, 1.0f), new Color(0.0f, 0.0f, 0.0f, 1.0f)};
-        float[] dist2 = {0.1f, 0.3f};
+        float[] dist2 = {0.05f, 0.3f};
 
         Polygon screen = new Polygon();
 
@@ -132,63 +161,80 @@ public class Renderer {
         screen.addPoint(core.getWidth(), 0);
         Area mask = new Area(screen);
         //if(light1.npoints>0){
-        g2d.setColor(Color.BLACK);
-        /*Path2D.Double sight = new Path2D.Double();
-         sight.moveTo(intersectionPoints.get(0).x, intersectionPoints.get(0).y);
-         for(int i = 1;i<=intersectionPoints.size();i++){
-         sight.lineTo(intersectionPoints.get(i%intersectionPoints.size()).x, intersectionPoints.get(i%intersectionPoints.size()).y);
-         }
-         */
 
-        g2d.setColor(Color.WHITE);
 
-        Area lightRadius = new Area(new Ellipse2D.Double(scaleX * (lightSource.x - radius) + cameraOffSetX, scaleY * (lightSource.y - radius) + cameraOffSetY, scaleX * 2 * radius + cameraOffSetX, scaleY * 2 * radius + cameraOffSetY));
-        light1.intersect(lightRadius);
+        
 
-        Polygon triangleSight = new Polygon();
+        //Area lightRadius = new Area(new Ellipse2D.Double(scaleX * (lightSource.x - radius) + cameraOffSetX, scaleY * (lightSource.y - radius) + cameraOffSetY, scaleX * 2 * radius + cameraOffSetX, scaleY * 2 * radius + cameraOffSetY));
+        //light1.intersect(lightRadius);
+
         Point2D.Double playerPoint = core.getObjectManager().getPlayer().getCurrentPosition();
         Vector playerOrientation = new Vector(core.getObjectManager().getPlayer().getOrientation());
         playerOrientation.normalize();
 
-        Point2D.Double p1 = new Point2D.Double(playerPoint.x, playerPoint.y);
-        Point2D.Double p2 = new Point2D.Double(playerPoint.x + 180 * playerOrientation.x - 150 * playerOrientation.y,
-                playerPoint.y + 180 * playerOrientation.y + 150 * playerOrientation.x);
-        Point2D.Double p3 = new Point2D.Double(playerPoint.x + 180 * playerOrientation.x + 150 * playerOrientation.y,
-                playerPoint.y + 180 * playerOrientation.y - 150 * playerOrientation.x);
-        p1.x = scaleX * p1.x + cameraOffSetX;
-        p1.y = scaleY * p1.y + cameraOffSetY;
-        p2.x = scaleX * p2.x + cameraOffSetX;
-        p2.y = scaleY * p2.y + cameraOffSetY;
-        p3.x = scaleX * p3.x + cameraOffSetX;
-        p3.y = scaleY * p3.y + cameraOffSetY;
-        triangleSight.addPoint((int) p1.x, (int) p1.y);
-        triangleSight.addPoint((int) p2.x, (int) p2.y);
-        triangleSight.addPoint((int) p3.x, (int) p3.y);
+        Point2D.Double p1 = getScaledPoint(playerPoint);
 
         int arcRadius = 380;
-        int extent = 90;
+        int extent = 130;
         double angle = Math.atan2(playerOrientation.x, playerOrientation.y) * 180 / Math.PI;
         //if(angle<0)
         //angle = 360+angle;
 
-        Arc2D.Double arc = new Arc2D.Double(p1.x - arcRadius / 2, p1.y - arcRadius / 2, arcRadius, arcRadius, angle-extent/2 , -extent, Arc2D.PIE);
-
+        Arc2D.Double arc = new Arc2D.Double(p1.x - arcRadius / 2, p1.y - arcRadius / 2, arcRadius, arcRadius, angle-extent/2+extent-90 , -extent, Arc2D.PIE);
+        
         light1.intersect(new Area(arc));
+        light1.add(visibility);
+        
+
+        //g2d.setColor(Color.black);
+        
+        
+        
+        Polygon visibilityTriangle = new Polygon();
+        
+        Point2D.Double scaledLightSource = getScaledPoint(lightSource);
+        
+        visibilityTriangle.addPoint((int)scaledLightSource.x,(int)scaledLightSource.y);
+        visibilityTriangle.addPoint((int)(scaledLightSource.x+(arc.getStartPoint().getX()-scaledLightSource.x)*10),(int)(scaledLightSource.y+(arc.getStartPoint().getY()-scaledLightSource.y)*10));
+        visibilityTriangle.addPoint((int)(scaledLightSource.x+(arc.getEndPoint().getX()-scaledLightSource.x)*10),(int)(scaledLightSource.y+(arc.getEndPoint().getY()-scaledLightSource.y)*10));
+        //g2d.setColor(Color.red);
+        //g2d.drawPolygon(visibilityTriangle);
+        
+        
+        
+        light1.intersect(new Area(visibilityTriangle));
         mask.subtract(new Area(light1));
 
         g2d.setColor(Color.black);
         g2d.fill(mask);
-
-        //g2d.setColor(Color.black);
         g2d.setPaint(new RadialGradientPaint(new Point2D.Double(lightSource.x + cameraOffSetX, lightSource.y + cameraOffSetY), radius, dist2, colors));
         g2d.fill(light1);
+        g2d.setColor(Color.red);
+        //g2d.draw(light1);
         g2d.setClip(light1);
-
-        g2d.setPaint(null);
+        //g2d.draw(light1);
+        for(int i=0;i<lightDescription.size();i++){
+            Point2D.Double pos = new Point2D.Double();
+            pos.x = lightDescription.get(i).getOwner().getCurrentPosition().x;
+            pos.y = lightDescription.get(i).getOwner().getCurrentPosition().y;
+            g2d.setPaint(new RadialGradientPaint(new Point2D.Double(pos.x + cameraOffSetX, pos.y + cameraOffSetY), lightDescription.get(i).getRadius(), lightDescription.get(i).getDist(), lightDescription.get(i).getColors()));
+            g2d.fill(lights.get(i));
+        }
+        
+        g2d.setClip(null);
+        //g2d.setPaint(null);
+        
         //core.getObjectManager().getRayCollisionTree().drawTree(g2d, (int) cameraOffSetX, (int) cameraOffSetY);
     }
 
-    public Polygon findIntersectionPoints(Point2D.Double lightSource, ArrayList<Point2D.Double> points, ArrayList<Line2D.Double> segments) {
+    public Point2D.Double getScaledPoint(Point2D.Double p){
+        Point2D.Double scaled = new Point2D.Double();
+        scaled.x = scaleX*p.x+cameraOffSetX;
+        scaled.y = scaleY*p.y+cameraOffSetY;
+        return scaled;
+    }
+    
+    public Polygon findIntersectionPoints(Point2D.Double lightSource) {
 
         ArrayList<Point2D.Double> intersectionPoints = new ArrayList<>();
         ArrayList<Point2D.Double> sPoints = new ArrayList<>();

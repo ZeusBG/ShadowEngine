@@ -6,7 +6,7 @@
 package test;
 
 import engine.Core;
-import engine.Renderer;
+import render.Renderer;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
 import java.awt.geom.Point2D;

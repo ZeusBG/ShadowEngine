@@ -7,7 +7,7 @@ package test;
 
 import engine.AbstractGame;
 import engine.Core;
-import engine.Renderer;
+import render.Renderer;
 import gameObjects.Weapon;
 import java.awt.geom.Point2D;
 

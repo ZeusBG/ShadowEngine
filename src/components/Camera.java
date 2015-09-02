@@ -22,6 +22,7 @@ public class Camera {
     private int width,height;
     private Core core;
     private Point2D.Double dynamicLock;
+    private boolean dynamic = false;
 
     public Camera(Core core){
         offset = new Point2D.Double(0,0);
@@ -68,12 +69,19 @@ public class Camera {
         //position.y = (targetY+core.getInput().getMouseY())/2;
         //position.x = target.getX()-(core.getInput().getMouseXNonScale()+target.getX())/4;
         //position.y = target.getY()-(core.getInput().getMouseYNonScale()+target.getY())/4;
-        
-        cameraCenter.x += (targetX-cameraCenter.x)*cameraSpeed/100.0;
-        cameraCenter.y += (targetY-cameraCenter.y)*cameraSpeed/100.0;
+        if(!dynamic){
+            cameraCenter.x += (targetX-cameraCenter.x)*cameraSpeed/100.0;
+            cameraCenter.y += (targetY-cameraCenter.y)*cameraSpeed/100.0;
+        }
+        else{
+            cameraCenter.x += targetX-cameraCenter.x;
+            cameraCenter.y += targetY-cameraCenter.y;
+        }
  
         offset.x = -(cameraCenter.x-width/2);
         offset.y = -(cameraCenter.y-height/2);
+        
+        
         
         dynamicLock.x = -(targetX+core.getInput().getMouseX())/2+width/2;
         dynamicLock.y = -(targetY+core.getInput().getMouseY())/2+width/2;
@@ -82,6 +90,10 @@ public class Camera {
 
     public DynamicGameObject getTarget() {
         return target;
+    }
+    
+    public void setDynamic(boolean dynamic) {
+        this.dynamic = dynamic;
     }
 
     public void setTarget(DynamicGameObject target) {

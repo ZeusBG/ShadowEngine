@@ -6,7 +6,7 @@
 package gameObjects;
 
 import engine.Core;
-import engine.Renderer;
+import render.Renderer;
 import utils.ObjectType;
 
 /**

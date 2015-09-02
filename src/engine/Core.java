@@ -5,6 +5,7 @@
  */
 package engine;
 
+import render.Renderer;
 import components.ObjectManager;
 import components.Physics;
 import components.SoundManager;
@@ -132,7 +133,7 @@ public class Core implements Runnable{
                     Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            //System.out.println("Time for a frame : " + (System.currentTimeMillis()-FPSCounter));
+            System.out.println("Time for a frame : " + (System.currentTimeMillis()-FPSCounter));
             
             
         }

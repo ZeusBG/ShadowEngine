@@ -27,11 +27,6 @@ public abstract class StaticGameObject extends GameObject{
         super(x, y, ObjectType.ENVIRONMENT);
         
     }
-    
-    
-
-    
-    
-    
+   
     
 }

@@ -7,11 +7,11 @@ package gameObjects;
 
 import components.AABB;
 import engine.Core;
-import engine.Renderer;
+import render.Renderer;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import java.util.HashMap;
+import render.Light;
 import utils.ObjectState;
 import utils.ObjectType;
 
@@ -29,6 +29,7 @@ public abstract class GameObject {
     protected ArrayList<Line2D.Double> lines;
     private static long IDGEN;
     private long id;
+    protected Light light;
     
     public GameObject(int x, int y,ObjectType type){
         id = IDGEN++;
@@ -39,7 +40,7 @@ public abstract class GameObject {
         points = new ArrayList<>();
         lines = new ArrayList<>();
         aabb = new AABB();
-        
+        light = null;
     }
     
     
@@ -140,6 +141,10 @@ public abstract class GameObject {
     
     public long getID(){
         return id;
+    }
+
+    public Light getLight() {
+        return light;
     }
     
     public abstract void update(Core gc, float dt);

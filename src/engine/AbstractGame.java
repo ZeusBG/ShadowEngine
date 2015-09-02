@@ -5,6 +5,8 @@
  */
 package engine;
 
+import render.Renderer;
+
 /**
  *
  * @author Zeus

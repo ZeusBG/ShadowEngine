@@ -6,7 +6,7 @@
 package test;
 
 import engine.Core;
-import engine.Renderer;
+import render.Renderer;
 import gameObjects.LivingObject;
 import gameObjects.Projectile;
 import gameObjects.Weapon;
@@ -25,8 +25,8 @@ public class AK extends Weapon {
         reloadTime = 1;
         ammonition = new ArrayList<Projectile>();
         clipSize = 30;
-        maxAmmo = 120;
-        currentAmmo = 90;
+        maxAmmo = 1000;
+        currentAmmo = 1000;
         reloadTime = 1;
         blockedTime = 0;
         fireRate = 600;
