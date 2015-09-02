@@ -11,6 +11,7 @@ import gameObjects.LivingObject;
 import gameObjects.Weapon;
 import java.awt.Color;
 import java.awt.Point;
+import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import utils.ObjectType;
@@ -99,10 +100,13 @@ public class Player extends LivingObject{
     
     @Override
     public void render(Core core, Renderer r) {
+        Shape tmp = r.getG2d().getClip();
+        r.getG2d().setClip(null);
         r.setColor(Color.black);
         r.drawCircle((int)currentPosition.x,(int)currentPosition.y,20);
         r.setColor(Color.red);
         r.drawRay((int)currentPosition.x, (int)currentPosition.y,crosshair.x, crosshair.y);
+        r.getG2d().setClip(tmp);
         //r.drawLine(x, y,crosshair.x, crosshair.y);
     }
     

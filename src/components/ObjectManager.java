@@ -48,7 +48,7 @@ public class ObjectManager {
         rayCollisionTree = new QuadTree<StaticGameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
         
         camera = new Camera(0,0,600,500);
-
+        camera.setCore(core);
     }
     
     public ArrayList<StaticGameObject> getStaticObjects() {
