@@ -204,6 +204,22 @@ public class QuadTree<T extends GameObject> {
 
         }
 
+        
+        public void checkCollision(Physics physics){
+            if(children!=null){
+                for(int i=0;i<4;i++){
+                    children[i].checkCollision(physics);
+                }
+            }
+            else{
+                for(int i=0;i<objects.size();i++){
+                    for(int j=0;j<objects.size();j++){
+                        physics.checkCollision(objects.get(i), objects.get(j));
+                    }
+                }
+            }
+        }
+        
         public class AABBComparator implements Comparator {
 
             Point2D.Double origin;
@@ -229,7 +245,11 @@ public class QuadTree<T extends GameObject> {
         }
 
     }
-
+    
+    public void checkCollision(Physics physics){
+        root.checkCollision(physics);
+    }
+    
     public QuadTree(int capacity, int maxHeight, AABB aabb) {
         this.capacity = capacity;
         root = new Node(aabb, 0);

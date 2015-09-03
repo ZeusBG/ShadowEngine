@@ -177,12 +177,12 @@ public class AABB {
         return String.format("AABB: %.2f,%.2f,%.2f,%.2f", minX, minY, maxX, maxY);
     }
 
-    public void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d,int offsetX,int offsetY) {
         Polygon p = new Polygon();
-        p.addPoint((int) minX, (int) minY);
-        p.addPoint((int) maxX, (int) minY);
-        p.addPoint((int) maxX, (int) maxY);
-        p.addPoint((int) minX, (int) maxY);
+        p.addPoint((int) minX+offsetX, (int) minY+offsetY);
+        p.addPoint((int) maxX+offsetX, (int) minY+offsetY);
+        p.addPoint((int) maxX+offsetX, (int) maxY+offsetY);
+        p.addPoint((int) minX+offsetX, (int) maxY+offsetY);
         g2d.drawPolygon(p);
     }
 
@@ -216,11 +216,14 @@ public class AABB {
         this.maxY = maxY;
 
     }
-
+    
+    
     public boolean contains(Point2D.Double p){
         return p.x>=minX-0.1 && p.y>=minY-0.1 && p.x<=maxX+0.1 && p.y<=maxY+0.1;
     }
     
-    
+    public boolean contains(Point2D p){
+        return p.getX()>=minX-0.1 && p.getY()>=minY-0.1 && p.getX()<=maxX+0.1 && p.getY()<=maxY+0.1;
+    }
     
 }

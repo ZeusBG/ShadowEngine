@@ -17,26 +17,7 @@ import utils.GeometryUtil;
  * @author Zeus
  */
 public class CollisionControl {
-
-    public static Point2D.Double getClosestIntersection(Ray r, ArrayList<GameObject> objects) {
-        Point2D.Double intersection = null;
-        
-        double currentDistance = 100000;
-        for (GameObject obj : objects) {
-
-            if (r.intersect(obj.getAabb())) {
-                
-                for (Line2D.Double line : obj.getLines()) {
-                    Point2D.Double tmpPoint = GeometryUtil.getIntersectionRayLine(r, line);
-                    if(currentDistance > GeometryUtil.getDistance(tmpPoint, r.source)){
-                        currentDistance = GeometryUtil.getDistance(tmpPoint, r.source);
-                        intersection = tmpPoint;
-                    }
-                }
-
-            }
-        }
-        return intersection;
-    }
-
+    
+    
+    
 }

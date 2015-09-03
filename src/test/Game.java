@@ -32,7 +32,7 @@ public class Game extends AbstractGame{
     private void test(Core core){
         Player player = new Player();
         player.setCurrentPosition(new Point2D.Double(200,200));
-        player.setNextPosition(new Point2D.Double(200,200));
+        player.setNextPosition(new Point2D.Double(220,210));
         core.addObject(player);
         
         Weapon wep = new AK(0,0,null);

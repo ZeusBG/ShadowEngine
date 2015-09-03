@@ -5,6 +5,7 @@
  */
 package test;
 
+import components.AABB;
 import engine.Core;
 import render.Renderer;
 import gameObjects.Projectile;
@@ -19,12 +20,13 @@ public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
-        speed =1200;
+        speed =1000;
         light = new Light(this);
     }
 
     @Override
     public void update(Core gc, float dt) {
+        aabb = new AABB(currentPosition.x,currentPosition.y,currentPosition.x+2,currentPosition.y+2);
         nextPosition.x = currentPosition.x + speed * dt * direction.x;
         nextPosition.y = currentPosition.y + speed * dt * direction.y;
     }

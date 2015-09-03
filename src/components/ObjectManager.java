@@ -32,7 +32,7 @@ public class ObjectManager {
     private ArrayList<Projectile> projectiles;
     private ArrayList<Line2D.Double> lines;
     private ArrayList<Point2D.Double> staticObjPoints;
-    private QuadTree collisionTree;
+    
     private QuadTree rayCollisionTree;
     
     private Camera camera;
@@ -45,7 +45,7 @@ public class ObjectManager {
         projectiles = new ArrayList<>();
         lines = new ArrayList<>();
         staticObjPoints = new ArrayList<>();
-        collisionTree = new QuadTree<GameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
+        //should be map.getWidth() and map.getHeight() nut there isnt a map for now
         rayCollisionTree = new QuadTree<StaticGameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
         allObjects = new ArrayList<>();
         camera = new Camera(0,0,600,500);

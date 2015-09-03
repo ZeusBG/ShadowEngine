@@ -5,8 +5,8 @@
  */
 package gameObjects;
 
+import components.AABB;
 import engine.Core;
-import render.Renderer;
 import utils.ObjectType;
 
 /**
@@ -21,6 +21,6 @@ public abstract class PlayerObject extends LivingObject {
         super(x, y,ObjectType.PLAYER);
     }
 
-    
+
     
 }

@@ -5,6 +5,7 @@
  */
 package test;
 
+import components.AABB;
 import engine.Core;
 import render.Renderer;
 import gameObjects.LivingObject;
@@ -29,16 +30,19 @@ public class Player extends LivingObject{
     public Player(int x, int y, ObjectType type) {
         super(x, y, type);
         speed = 500;
+        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
     }
     
     public Player(){
-        super(50,50,ObjectType.PLAYER);
+        super(200,210,ObjectType.PLAYER);
         crosshair = new Point();
         weapon = null;
+        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
     }
     
-    @Override
+    
     public void update(Core core, float dt) {
+        
         crosshair.x = core.getInput().getMouseX();
         crosshair.y = core.getInput().getMouseY();
         
@@ -88,7 +92,7 @@ public class Player extends LivingObject{
             core.getSoundManager().stop(Sounds.MOVEMENT_PLAYER);
         }
         
-        
+        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
     }
     
     public void addWeapon(Weapon w){

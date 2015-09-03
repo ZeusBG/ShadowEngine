@@ -9,7 +9,6 @@ import engine.Core;
 import render.Renderer;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
-import java.awt.geom.Point2D;
 
 /**
  *
@@ -30,7 +29,7 @@ public class Wall extends StaticGameObject{
     
     @Override
     public void update(Core gc, float dt) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

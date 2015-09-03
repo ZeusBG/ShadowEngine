@@ -5,6 +5,7 @@
  */
 package test;
 
+import components.AABB;
 import engine.Core;
 import render.Renderer;
 import gameObjects.LivingObject;
@@ -32,10 +33,11 @@ public class AK extends Weapon {
         fireRate = 600;
         timePerProjectile = 60000 / (double) fireRate;
         currentPosition = new Point2D.Double();
-
+        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
         for (int i = 0; i < clipSize; i++) {
             ammonition.add(new Bullet(0, 0));
         }
+        
 
     }
 
@@ -48,7 +50,7 @@ public class AK extends Weapon {
 
             nextPosition.x = owner.getNextPosition().x;
             nextPosition.y = owner.getNextPosition().y;
-
+            aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
         }
     }
 

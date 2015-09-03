@@ -140,6 +140,10 @@ public class Core implements Runnable{
         cleanUp();
         
     }
+
+    public Physics getPhysics() {
+        return physics;
+    }
     
     public void handleInput(){
         
