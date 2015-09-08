@@ -14,11 +14,19 @@ import utils.ObjectType;
  */
 public abstract class Projectile extends DynamicGameObject{
     
-    
+    protected ExplodingGameObject explosive;
 
     public Projectile(int x, int y) {
         super(x, y, ObjectType.PROJECTILE);
-        this.speed = speed;
+        explosive = null;
+    }
+
+    public ExplodingGameObject getExplosive() {
+        return explosive;
+    }
+
+    public void setExplosive(ExplodingGameObject explosive) {
+        this.explosive = explosive;
     }
 
 

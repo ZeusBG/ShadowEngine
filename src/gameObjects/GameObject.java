@@ -31,6 +31,8 @@ public abstract class GameObject {
     private long id;
     protected Light light;
     
+    
+    
     public GameObject(int x, int y,ObjectType type){
         id = IDGEN++;
         this.type = type;
@@ -147,6 +149,39 @@ public abstract class GameObject {
         return light;
     }
     
+    protected void dispose(){
+        core.getObjectManager().removeObject(this);
+    }
+    
+    public boolean isCollidableWith(GameObject object){
+        return ObjState.isCollidableWith(object.getObjState());
+    }
+    
+    public void addCollidableWithType(String type){
+        ObjState.addCollidableWithType(type);
+    }
+    
+    public void addCollidableType(String type){
+        ObjState.addCollidableType(type);
+    }
+    
+    public void removeCollidableWithType(String type){
+        ObjState.removeCollidableWithType(type);
+    }
+    
+    public void removeCollidableType(String type){
+        ObjState.removeCollidableType(type);
+    }
+    
+    public void setRenderable(boolean renderable){
+        ObjState.setRenderable(renderable);
+    }
+    public boolean isRenderable(){
+        return ObjState.isRenderable();
+    }
+    
+    
     public abstract void update(Core gc, float dt);
     public abstract void render(Core gc,Renderer r);
 }
+

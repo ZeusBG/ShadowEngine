@@ -88,7 +88,6 @@ public class SoundClip {
         float newVolume = gainControl.getMinimum() + volume * value;
         if (newVolume >= gainControl.getMinimum() && newVolume <= gainControl.getMaximum()) {
             gainControl.setValue(newVolume);
-            System.out.println(newVolume);
         }
     }
 

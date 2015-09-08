@@ -20,13 +20,14 @@ public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
-        speed =1000;
+        speed=1000;
         light = new Light(this);
+        explosive = new Explosion1();
     }
 
     @Override
     public void update(Core gc, float dt) {
-        aabb = new AABB(currentPosition.x,currentPosition.y,currentPosition.x+2,currentPosition.y+2);
+        aabb = new AABB(currentPosition.x-1,currentPosition.y-1,currentPosition.x+1,currentPosition.y+1);
         nextPosition.x = currentPosition.x + speed * dt * direction.x;
         nextPosition.y = currentPosition.y + speed * dt * direction.y;
     }

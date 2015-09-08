@@ -31,6 +31,7 @@ public class Game extends AbstractGame{
 
     private void test(Core core){
         Player player = new Player();
+        player.addCollidableWithType("player");
         player.setCurrentPosition(new Point2D.Double(200,200));
         player.setNextPosition(new Point2D.Double(220,210));
         core.addObject(player);
@@ -64,6 +65,7 @@ public class Game extends AbstractGame{
         core.addObject(w);
         
         w = new Wall(0,0);
+        w.setRenderable(false);
         w.addPoint(new Point2D.Double(500, 100));
         w.addPoint(new Point2D.Double(600,100));
         w.addPoint(new Point2D.Double(600,200));
@@ -94,6 +96,8 @@ public class Game extends AbstractGame{
         w.addPoint(new Point2D.Double(210,140));
         w.addPoint(new Point2D.Double(210,110));
         core.addObject(w);
+        
+        
         
         core.getObjectManager().getCamera().setTarget(player);
     }

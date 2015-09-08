@@ -22,6 +22,7 @@ import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import math.Ray;
 import math.Vector;
 import utils.SortPointsClockWise;
@@ -40,15 +41,14 @@ public class Renderer {
     private double cameraOffSetY;
     private double scaleX;
     private double scaleY;
-    private boolean dynamicCamera = true;
 
     public Renderer(Core core) {
         this.core = core;
         g2d = (Graphics2D) core.getWindow().getBufferStrategy().getDrawGraphics();
         bs = core.getWindow().getBufferStrategy();
         //g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-         // g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-          //        RenderingHints.VALUE_RENDER_QUALITY);
+        //g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
+        //RenderingHints.VALUE_RENDER_QUALITY);
     }
 
     public void render() {
@@ -58,47 +58,50 @@ public class Renderer {
 
         //setvam clip
         //render objects
-        if(dynamicCamera){
+        if (core.getObjectManager().getCamera().isDynamic()) {
             cameraOffSetX = core.getObjectManager().getCamera().getDynamicX();
             cameraOffSetY = core.getObjectManager().getCamera().getDynamicY();
-        }
-        else{
+        } else {
             cameraOffSetX = core.getObjectManager().getCamera().getX();
             cameraOffSetY = core.getObjectManager().getCamera().getY();
         }
         //cameraOffSetX = 0;
         //cameraOffSetX = 0;
 
-        scaleX = core.getWidthScale();
-        scaleY = core.getHeightScale();
+        scaleX = core.getObjectManager().getCamera().getWidthScale();
+        scaleY = core.getObjectManager().getCamera().getHeightScale();
 
-        
-        
+        cameraOffSetX *= scaleX;
+        cameraOffSetY *= scaleY;
+        //System.out.println("cameraOffsetX: "+cameraOffSetX);
+
+        clear();
+
         castShadows(objectsToRender.getPlayer().getCurrentPosition());
-        
+
         //setClip
         if (core.getObjectManager().getPlayer() != null) {
             core.getObjectManager().getPlayer().render(core, this);
         }
 
         for (DynamicGameObject obj : core.getObjectManager().getDynamicObjects()) {
-            obj.render(core, this);
+            if(obj.getObjState().isRenderable())
+                obj.render(core, this);
         }
         for (Projectile obj : core.getObjectManager().getProjectiles()) {
-            obj.render(core, this);
+            if(obj.getObjState().isRenderable())
+                obj.render(core, this);
         }
-
         for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
-
-            obj.render(core, this);
+            if(obj.getObjState().isRenderable())
+                obj.render(core, this);
         }
-
         bs.show();
-       
+
     }
 
     public void drawCircle(int x, int y, int r) {
-        g2d.draw(new Ellipse2D.Double(scaleX * x - r + cameraOffSetX, scaleY * y - r + cameraOffSetY, scaleX * r * 2, scaleY * r * 2));
+        g2d.draw(new Ellipse2D.Double(scaleX * (x - r) + cameraOffSetX, scaleY * (y - r) + cameraOffSetY, scaleX * r * 2, scaleY * r * 2));
     }
 
     public Graphics2D getG2d() {
@@ -106,48 +109,47 @@ public class Renderer {
     }
 
     public void clear() {
+        g2d.setClip(null);
         g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, core.getWidth(), core.getHeight());
+        g2d.fillRect(0, 0, 5000, 5000);
         g2d.setColor(Color.BLACK);
         //g2d.dispose();
         //bs.dispose();
     }
 
     public void castShadows(Point2D.Double lightSource) {
-        
+
         drawSight(lightSource);
 
     }
 
     private void drawSight(Point2D.Double lightSource) {
-        
+
         g2d.setClip(null);
-        
-        Area light1 = new Area(findIntersectionPoints(lightSource));
+
+        Area light1 = new Area(findIntersectionPoints(core.getObjectManager().getPlayer().getLight()));
         ArrayList<Area> lights = new ArrayList<>();
         ArrayList<Light> lightDescription = new ArrayList<>();
         Area visibility = new Area();
-        for(GameObject obj : core.getObjectManager().getAllObjects()){
+        for (GameObject obj : core.getObjectManager().getAllObjects()) {
             Light light = obj.getLight();
-            if(light==null)
+            if (light == null || !obj.getObjState().isRenderable()) {
                 continue;
-            Area lightRadius = new Area(findIntersectionPoints(light.getOwner().getCurrentPosition()));
-            lightRadius.intersect(new Area(new Ellipse2D.Double(scaleX * (light.getOwner().getCurrentPosition().x - light.getRadius()) + cameraOffSetX, 
-                    scaleY * (light.getOwner().getCurrentPosition().y - light.getRadius()) + cameraOffSetY, 
-                    scaleX * 2 * light.getRadius(), 
+            }
+            Area lightRadius = new Area(findIntersectionPoints(light));
+            lightRadius.intersect(new Area(new Ellipse2D.Double(scaleX * (light.getOwner().getCurrentPosition().x - light.getRadius()) + cameraOffSetX,
+                    scaleY * (light.getOwner().getCurrentPosition().y - light.getRadius()) + cameraOffSetY,
+                    scaleX * 2 * light.getRadius(),
                     scaleY * 2 * light.getRadius())));
-            
+
             lights.add(lightRadius);
             visibility.add(lightRadius);
             lightDescription.add(light);
-            
-            
-            
-            
+
         }
-        
+
         visibility.intersect(light1);
-        
+
         float radius = 640;
         float[] dist = {0.0f, 0.4f};
         Color[] colors = {new Color(1.0f, 1.0f, 1.0f, 1.0f), new Color(0.0f, 0.0f, 0.0f, 1.0f)};
@@ -156,18 +158,14 @@ public class Renderer {
         Polygon screen = new Polygon();
 
         screen.addPoint(0, 0);
-        screen.addPoint(0, core.getHeight());
-        screen.addPoint(core.getWidth(), core.getHeight());
-        screen.addPoint(core.getWidth(), 0);
+        screen.addPoint(0, 2000);
+        screen.addPoint(2000, 2000);
+        screen.addPoint(2000, 0);
         Area mask = new Area(screen);
         //if(light1.npoints>0){
 
-
-        
-
         //Area lightRadius = new Area(new Ellipse2D.Double(scaleX * (lightSource.x - radius) + cameraOffSetX, scaleY * (lightSource.y - radius) + cameraOffSetY, scaleX * 2 * radius + cameraOffSetX, scaleY * 2 * radius + cameraOffSetY));
         //light1.intersect(lightRadius);
-
         Point2D.Double playerPoint = core.getObjectManager().getPlayer().getCurrentPosition();
         Vector playerOrientation = new Vector(core.getObjectManager().getPlayer().getOrientation());
         playerOrientation.normalize();
@@ -180,70 +178,81 @@ public class Renderer {
         //if(angle<0)
         //angle = 360+angle;
 
-        Arc2D.Double arc = new Arc2D.Double(p1.x - arcRadius / 2, p1.y - arcRadius / 2, arcRadius, arcRadius, angle-extent/2+extent-90 , -extent, Arc2D.PIE);
-        
+        Arc2D.Double arc = new Arc2D.Double(p1.x - scaleX * arcRadius / 2, p1.y - scaleY * arcRadius / 2, scaleX * arcRadius, scaleY * arcRadius, angle - extent / 2 + extent - 90, -extent, Arc2D.PIE);
+        //Arc2D.Double arc = new Arc2D.Double(scaleX*(playerPoint.x - arcRadius / 2)+cameraOffSetX, scaleY*(playerPoint.y - arcRadius / 2)+cameraOffSetY, scaleX*arcRadius, scaleY*arcRadius, angle-extent/2+extent-90 , -extent, Arc2D.PIE);
+
         light1.intersect(new Area(arc));
         light1.add(visibility);
-        
 
         //g2d.setColor(Color.black);
-        
-        
-        
         Polygon visibilityTriangle = new Polygon();
-        
+
         Point2D.Double scaledLightSource = getScaledPoint(lightSource);
-        
-        visibilityTriangle.addPoint((int)scaledLightSource.x,(int)scaledLightSource.y);
-        visibilityTriangle.addPoint((int)(scaledLightSource.x+(arc.getStartPoint().getX()-scaledLightSource.x)*10),(int)(scaledLightSource.y+(arc.getStartPoint().getY()-scaledLightSource.y)*10));
-        visibilityTriangle.addPoint((int)(scaledLightSource.x+(arc.getEndPoint().getX()-scaledLightSource.x)*10),(int)(scaledLightSource.y+(arc.getEndPoint().getY()-scaledLightSource.y)*10));
+
+        visibilityTriangle.addPoint((int) scaledLightSource.x, (int) scaledLightSource.y);
+        visibilityTriangle.addPoint((int) (scaledLightSource.x + (arc.getStartPoint().getX() - scaledLightSource.x) * 10), (int) (scaledLightSource.y + (arc.getStartPoint().getY() - scaledLightSource.y) * 10));
+        visibilityTriangle.addPoint((int) (scaledLightSource.x + (arc.getEndPoint().getX() - scaledLightSource.x) * 10), (int) (scaledLightSource.y + (arc.getEndPoint().getY() - scaledLightSource.y) * 10));
         //g2d.setColor(Color.red);
         //g2d.drawPolygon(visibilityTriangle);
-        
-        
-        
+
         light1.intersect(new Area(visibilityTriangle));
         mask.subtract(new Area(light1));
-
-        g2d.setColor(Color.black);
+        g2d.setColor(Color.BLACK);
         g2d.fill(mask);
-        g2d.setPaint(new RadialGradientPaint(new Point2D.Double(lightSource.x + cameraOffSetX, lightSource.y + cameraOffSetY), radius, dist2, colors));
+        for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
+            if(obj.getObjState().isRenderable())
+                obj.render(core, this);
+        }
+
+        g2d.setColor(new Color(0f, 0f, 0f, 0.8f));
+        g2d.fill(mask);
+
+        //g2d.setColor(null);
+        g2d.setPaint(new RadialGradientPaint(new Point2D.Double(scaleX * lightSource.x + cameraOffSetX, scaleY * lightSource.y + cameraOffSetY), (int) (scaleX * radius), dist2, colors));
         g2d.fill(light1);
+
         g2d.setColor(Color.red);
         //g2d.draw(light1);
         g2d.setClip(light1);
         //g2d.draw(light1);
-        for(int i=0;i<lightDescription.size();i++){
+        //g2d.scale(scaleX, scaleY);
+        for (int i = 0; i < lightDescription.size(); i++) {
             Point2D.Double pos = new Point2D.Double();
             pos.x = lightDescription.get(i).getOwner().getCurrentPosition().x;
             pos.y = lightDescription.get(i).getOwner().getCurrentPosition().y;
-            g2d.setPaint(new RadialGradientPaint(new Point2D.Double(pos.x + cameraOffSetX, pos.y + cameraOffSetY), lightDescription.get(i).getRadius(), lightDescription.get(i).getDist(), lightDescription.get(i).getColors()));
+
+            g2d.setPaint(new RadialGradientPaint(new Point2D.Double(scaleX * pos.x + cameraOffSetX, scaleY * pos.y + cameraOffSetY), (int) (lightDescription.get(i).getRadius() * scaleX), lightDescription.get(i).getDist(), lightDescription.get(i).getColors()));
+
             g2d.fill(lights.get(i));
         }
-        
-        g2d.setClip(null);
+
+        //g2d.scale(1, 1);
+        //g2d.setClip(null);
         //g2d.setPaint(null);
-        
         //core.getObjectManager().getRayCollisionTree().drawTree(g2d, (int) cameraOffSetX, (int) cameraOffSetY);
+        core.getPhysics().getCollisionTree().drawTree(g2d, (int) cameraOffSetX, (int) cameraOffSetY, scaleX, scaleY);
     }
 
-    public Point2D.Double getScaledPoint(Point2D.Double p){
+    public Point2D.Double getScaledPoint(Point2D.Double p) {
         Point2D.Double scaled = new Point2D.Double();
-        scaled.x = scaleX*p.x+cameraOffSetX;
-        scaled.y = scaleY*p.y+cameraOffSetY;
+        scaled.x = scaleX * p.x + cameraOffSetX;
+        scaled.y = scaleY * p.y + cameraOffSetY;
         return scaled;
     }
-    
-    public Polygon findIntersectionPoints(Point2D.Double lightSource) {
 
+    public Polygon findIntersectionPoints(Light lightSrc) {
+        Point2D.Double lightSource = lightSrc.getOwner().getCurrentPosition();
         ArrayList<Point2D.Double> intersectionPoints = new ArrayList<>();
         ArrayList<Point2D.Double> sPoints = new ArrayList<>();
         //Point2D.Double playerPoint = lightSource;
-
-        for (StaticGameObject s : core.getObjectManager().getStaticObjects()) {
+        HashSet<GameObject> objects = core.getObjectManager().getRayCollisionTree().getObjectsInRange(lightSrc.getAABB());
+        
+        for (GameObject s : objects) {
+            if(!s.getObjState().isRenderable())
+                continue;
             for (Point2D.Double cPoint : s.getPoints()) {
                 Ray tmpRay = new Ray(lightSource, cPoint);
-                if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay))) {
+                if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay,objects))) {
                     addSecondaryPoints(cPoint, lightSource, sPoints);
                 }
             }
@@ -252,7 +261,7 @@ public class Renderer {
         for (Point2D.Double cPoint : sPoints) {
 
             Ray tmpRay = new Ray(lightSource, cPoint);
-            Point2D.Double intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay);
+            Point2D.Double intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay,objects);
             if (intersection != null) {
                 intersectionPoints.add(intersection);
             }
@@ -295,7 +304,7 @@ public class Renderer {
     public void drawRay(int x1, int y1, int x2, int y2) {
 
         Ray r = new Ray(x1, y1, x2, y2);
-        Point2D.Double endPoint = core.getObjectManager().getRayCollisionTree().intersect(r);
+        Point2D.Double endPoint = core.getObjectManager().getRayCollisionTree().intersect(r,null);
 
         if (endPoint != null) {
             drawLine(x1, y1, (int) endPoint.x, (int) endPoint.y);

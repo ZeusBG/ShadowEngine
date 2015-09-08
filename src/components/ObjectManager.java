@@ -48,8 +48,9 @@ public class ObjectManager {
         //should be map.getWidth() and map.getHeight() nut there isnt a map for now
         rayCollisionTree = new QuadTree<StaticGameObject>(4,6,new AABB(0,0,900,700));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
         allObjects = new ArrayList<>();
-        camera = new Camera(0,0,600,500);
+        camera = new Camera(0,0,400,300);
         camera.setCore(core);
+        camera.setDynamic(true);
     }
     
     public ArrayList<StaticGameObject> getStaticObjects() {
@@ -99,7 +100,9 @@ public class ObjectManager {
     }
     
     public void addObject(GameObject obj){
-        System.out.println("OBJECT ID: "+obj.getID());
+        //System.out.println("OBJECT ID: "+obj.getID());
+        System.out.println("ADDING: "+obj.getType()+" ID: "+obj.getID());
+        
         allObjects.add(obj);
         obj.setCore(core);
         //System.out.println("asdad");
@@ -135,7 +138,20 @@ public class ObjectManager {
         return allObjects;
     }
     
-    
+    public void removeObject(GameObject obj){
+        allObjects.remove(obj);
+        
+        if(obj.getType()==ObjectType.PROJECTILE){
+            projectiles.remove(obj);
+        }
+        else if(obj.getType()==ObjectType.ENVIRONMENT){
+            staticObjects.remove(obj);
+        }
+        else if(obj.getType()==ObjectType.ITEM || obj.getType()==ObjectType.NPC){
+            dynamicObjects.remove(obj);
+        }
+        
+    }
     
     
     

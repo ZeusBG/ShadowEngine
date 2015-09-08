@@ -15,6 +15,7 @@ import java.awt.Point;
 import java.awt.Shape;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import render.Light;
 import utils.ObjectType;
 import utils.Sounds;
 
@@ -38,6 +39,7 @@ public class Player extends LivingObject{
         crosshair = new Point();
         weapon = null;
         aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+        light = new Light(this);
     }
     
     
@@ -79,9 +81,11 @@ public class Player extends LivingObject{
         
         if(core.getInput().isKeyPressed(KeyEvent.VK_O)){
             core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.8f);
+            core.getObjectManager().getCamera().zoomIn();
         }
         
         if(core.getInput().isKeyPressed(KeyEvent.VK_P)){
+            core.getObjectManager().getCamera().zoomOut();
             core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 1.0f);
         }
         

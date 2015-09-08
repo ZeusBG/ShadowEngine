@@ -124,11 +124,11 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener{
     }
     
     public int getMouseX(){
-        return (int)(mouseX/core.getWidthScale() - core.getObjectManager().getCamera().getX());
+        return (int)(mouseX/core.getObjectManager().getCamera().getWidthScale() - core.getObjectManager().getCamera().getX());
     }
     
     public int getMouseY(){
-        return (int)(mouseY/core.getHeightScale() - core.getObjectManager().getCamera().getY());
+        return (int)(mouseY/core.getObjectManager().getCamera().getHeightScale() - core.getObjectManager().getCamera().getY());
     }
     
 }

@@ -19,10 +19,28 @@ public class Camera {
     private Point2D.Double offset;
     private Point2D.Double cameraCenter;
     private double cameraSpeed;
-    private int width,height;
+    private double width,height;
     private Core core;
     private Point2D.Double dynamicLock;
     private boolean dynamic = false;
+    private double widthScale = 1.0f;
+    private double heightScale = 1.0f;
+
+    public double getWidthScale() {
+        return widthScale;
+    }
+
+    public void setWidthScale(float widthScale) {
+        this.widthScale = widthScale;
+    }
+
+    public double getHeightScale() {
+        return heightScale;
+    }
+
+    public void setHeightScale(float heightScale) {
+        this.heightScale = heightScale;
+    }
 
     public Camera(Core core){
         offset = new Point2D.Double(0,0);
@@ -32,6 +50,8 @@ public class Camera {
         cameraSpeed = 10;
         this.core = core;
         dynamicLock = new Point2D.Double(0,0);
+        widthScale = core.getWidth()/width;
+        heightScale = core.getHeight()/height;
     }
     
     public Camera(int x, int y, int width, int height) {
@@ -41,18 +61,15 @@ public class Camera {
         this.height = height;
         cameraSpeed = 10;
         dynamicLock = new Point2D.Double(0,0);
+        
     }
 
     public void addOffSetX(int offSet){
-        //if(x-offSet>=0){
             offset.x-=offSet;
-        //}
     }
     
     public void addOffSetY(int offSet){
-        //if(y-offSet>=0){
             offset.y-=offSet;
-        //}
     }
     
     public void update(){
@@ -84,7 +101,7 @@ public class Camera {
         
         
         dynamicLock.x = -(targetX+core.getInput().getMouseX())/2+width/2;
-        dynamicLock.y = -(targetY+core.getInput().getMouseY())/2+width/2;
+        dynamicLock.y = -(targetY+core.getInput().getMouseY())/2+height/2;
         
     }
 
@@ -109,12 +126,22 @@ public class Camera {
     }
     
  
-    public int getWidth() {
+    public double getWidth() {
         return width;
     }
 
     public void setCore(Core core) {
         this.core = core;
+        widthScale = core.getWidth()/width;
+        heightScale = core.getHeight()/height;
+        
+        if(widthScale>heightScale){
+            widthScale = heightScale;
+        }
+        else if(heightScale>widthScale){
+            heightScale = widthScale;
+        }
+        
     }
     
     public double getX(){
@@ -137,7 +164,7 @@ public class Camera {
         this.width = width;
     }
 
-    public int getHeight() {
+    public double getHeight() {
         return height;
     }
 
@@ -148,9 +175,37 @@ public class Camera {
     public double getCameraSpeed() {
         return cameraSpeed;
     }
-
+    
+    public void zoomIn(){
+        width*=0.99;
+        height*=0.99;
+        refreshScale();
+    }
+    
+    public void zoomOut(){
+        width/=0.99;
+        height/=0.99;
+        refreshScale();
+    }
+    
+    public void refreshScale(){
+        widthScale = core.getWidth()/width;
+        heightScale = core.getHeight()/height;
+        
+        if(widthScale>heightScale){
+            widthScale = heightScale;
+        }
+        else if(heightScale>widthScale){
+            heightScale = widthScale;
+        }
+    }
+    
     public void setCameraSpeed(double cameraSpeed) {
         if(cameraSpeed<=100 && cameraSpeed>=0)
             this.cameraSpeed = cameraSpeed;
+    }
+    
+    public boolean isDynamic(){
+        return dynamic;
     }
 }

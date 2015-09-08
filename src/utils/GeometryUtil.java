@@ -6,8 +6,10 @@
 package utils;
 
 import components.AABB;
+import gameObjects.GameObject;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import math.Ray;
 
 /**
@@ -138,9 +140,30 @@ public class GeometryUtil {
     }
     
 
-    public static double getDistance(Point2D.Double p1, Point2D.Double p2){
+    public static double getDistance(Point2D p1, Point2D p2){
         
-        return Math.sqrt((p2.x-p1.x)*(p2.x-p1.x)+(p2.y-p1.y)*(p2.y-p1.y));
+        return Math.sqrt((p2.getX()-p1.getX())*(p2.getX()-p1.getX())+(p2.getY()-p1.getY())*(p2.getY()-p1.getY()));
     }
+    
+    public static Point2D.Double getClosestIntersection(Line2D.Double path,ArrayList<GameObject> objects){
+        Point2D.Double intersection = null;
+        double currentDistance = 100000;
+        
+        
+        for(GameObject go: objects){
+            Point2D.Double currentIntersection;
+            if(GeometryUtil.checkIntersectionLineAABB(path, go.getAabb())){
+                for(Line2D.Double line: go.getLines()){
+                    currentIntersection = GeometryUtil.getIntersectionLines(path, line);
+                    if(currentIntersection!=null && GeometryUtil.getDistance(currentIntersection,path.getP1())<currentDistance){
+                        currentDistance = GeometryUtil.getDistance(currentIntersection,path.getP1());
+                        intersection = currentIntersection;
+                    }
+                }
+            }
+        }
+        return intersection;
+    }
+    
 
 }

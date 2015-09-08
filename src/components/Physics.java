@@ -6,13 +6,16 @@
 package components;
 
 import engine.Core;
-import gameObjects.DynamicGameObject;
+import gameObjects.ExplodingGameObject;
 import gameObjects.GameObject;
 import gameObjects.LivingObject;
 import gameObjects.Projectile;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
+import java.util.HashSet;
 import math.Vector;
+import test.Explosion1;
 import utils.GeometryUtil;
 import utils.ObjectType;
 
@@ -52,15 +55,14 @@ public class Physics {
         for (GameObject go : core.getObjectManager().getAllObjects()) {
             collisionTree.insert(go);
         }
-        
         this.dt = _dt;
         updateObjects();
         collisionTree.checkCollision(this);
         moveObjects(dt);
     }
-    
-    public void updateObjects(){
-        for(int i=0;i<core.getObjectManager().getAllObjects().size();i++){
+
+    public void updateObjects() {
+        for (int i = 0; i < core.getObjectManager().getAllObjects().size(); i++) {
             core.getObjectManager().getAllObjects().get(i).update(core, dt);
         }
     }
@@ -68,8 +70,9 @@ public class Physics {
     public QuadTree<GameObject> getCollisionTree() {
         return collisionTree;
     }
-    
+
     public void checkCollision(GameObject go1, GameObject go2) {
+        
         if (go1 == go2) {
             return;
         }
@@ -77,27 +80,58 @@ public class Physics {
         if (go1.getType() == ObjectType.ENVIRONMENT) {
             return;
         }
-        
-        if(go1.getType() == ObjectType.ITEM){
-            go1.update(core, dt);
+        if(!go1.isCollidableWith(go2))
             return;
-        }
-       
-        if (go1.getType() == ObjectType.PROJECTILE) {
-            //go1.update(core, dt);
-            Projectile projectile = (Projectile) go1;
-            Line2D.Double projectilePath = new Line2D.Double(projectile.getCurrentPosition(), projectile.getNextPosition());
+        if (go1.getType() == ObjectType.ITEM) {
+            
+            if (go1 instanceof ExplodingGameObject) {
+                //System.out.println(go1.getAabb());
+                ExplodingGameObject ego = (ExplodingGameObject) go1;
+                if(!ego.isExploded()){
+                    
+                    //System.out.println("it hasnt exploded yet");   
+                    return;
+                }
+                HashSet<GameObject> objects = collisionTree.getObjectsInRange(ego.getCurrentAABB());
+                for (GameObject go : objects) {
+                    if (go instanceof LivingObject) {
+                        LivingObject lo = (LivingObject) go;
 
-            if (GeometryUtil.checkIntersectionLineAABB(projectilePath, go2.getAabb())) {
-                if (go2.getType() == ObjectType.ENVIRONMENT) {
+                        double distanceToExplosion = GeometryUtil.getDistance(lo.getCurrentPosition(), ego.getCurrentPosition());
+                        //System.out.println("dealing damage to "+go1.getID());
+                        if (ego.getDamageDealtTo().get(go) == null
+                                && distanceToExplosion > ego.getPreviousRadius()
+                                && distanceToExplosion < ego.getCurrentRadius()) {
 
-                    for (Line2D l : go2.getLines()) {
-                        if (GeometryUtil.getIntersectionLines(projectilePath, l) != null) {
-                            core.getObjectManager().getProjectiles().remove(projectile);
-                            core.getObjectManager().getAllObjects().remove(go1);
+                            System.out.println("dealing damage to "+go.getID());
+                            //ego.getDamageDealtTo().put(go, Boolean.TRUE);
+
                         }
                     }
                 }
+
+            }
+            return;
+        }
+
+        else if (go1.getType() == ObjectType.PROJECTILE) {
+            //go1.update(core, dt);
+            Projectile projectile = (Projectile) go1;
+            AABB ProjectilePathAABB = new AABB();
+            ProjectilePathAABB.update(projectile.getCurrentPosition());
+            ProjectilePathAABB.update(projectile.getNextPosition());
+
+            Line2D.Double projectilePath = new Line2D.Double(projectile.getCurrentPosition(), projectile.getNextPosition());
+            ArrayList<GameObject> objects = collisionTree.getObjectsLineIntersect(projectilePath);
+
+            Point2D.Double intersection = GeometryUtil.getClosestIntersection(projectilePath, objects);
+            if (intersection != null) {
+                core.getObjectManager().removeObject(go1);
+                Point2D.Double explosionSpawnPoint = new Point2D.Double();
+                explosionSpawnPoint.x = intersection.x - projectile.getDirection().x * 2;
+                explosionSpawnPoint.y = intersection.y - projectile.getDirection().y * 2;
+                core.getObjectManager().addObject(new Explosion1((int) explosionSpawnPoint.x, (int) explosionSpawnPoint.y));
+                collisionTree.remove(go1);
             }
 
         } else if (go1.getType() == ObjectType.PLAYER) {
@@ -118,7 +152,7 @@ public class Physics {
                             nextPoint.y += 2 * normal.y;
 
                             player.setNextPosition(nextPoint);
-                            
+
                             return;
                         }
                     }

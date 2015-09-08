@@ -112,7 +112,6 @@ public abstract class Weapon extends DynamicGameObject{
                 p.setCurrentPosition(currentPosition);
                 orientation.normalize();
                 p.setDirection(orientation);
-                
                 core.addObject(p);
                 
                 ammonition.remove(ammonition.size()-1);
