@@ -12,6 +12,7 @@ import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import render.Light;
+import render.Material;
 import utils.ObjectState;
 import utils.ObjectType;
 
@@ -30,6 +31,7 @@ public abstract class GameObject {
     private static long IDGEN;
     private long id;
     protected Light light;
+    protected Material material;//later it will have arrayList of components
     
     
     
@@ -98,8 +100,14 @@ public abstract class GameObject {
     public ArrayList<Line2D.Double> getLines() {
         return lines;
     }
-    
-   
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
     
     public void addPoint(Point2D.Double point){
         if(!points.isEmpty()){

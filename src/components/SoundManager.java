@@ -23,6 +23,9 @@ public class SoundManager {
     }
 
     public void play(Sounds type) {
+        if(true){
+            return;
+        }
         if (type == Sounds.MOVEMENT_PLAYER && !sounds.get(type).isRunning()) {
             sounds.get(type).loop();
         } else if (type == Sounds.AK47_SHOT) {
@@ -31,6 +34,9 @@ public class SoundManager {
     }
 
     public void stop(Sounds type) {
+        if(true){
+            return;
+        }
         if (type == Sounds.MOVEMENT_PLAYER && sounds.get(type).isRunning()) {
             sounds.get(type).stop();
         }

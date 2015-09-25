@@ -20,9 +20,12 @@ public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
-        speed=1000;
+        speed=300;
         light = new Light(this);
+        Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
+        light.setColor(c);
         explosive = new Explosion1();
+        explosive.getLight().setColor(c);
     }
 
     @Override
@@ -34,8 +37,8 @@ public class Bullet extends Projectile {
 
     @Override
     public void render(Core gc, Renderer r) {
-        r.setColor(Color.BLACK);
-        r.drawCircle((int) currentPosition.x, (int) currentPosition.y, 2);
+        r.setColor(Color.WHITE);
+        r.drawCircle((int) currentPosition.x, (int) currentPosition.y, 1);
     }
 
 }

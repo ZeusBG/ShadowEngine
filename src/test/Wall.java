@@ -34,12 +34,12 @@ public class Wall extends StaticGameObject{
 
     @Override
     public void render(Core gc, Renderer r) {
-        r.setColor(Color.RED);
+        r.setColor(Color.BLUE);
         for(int i=0;i<points.size()-1;i++){
             r.drawLine((int)points.get(i).x,(int) points.get(i).y, (int)points.get(i+1).x, (int)points.get(i+1).y);
         }
         
-        r.setColor(null);
+        r.setColor(Color.WHITE);
     }
     
 }

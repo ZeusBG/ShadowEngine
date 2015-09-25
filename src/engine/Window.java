@@ -10,8 +10,21 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
+import static org.lwjgl.opengl.GL11.GL_PROJECTION;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
+import org.lwjgl.opengl.PixelFormat;
 
 /**
  *
@@ -28,28 +41,32 @@ public class Window {
     public Window(Core core)
     {
         
-        Dimension s = new Dimension((int)(core.getWidth()),(int)(core.getHeight()));
-        gameArea = new JPanel();
-        gameArea.setPreferredSize(s);
-        gameArea.setMaximumSize(s);
+        try {
+            Display.setDisplayMode(new DisplayMode(core.getWidth(), core.getHeight()));
+            Display.setTitle("Shadow Engine");
+            Display.create(new PixelFormat(0, 16, 1));
+
+        } catch (LWJGLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            Mouse.create();
+        } catch (LWJGLException ex) {
+            Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            Keyboard.create();
+        } catch (LWJGLException ex) {
+            Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        glOrtho(0, core.getWidth(), core.getHeight(), 0, -1, 1);
+        glMatrixMode(GL_MODELVIEW);
         
-        gameArea.setBackground(Color.WHITE);
-        gameArea.setFocusable(true);
-        gameArea.requestFocusInWindow();
         
-        frame = new JFrame(core.getTitle());
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        frame.setLayout(new BorderLayout());
-        frame.add(gameArea,BorderLayout.CENTER);
-        frame.pack();
-        frame.setLocationRelativeTo(null);
-        frame.setResizable(true);
-        frame.setVisible(true);
-        frame.createBufferStrategy(2);
-        g = gameArea.getGraphics();
-        gameArea.setIgnoreRepaint(false);
-        frame.setIgnoreRepaint(false);
     }
     public void update()
     {

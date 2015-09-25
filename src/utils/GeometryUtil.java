@@ -165,5 +165,9 @@ public class GeometryUtil {
         return intersection;
     }
     
+    public static boolean pointsEqual(Point2D.Double p1,Point2D.Double p2){
+        return  p1.x==p2.x && p1.y == p2.y;
+        
+    }
 
 }

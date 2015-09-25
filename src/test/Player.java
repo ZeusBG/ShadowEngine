@@ -12,9 +12,8 @@ import gameObjects.LivingObject;
 import gameObjects.Weapon;
 import java.awt.Color;
 import java.awt.Point;
-import java.awt.Shape;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import render.Light;
 import utils.ObjectType;
 import utils.Sounds;
@@ -32,6 +31,7 @@ public class Player extends LivingObject{
         super(x, y, type);
         speed = 500;
         aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+        
     }
     
     public Player(){
@@ -40,6 +40,8 @@ public class Player extends LivingObject{
         weapon = null;
         aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
         light = new Light(this);
+        light.setRadius(300);
+        
     }
     
     
@@ -52,47 +54,47 @@ public class Player extends LivingObject{
         orientation.y = crosshair.y - currentPosition.y;
         orientation.normalize();
         
-        if(core.getInput().isMouseButtonPressed(MouseEvent.BUTTON1)){
+        if(core.getInput().isMouseButtonPressed(0)){
             weapon.fire();
         }
         
-       if(core.getInput().isKeyPressed(KeyEvent.VK_R)){
+       if(core.getInput().isKeyPressed(Keyboard.KEY_R)){
            weapon.reload();
         }
         
-        if(core.getInput().isKeyPressed(KeyEvent.VK_W)){
+        if(core.getInput().isKeyPressed(Keyboard.KEY_W)){
             nextPosition.y = currentPosition.y-2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
-        if(core.getInput().isKeyPressed(KeyEvent.VK_S)){
+        if(core.getInput().isKeyPressed(Keyboard.KEY_S)){
             nextPosition.y = currentPosition.y+2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
-        if(core.getInput().isKeyPressed(KeyEvent.VK_A)){
+        if(core.getInput().isKeyPressed(Keyboard.KEY_A)){
             nextPosition.x = currentPosition.x-2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
-        if(core.getInput().isKeyPressed(KeyEvent.VK_D)){
+        if(core.getInput().isKeyPressed(Keyboard.KEY_D)){
             nextPosition.x = currentPosition.x+2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         
         
         
-        if(core.getInput().isKeyPressed(KeyEvent.VK_O)){
-            core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.8f);
+        if(core.getInput().isKeyPressed(Keyboard.KEY_O)){
+            //core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.8f);
             core.getObjectManager().getCamera().zoomIn();
         }
         
-        if(core.getInput().isKeyPressed(KeyEvent.VK_P)){
+        if(core.getInput().isKeyPressed(Keyboard.KEY_P)){
             core.getObjectManager().getCamera().zoomOut();
-            core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 1.0f);
+            //core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 1.0f);
         }
         
-        if(core.getInput().isKeyReleased(KeyEvent.VK_A) &&
-           core.getInput().isKeyReleased(KeyEvent.VK_D) &&
-           core.getInput().isKeyReleased(KeyEvent.VK_W) &&
-           core.getInput().isKeyReleased(KeyEvent.VK_S)){
+        if(core.getInput().isKeyReleased(Keyboard.KEY_A) &&
+           core.getInput().isKeyReleased(Keyboard.KEY_D) &&
+           core.getInput().isKeyReleased(Keyboard.KEY_W) &&
+           core.getInput().isKeyReleased(Keyboard.KEY_S)){
             core.getSoundManager().stop(Sounds.MOVEMENT_PLAYER);
         }
         
@@ -108,13 +110,10 @@ public class Player extends LivingObject{
     
     @Override
     public void render(Core core, Renderer r) {
-        Shape tmp = r.getG2d().getClip();
-        r.getG2d().setClip(null);
         r.setColor(Color.black);
-        r.drawCircle((int)currentPosition.x,(int)currentPosition.y,20);
+        r.drawCircle((int)currentPosition.x,(int)currentPosition.y,5);
         r.setColor(Color.red);
         r.drawRay((int)currentPosition.x, (int)currentPosition.y,crosshair.x, crosshair.y);
-        r.getG2d().setClip(tmp);
         //r.drawLine(x, y,crosshair.x, crosshair.y);
     }
     

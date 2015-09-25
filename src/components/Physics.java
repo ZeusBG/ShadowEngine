@@ -31,7 +31,7 @@ public class Physics {
 
     public Physics(Core core) {
         this.core = core;
-        collisionTree = new QuadTree<>(4, 6, new AABB(0, 0, 900, 700));
+        collisionTree = new QuadTree<>(4, 6, new AABB(0, 0, 1700, 1300));
     }
 
     public void moveObjects(float dt) {
@@ -51,7 +51,7 @@ public class Physics {
     }
 
     public void update(float _dt) {
-        collisionTree = new QuadTree<>(4, 6, new AABB(0, 0, 900, 700));
+        collisionTree = new QuadTree<>(4, 6, new AABB(0, 0, 1700, 1300));
         for (GameObject go : core.getObjectManager().getAllObjects()) {
             collisionTree.insert(go);
         }
@@ -104,7 +104,7 @@ public class Physics {
                                 && distanceToExplosion < ego.getCurrentRadius()) {
 
                             System.out.println("dealing damage to "+go.getID());
-                            //ego.getDamageDealtTo().put(go, Boolean.TRUE);
+                            ego.getDamageDealtTo().put(go, Boolean.TRUE);
 
                         }
                     }
@@ -142,7 +142,7 @@ public class Physics {
                 if (GeometryUtil.checkIntersectionLineAABB(playerPath, go2.getAabb())) {
                     for (Line2D.Double line : go2.getLines()) {
                         if (GeometryUtil.getIntersectionLines(playerPath, line) != null) {
-                            System.out.println("intersection !");
+                            //System.out.println("intersection !");
                             Point2D.Double nextPoint = GeometryUtil.getIntersectionLines(playerPath, line);
                             Vector v = new Vector((Point2D.Double) line.getP2(), (Point2D.Double) line.getP1());
 

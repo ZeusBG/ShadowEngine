@@ -5,18 +5,18 @@
  */
 package engine;
 
-import java.awt.Point;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 /**
  *
  * @author Zeus
  */
-public class Input implements KeyListener,MouseListener,MouseMotionListener{
+public class Input{
     private Core core;
     private boolean keys[];
     private boolean previousKeys[];
@@ -33,97 +33,47 @@ public class Input implements KeyListener,MouseListener,MouseMotionListener{
         mouseButtons = new boolean[5];
         previousMouseButtons = new boolean[5];
         
-        
-        core.getWindow().getGameArea().addMouseListener(this);
-        core.getWindow().getGameArea().addMouseMotionListener(this);
-        core.getWindow().getGameArea().addKeyListener(this);
-        
+        System.out.println("Mouse: "+Mouse.isCreated());
     }
     
     public void update(){
         previousKeys = keys.clone();
         previousMouseButtons = mouseButtons.clone();
-    }
-
-    
-    
-    @Override
-    public void keyTyped(KeyEvent e) {
-    }
-
-    @Override
-    public void keyPressed(KeyEvent e) {
-        keys[e.getKeyCode()] = true;
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        keys[e.getKeyCode()] = false;
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
+        mouseX = Mouse.getX();
+        mouseY = Display.getHeight()-Mouse.getY();
         
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        mouseButtons[e.getButton()] = true;
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        mouseButtons[e.getButton()] = false;
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        mouseX = e.getX()+8;
-        mouseY = e.getY()-25;
-    }
-
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        mouseX = e.getX()+8;
-        mouseY = e.getY()-25;
-    }
+    
+    
+    
     
     public boolean isKeyJustPressed(int code){
-        return keys[code] && !previousKeys[code];
+        return Keyboard.isKeyDown(code);
     }
     
     public boolean isKeyJustReleased(int code){
-        return !keys[code] && previousKeys[code];
+        return !Keyboard.isKeyDown(code);
     }
     
     public boolean isKeyPressed(int code){
         
-        return keys[code];
+        return Keyboard.isKeyDown(code);
     }
     
     public boolean isKeyReleased(int code){
-        return !keys[code];
+        return !Keyboard.isKeyDown(code);
     }
     
     public boolean isMouseButtonPressed(int button){
-        return mouseButtons[button];
+        return Mouse.isButtonDown(button);
     }
     
     public boolean isMouseButtonReleased(int button){
-        return !mouseButtons[button];
+        return !Mouse.isButtonDown(button);
     }
     
-    public int getMouseX(){
+     public int getMouseX(){
         return (int)(mouseX/core.getObjectManager().getCamera().getWidthScale() - core.getObjectManager().getCamera().getX());
     }
     

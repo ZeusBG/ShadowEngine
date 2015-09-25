@@ -39,7 +39,8 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         timeSpawned = System.currentTimeMillis();
         damageDealtTo = new HashMap<>();
         light = new Light(this);
-        
+        Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
+        light.setColor(c);
         
         
         currentPosition = new Point2D.Double(x,y);
@@ -53,11 +54,8 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         currentRadius = 0;
         timeExploded = System.currentTimeMillis();
         light = new Light(this);
-        Color[] colors = {new Color(255/255f, 0/255f, 0/255f, 0.9f), 
-                            new Color(153/255f, 204/255f, 255/255f,0.2f),
-                            new Color(1.0f, 1.0f, 1.0f, 0.0f)};
-        
-        light.setColors(colors);
+        Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
+        light.setColor(c);
         
     }
     
@@ -72,6 +70,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
             previousRadius = currentRadius;
             currentRadius +=(expansionSpeed*dt);
             light.setRadius(currentRadius*5);
+            light.setPower(light.getPower()+(float)(expansionSpeed/10000.0));
             
         }
         
@@ -83,8 +82,10 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     }
     
     public void render(Core core,Renderer r){
-        if(exploded)
+        if(exploded){
+            r.setColor(Color.WHITE);
             r.drawCircle((int)currentPosition.x,(int)currentPosition.y,currentRadius);
+        }
         
     }
 

@@ -1,0 +1,8 @@
+1.Add Z-index to objects so that they can render properly one after another;
+2.Add object components to hold textures.
+3.Make AI and AI control on separate thread.
+4.Make a way to serialize the whole map into a file and then read from it.
+5.Make map editor
+6.Networking and Multiplayer.
+7.After everything is done start extending the game and make different weapons, bots, maps, etc..
+8.Game Release (definitely not soon :D)

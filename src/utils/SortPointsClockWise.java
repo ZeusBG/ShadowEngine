@@ -20,6 +20,9 @@ public class SortPointsClockWise implements Comparator<Point2D.Double>{
         }
         @Override
         public int compare(Point2D.Double o1, Point2D.Double o2) {
+            if(o1.equals(o2)){
+                return 0;
+            }
             if (o1.x - center.x >= 0 && o2.x - center.x < 0)
                 return 1;
             if (o1.x - center.x < 0 && o2.x - center.x >= 0)

@@ -8,29 +8,31 @@ package render;
 import components.AABB;
 import gameObjects.DynamicGameObject;
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 /**
  *
  * @author Zeus
  */
 public class Light {
-    float radius= 100;
-    float[] dist = {0.001f,0.01f, 1.0f};
-    Color[] colors = {new Color(255/255f, 255/255f, 128/255f, 0.5f), new Color(255/255f, 255/255f, 204/255f,0.2f),new Color(1.0f, 1.0f, 1.0f, 0.0f)};
-    DynamicGameObject owner;
-    AABB aabb;
+    public float radius= 300;
+    public float power = 1;
+    public Color color;
+    public Point2D.Double location;
+    public DynamicGameObject owner;
+    public AABB aabb;
     
     
-    public Light(float radius, float[] dist, Color[] colors, DynamicGameObject owner) {
+    public Light(float radius, Color color, DynamicGameObject owner) {
         this.radius = radius;
-        this.dist = dist;
-        this.colors = colors;
+        this.color = color;
         this.owner = owner;
         aabb = new AABB();
     }
 
     public Light(DynamicGameObject owner) {
         this.owner = owner;
+        color = new Color(1.0f,1.0f,1.0f);
         aabb = new AABB();
     }
 
@@ -38,12 +40,8 @@ public class Light {
         return radius;
     }
 
-    public float[] getDist() {
-        return dist;
-    }
-
-    public Color[] getColors() {
-        return colors;
+    public Color getColor() {
+        return color;
     }
 
     public DynamicGameObject getOwner() {
@@ -54,12 +52,8 @@ public class Light {
         this.radius = radius;
     }
 
-    public void setDist(float[] dist) {
-        this.dist = dist;
-    }
-
-    public void setColors(Color[] colors) {
-        this.colors = colors;
+    public void setColor(Color color) {
+        this.color = color;
     }
 
     public void setOwner(DynamicGameObject owner) {
@@ -74,7 +68,22 @@ public class Light {
         return aabb;
     }
     
-    
+    public Point2D.Double getLocation(){
+        
+        Point2D.Double loc = new Point2D.Double();
+        loc.x = owner.getCurrentPosition().x;
+        loc.y = owner.getCurrentPosition().y;
+        return loc;
+        
+    }
+
+    public float getPower() {
+        return power;
+    }
+
+    public void setPower(float power) {
+        this.power = power;
+    }
 
 
     

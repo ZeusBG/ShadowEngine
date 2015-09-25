@@ -10,8 +10,16 @@ import components.ObjectManager;
 import components.Physics;
 import components.SoundManager;
 import gameObjects.GameObject;
+import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.scene.input.KeyCode;
+import org.lwjgl.LWJGLException;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.PixelFormat;
 
 /**
  *
@@ -24,7 +32,7 @@ public class Core implements Runnable {
     private Window window;
     private Input input;
     private Physics physics;
-    private int width = 800, height = 600;
+    private int width = 1920, height = 1080;
     
     private String title = "My engine v1.0";
     private ObjectManager objManager;
@@ -40,7 +48,11 @@ public class Core implements Runnable {
     }
 
     public void init() {
-
+        System.out.println("first");
+        
+        
+        
+        
         thread = new Thread(this);
         objManager = new ObjectManager(this);
         window = new Window(this);
@@ -79,8 +91,11 @@ public class Core implements Runnable {
         double lastTime = System.nanoTime() / 1000000000.0;
         double passedTime = 0;
         double unprocessedTime = 0;
-
+        int count = 0;
         while (isRunning) {
+            count++;
+            if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
+                System.exit(0);
             FPSCounter = System.nanoTime();
             //System.out.println("asdasd");
             boolean render = false;
@@ -91,7 +106,7 @@ public class Core implements Runnable {
             unprocessedTime += passedTime;
             input.update();
             while (unprocessedTime >= frameCap) {
-                int count = 0;
+                
                 //System.out.printf("inner While - %d\n",count++);
 
                 //game.update(this,(float) frameCap);
@@ -109,7 +124,7 @@ public class Core implements Runnable {
                 //window.update();
 
                 game.render(this, renderer);
-                renderer.clear();
+                //renderer.clear();
 
             } else {
                 try {
@@ -118,7 +133,8 @@ public class Core implements Runnable {
                     Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            System.out.println("Time for a frame : " + (System.nanoTime() - FPSCounter) / 1000000);
+            if(count%60==0);
+                System.out.println("Time for a frame : " + (System.nanoTime() - FPSCounter) / 1000000);
 
         }
         cleanUp();

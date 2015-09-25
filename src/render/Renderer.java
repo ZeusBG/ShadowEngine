@@ -7,25 +7,36 @@ package render;
 
 import components.ObjectManager;
 import engine.Core;
-import gameObjects.DynamicGameObject;
 import gameObjects.GameObject;
-import gameObjects.Projectile;
+import gameObjects.LivingObject;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
-import java.awt.RadialGradientPaint;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Area;
-import java.awt.geom.Ellipse2D;
+import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferStrategy;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import math.Ray;
 import math.Vector;
+import org.lwjgl.opengl.Display;
+import static org.lwjgl.opengl.GL11.*;
+
 import utils.SortPointsClockWise;
+import static org.lwjgl.opengl.GL20.*;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
+import render.Material.MaterialBuilder;
+import utils.GeometryUtil;
 
 /**
  *
@@ -37,200 +48,237 @@ public class Renderer {
     //private Graphics2D g2d;
     private Graphics2D g2d;
     private BufferStrategy bs;
-    private double cameraOffSetX;
-    private double cameraOffSetY;
-    private double scaleX;
-    private double scaleY;
+    private float cameraOffSetX;
+    private float cameraOffSetY;
+    private float scaleX;
+    private float scaleY;
+    private int lightShader;
+    private int lightFragmentShader;
+    private int textureShader;
+    private LightMap lightMap;
+    private Texture tex;
+    private Texture floor;
 
     public Renderer(Core core) {
         this.core = core;
-        g2d = (Graphics2D) core.getWindow().getBufferStrategy().getDrawGraphics();
-        bs = core.getWindow().getBufferStrategy();
-        //g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        //g2d.setRenderingHint(RenderingHints.KEY_RENDERING,
-        //RenderingHints.VALUE_RENDER_QUALITY);
+        initialize();
+        lightMap = new LightMap(core.getWidth(), core.getHeight(),this,core);
+        lightMap.init();
+        glEnable(GL_TEXTURE_2D);
+        tex = null;
+        try {
+             tex = TextureLoader.getTexture("JPEG",new FileInputStream(new File("res/textures/car.jpg")));
+             floor = TextureLoader.getTexture("JPEG",new FileInputStream(new File("res/textures/plates6.jpg")));
+        } catch (IOException ex) {
+            Logger.getLogger(Renderer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public void render() {
+        float xPos = core.getInput().getMouseX();
+        float ypos = core.getInput().getMouseY();
+        
+        
+        
+        
+        
+        
         ObjectManager objectsToRender = core.getObjectManager();
-        //if(dynamicLights) - castvam senki kum vsi4ko(kur6umi,hora);
-        //castvam visibilityto
 
-        //setvam clip
-        //render objects
         if (core.getObjectManager().getCamera().isDynamic()) {
-            cameraOffSetX = core.getObjectManager().getCamera().getDynamicX();
-            cameraOffSetY = core.getObjectManager().getCamera().getDynamicY();
+            cameraOffSetX = (float)core.getObjectManager().getCamera().getDynamicX();
+            cameraOffSetY = (float)core.getObjectManager().getCamera().getDynamicY();
         } else {
-            cameraOffSetX = core.getObjectManager().getCamera().getX();
-            cameraOffSetY = core.getObjectManager().getCamera().getY();
+            cameraOffSetX = (float)core.getObjectManager().getCamera().getX();
+            cameraOffSetY = (float)core.getObjectManager().getCamera().getY();
         }
-        //cameraOffSetX = 0;
-        //cameraOffSetX = 0;
-
-        scaleX = core.getObjectManager().getCamera().getWidthScale();
-        scaleY = core.getObjectManager().getCamera().getHeightScale();
+        scaleX = (float)core.getObjectManager().getCamera().getWidthScale();
+        scaleY = (float)core.getObjectManager().getCamera().getHeightScale();
 
         cameraOffSetX *= scaleX;
         cameraOffSetY *= scaleY;
-        //System.out.println("cameraOffsetX: "+cameraOffSetX);
+        
+        
+        MaterialBuilder matBuilder = new MaterialBuilder(floor,new Point2D.Float(0,0)).color(org.newdawn.slick.Color.white).scale(45, 45).dimension(2000, 2000);
+        
+        Material mat = new Material(matBuilder);
+        drawMaterial(mat);
+        
+        glBindTexture(GL_TEXTURE_2D, tex.getTextureID());
+        glEnable(GL_TEXTURE_2D);
+        glBegin(GL_QUADS);
+           glTexCoord2f(0,0);
+           glVertex2f((int)(200*scaleX+cameraOffSetX),(int)(200*scaleY+cameraOffSetY));
+           glTexCoord2f(0,0.65f);
+           glVertex2f((int)(225*scaleX+cameraOffSetX),(int)(200*scaleY+cameraOffSetY));
+           glTexCoord2f(0.65f,0.65f);
+           glVertex2f((int)(225*scaleX+cameraOffSetX),(int)(250*scaleY+cameraOffSetY));
+           glTexCoord2f(0.65f,0);
+           glVertex2f((int)(200*scaleX+cameraOffSetX),(int)(250*scaleY+cameraOffSetY));
+        glEnd();
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glDisable(GL_TEXTURE_2D);
+          
+          
+          
+          
+        glEnable(GL_STENCIL_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+        
+        castShadows(objectsToRender.getPlayer());
+        
+        glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST);
+        //glDisable(GL_BLEND);
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glBegin(GL_QUADS);
+        glVertex2f(300, 300);
+        glVertex2f(350, 300);
+        glVertex2f(350, 350);
+        glVertex2f(300, 350);
+        glEnd();
+        
 
-        clear();
+       
+        
+        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
+        glEnable(GL_STENCIL_TEST);
+        //drawPolygon(findIntersectionPoints(objectsToRender.getPlayer().getLight()));
+        glDisable(GL_STENCIL_TEST);
+        
+        //lightMap.blurShadows();
+        lightMap.blurShadows();
+        lightMap.blurShadows();
+        lightMap.blurShadows();
+        lightMap.blurShadows();
 
-        castShadows(objectsToRender.getPlayer().getCurrentPosition());
-
-        //setClip
-        if (core.getObjectManager().getPlayer() != null) {
+        drawLightMap();
+        
+         if (core.getObjectManager().getPlayer() != null) {
             core.getObjectManager().getPlayer().render(core, this);
         }
 
-        for (DynamicGameObject obj : core.getObjectManager().getDynamicObjects()) {
-            if(obj.getObjState().isRenderable())
+        
+        glColor3f(1.0f,1.0f,1.0f);
+        for(GameObject obj : core.getObjectManager().getAllObjects()){
+            if(obj.getMaterial()!=null){
+                drawMaterial(obj.getMaterial());
+            }
+            else{
                 obj.render(core, this);
+            }
         }
-        for (Projectile obj : core.getObjectManager().getProjectiles()) {
-            if(obj.getObjState().isRenderable())
-                obj.render(core, this);
-        }
-        for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
-            if(obj.getObjState().isRenderable())
-                obj.render(core, this);
-        }
-        bs.show();
+
+        glDisable(GL_BLEND);
+        
+        lightMap.clear();
+        lightMap.drawVisibilityTriangle(objectsToRender.getPlayer());
+        lightMap.drawVisibilityPolygon(core.getObjectManager().getPlayer().getCurrentPosition());
+        //drawLightMap();
+        lightMap.blurShadows();
+        lightMap.blurShadows();
+        lightMap.blurShadows();
+        lightMap.blurShadows();
+    
+        
+        drawLightMap();
+        
+        
+        
+        Display.update();
+        Display.sync(60);
+        
+        
+        clear();
+    }
+
+    public float getScale(){
+        return scaleX;
+    }
+    
+    private void initialize() {
+        initLightShader();
 
     }
 
-    public void drawCircle(int x, int y, int r) {
-        g2d.draw(new Ellipse2D.Double(scaleX * (x - r) + cameraOffSetX, scaleY * (y - r) + cameraOffSetY, scaleX * r * 2, scaleY * r * 2));
-    }
+    public void drawCircle(double cx, double cy, double r) {
+        glBegin(GL_LINE_LOOP);
+        int num_segments = 100;
+        cx = scaleX * cx + cameraOffSetX;
+        cy = scaleY * cy + cameraOffSetY;
+        r = scaleX * r;
+        for (int ii = 0; ii < num_segments; ii++) {
+            float theta = ii * 2.0f * 3.1415926f / (float) num_segments;//get the current angle 
 
-    public Graphics2D getG2d() {
-        return g2d;
+            double x = r * Math.cos(theta);//calculate the x component 
+            double y = r * Math.sin(theta);//calculate the y component 
+
+            glVertex2f((float) (x + cx), (float) (y + cy));//output vertex 
+
+        }
+        glEnd();
     }
 
     public void clear() {
-        g2d.setClip(null);
-        g2d.setColor(Color.WHITE);
-        g2d.fillRect(0, 0, 5000, 5000);
-        g2d.setColor(Color.BLACK);
-        //g2d.dispose();
-        //bs.dispose();
+
+        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_STENCIL_BUFFER_BIT);
+        glDisable(GL_STENCIL_TEST);
+        lightMap.clear();
     }
 
-    public void castShadows(Point2D.Double lightSource) {
+    public void castShadows(LivingObject pointOfView) {
 
-        drawSight(lightSource);
+        drawSight(pointOfView.getCurrentPosition());
+        glDisable(GL_BLEND);
+        glClear(GL_STENCIL_BUFFER_BIT);
 
+
+    }
+
+    private void drawVisibilityTriangle(LivingObject pointOfView) {
+        glColor3f(0.0f,0.0f,0.0f);
+        Vector p = pointOfView.getOrientation();
+        Point2D.Double p1 = new Point2D.Double();
+        p1.x = pointOfView.getCurrentPosition().x + p.x * 10;
+        p1.y = pointOfView.getCurrentPosition().y + p.y * 10;
+        Point2D.Double p2 = new Point2D.Double();
+        Point2D.Double p3 = new Point2D.Double();
+        p2.x = p1.x + p.getPerpendicular().x * 20;
+        p2.y = p1.y + p.getPerpendicular().y * 20;
+        p3.x = p1.x + p.getPerpendicular2().x * 20;
+        p3.y = p1.y + p.getPerpendicular2().y * 20;
+        p2.x += (p2.x - pointOfView.getCurrentPosition().x) * 1000;
+        p2.y += (p2.y - pointOfView.getCurrentPosition().y) * 1000;
+
+        p3.x += (p3.x - pointOfView.getCurrentPosition().x) * 1000;
+        p3.y += (p3.y - pointOfView.getCurrentPosition().y) * 1000;
+
+        ArrayList<Point2D.Double> visibility = new ArrayList<>();
+        visibility.add(pointOfView.getCurrentPosition());
+        visibility.add(p2);
+        visibility.add(p3);
+        drawPolygon(visibility);
     }
 
     private void drawSight(Point2D.Double lightSource) {
 
-        g2d.setClip(null);
-
-        Area light1 = new Area(findIntersectionPoints(core.getObjectManager().getPlayer().getLight()));
-        ArrayList<Area> lights = new ArrayList<>();
-        ArrayList<Light> lightDescription = new ArrayList<>();
-        Area visibility = new Area();
         for (GameObject obj : core.getObjectManager().getAllObjects()) {
+
             Light light = obj.getLight();
-            if (light == null || !obj.getObjState().isRenderable()) {
+            if (light == null) {
                 continue;
             }
-            Area lightRadius = new Area(findIntersectionPoints(light));
-            lightRadius.intersect(new Area(new Ellipse2D.Double(scaleX * (light.getOwner().getCurrentPosition().x - light.getRadius()) + cameraOffSetX,
-                    scaleY * (light.getOwner().getCurrentPosition().y - light.getRadius()) + cameraOffSetY,
-                    scaleX * 2 * light.getRadius(),
-                    scaleY * 2 * light.getRadius())));
-
-            lights.add(lightRadius);
-            visibility.add(lightRadius);
-            lightDescription.add(light);
+            Point2D.Double pos = getScaledPoint(light.getLocation());
+            
+            ArrayList<Point2D.Double> points = findIntersectionPoints(light);
+            lightMap.addLight(light,pos,points);
+            drawLight(points, light);
 
         }
 
-        visibility.intersect(light1);
-
-        float radius = 640;
-        float[] dist = {0.0f, 0.4f};
-        Color[] colors = {new Color(1.0f, 1.0f, 1.0f, 1.0f), new Color(0.0f, 0.0f, 0.0f, 1.0f)};
-        float[] dist2 = {0.05f, 0.3f};
-
-        Polygon screen = new Polygon();
-
-        screen.addPoint(0, 0);
-        screen.addPoint(0, 2000);
-        screen.addPoint(2000, 2000);
-        screen.addPoint(2000, 0);
-        Area mask = new Area(screen);
-        //if(light1.npoints>0){
-
-        //Area lightRadius = new Area(new Ellipse2D.Double(scaleX * (lightSource.x - radius) + cameraOffSetX, scaleY * (lightSource.y - radius) + cameraOffSetY, scaleX * 2 * radius + cameraOffSetX, scaleY * 2 * radius + cameraOffSetY));
-        //light1.intersect(lightRadius);
-        Point2D.Double playerPoint = core.getObjectManager().getPlayer().getCurrentPosition();
-        Vector playerOrientation = new Vector(core.getObjectManager().getPlayer().getOrientation());
-        playerOrientation.normalize();
-
-        Point2D.Double p1 = getScaledPoint(playerPoint);
-
-        int arcRadius = 380;
-        int extent = 130;
-        double angle = Math.atan2(playerOrientation.x, playerOrientation.y) * 180 / Math.PI;
-        //if(angle<0)
-        //angle = 360+angle;
-
-        Arc2D.Double arc = new Arc2D.Double(p1.x - scaleX * arcRadius / 2, p1.y - scaleY * arcRadius / 2, scaleX * arcRadius, scaleY * arcRadius, angle - extent / 2 + extent - 90, -extent, Arc2D.PIE);
-        //Arc2D.Double arc = new Arc2D.Double(scaleX*(playerPoint.x - arcRadius / 2)+cameraOffSetX, scaleY*(playerPoint.y - arcRadius / 2)+cameraOffSetY, scaleX*arcRadius, scaleY*arcRadius, angle-extent/2+extent-90 , -extent, Arc2D.PIE);
-
-        light1.intersect(new Area(arc));
-        light1.add(visibility);
-
-        //g2d.setColor(Color.black);
-        Polygon visibilityTriangle = new Polygon();
-
-        Point2D.Double scaledLightSource = getScaledPoint(lightSource);
-
-        visibilityTriangle.addPoint((int) scaledLightSource.x, (int) scaledLightSource.y);
-        visibilityTriangle.addPoint((int) (scaledLightSource.x + (arc.getStartPoint().getX() - scaledLightSource.x) * 10), (int) (scaledLightSource.y + (arc.getStartPoint().getY() - scaledLightSource.y) * 10));
-        visibilityTriangle.addPoint((int) (scaledLightSource.x + (arc.getEndPoint().getX() - scaledLightSource.x) * 10), (int) (scaledLightSource.y + (arc.getEndPoint().getY() - scaledLightSource.y) * 10));
-        //g2d.setColor(Color.red);
-        //g2d.drawPolygon(visibilityTriangle);
-
-        light1.intersect(new Area(visibilityTriangle));
-        mask.subtract(new Area(light1));
-        g2d.setColor(Color.BLACK);
-        g2d.fill(mask);
-        for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
-            if(obj.getObjState().isRenderable())
-                obj.render(core, this);
-        }
-
-        g2d.setColor(new Color(0f, 0f, 0f, 0.8f));
-        g2d.fill(mask);
-
-        //g2d.setColor(null);
-        g2d.setPaint(new RadialGradientPaint(new Point2D.Double(scaleX * lightSource.x + cameraOffSetX, scaleY * lightSource.y + cameraOffSetY), (int) (scaleX * radius), dist2, colors));
-        g2d.fill(light1);
-
-        g2d.setColor(Color.red);
-        //g2d.draw(light1);
-        g2d.setClip(light1);
-        //g2d.draw(light1);
-        //g2d.scale(scaleX, scaleY);
-        for (int i = 0; i < lightDescription.size(); i++) {
-            Point2D.Double pos = new Point2D.Double();
-            pos.x = lightDescription.get(i).getOwner().getCurrentPosition().x;
-            pos.y = lightDescription.get(i).getOwner().getCurrentPosition().y;
-
-            g2d.setPaint(new RadialGradientPaint(new Point2D.Double(scaleX * pos.x + cameraOffSetX, scaleY * pos.y + cameraOffSetY), (int) (lightDescription.get(i).getRadius() * scaleX), lightDescription.get(i).getDist(), lightDescription.get(i).getColors()));
-
-            g2d.fill(lights.get(i));
-        }
-
-        //g2d.scale(1, 1);
-        //g2d.setClip(null);
-        //g2d.setPaint(null);
-        //core.getObjectManager().getRayCollisionTree().drawTree(g2d, (int) cameraOffSetX, (int) cameraOffSetY);
-        core.getPhysics().getCollisionTree().drawTree(g2d, (int) cameraOffSetX, (int) cameraOffSetY, scaleX, scaleY);
     }
 
     public Point2D.Double getScaledPoint(Point2D.Double p) {
@@ -239,29 +287,37 @@ public class Renderer {
         scaled.y = scaleY * p.y + cameraOffSetY;
         return scaled;
     }
+    
+    public Point2D.Float getScaledPoint(Point2D.Float p) {
+        Point2D.Float scaled = new Point2D.Float();
+        scaled.x = (float)(scaleX * p.x + cameraOffSetX);
+        scaled.y = (float)(scaleY * p.y + cameraOffSetY);
+        return scaled;
+    }
 
-    public Polygon findIntersectionPoints(Light lightSrc) {
+    public ArrayList<Point2D.Double> findIntersectionPoints(Light lightSrc) {
+
         Point2D.Double lightSource = lightSrc.getOwner().getCurrentPosition();
         ArrayList<Point2D.Double> intersectionPoints = new ArrayList<>();
         ArrayList<Point2D.Double> sPoints = new ArrayList<>();
-        //Point2D.Double playerPoint = lightSource;
-        HashSet<GameObject> objects = core.getObjectManager().getRayCollisionTree().getObjectsInRange(lightSrc.getAABB());
-        
-        for (GameObject s : objects) {
-            if(!s.getObjState().isRenderable())
+        HashSet<GameObject> objects = new HashSet();
+        ArrayList<StaticGameObject> allObjects = core.getObjectManager().getStaticObjects();
+
+        for (GameObject s : allObjects) {
+            if (!s.getObjState().isRenderable()) {
                 continue;
+            }
             for (Point2D.Double cPoint : s.getPoints()) {
                 Ray tmpRay = new Ray(lightSource, cPoint);
-                if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay,objects))) {
+                if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null))) {
                     addSecondaryPoints(cPoint, lightSource, sPoints);
                 }
             }
         }
 
         for (Point2D.Double cPoint : sPoints) {
-
             Ray tmpRay = new Ray(lightSource, cPoint);
-            Point2D.Double intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay,objects);
+            Point2D.Double intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null);
             if (intersection != null) {
                 intersectionPoints.add(intersection);
             }
@@ -269,12 +325,7 @@ public class Renderer {
 
         Collections.sort(intersectionPoints, new SortPointsClockWise(lightSource));
 
-        Polygon light = new Polygon();
-        for (int i = 0; i < intersectionPoints.size(); i++) {
-            light.addPoint((int) (scaleX * intersectionPoints.get(i).x + cameraOffSetX), (int) (scaleY * intersectionPoints.get(i).y + cameraOffSetY));
-
-        }
-        return light;
+        return intersectionPoints;
 
     }
 
@@ -297,14 +348,17 @@ public class Renderer {
 
     public void drawLine(int x1, int y1, int x2, int y2) {
 
-        g2d.drawLine((int) (scaleX * x1 + cameraOffSetX), (int) (scaleY * y1 + cameraOffSetY), (int) (scaleX * x2 + cameraOffSetX), (int) (scaleY * y2 + cameraOffSetY));
+        glBegin(GL_LINE_LOOP);
+        glVertex2f((float) (scaleX * x1 + cameraOffSetX), (float) (scaleY * y1 + cameraOffSetY));
+        glVertex2f((float) (scaleX * x2 + cameraOffSetX), (float) (scaleY * y2 + cameraOffSetY));;
+        glEnd();
 
     }
 
     public void drawRay(int x1, int y1, int x2, int y2) {
 
         Ray r = new Ray(x1, y1, x2, y2);
-        Point2D.Double endPoint = core.getObjectManager().getRayCollisionTree().intersect(r,null);
+        Point2D.Double endPoint = core.getObjectManager().getRayCollisionTree().intersect(r, null);
 
         if (endPoint != null) {
             drawLine(x1, y1, (int) endPoint.x, (int) endPoint.y);
@@ -315,14 +369,215 @@ public class Renderer {
     }
 
     public void setColor(Color c) {
-        g2d.setColor(c);
+        if (c == null) {
+            return;
+        }
+        glColor4f(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
     }
 
     public void drawTriangle(Point2D.Double a, Point2D.Double b, Point2D.Double c) {
-        Polygon p = new Polygon();
-        p.addPoint((int) (scaleX * a.x + cameraOffSetX), (int) (scaleY * a.y + cameraOffSetY));
-        p.addPoint((int) (scaleX * b.x + cameraOffSetX), (int) (scaleY * b.y + cameraOffSetY));
-        p.addPoint((int) (scaleX * c.x + cameraOffSetX), (int) (scaleY * c.y + cameraOffSetY));
-        g2d.fill(p);
+        glBegin(GL_QUADS);
+        glVertex2f((float) (scaleX * a.x + cameraOffSetX), (float) (scaleY * a.y + cameraOffSetY));
+        glVertex2f((float) (scaleX * b.x + cameraOffSetX), (float) (scaleY * b.y + cameraOffSetY));
+        glVertex2f((float) (scaleX * c.x + cameraOffSetX), (float) (scaleY * c.y + cameraOffSetY));
+        glEnd();
+    }
+
+    public void drawPolygon(ArrayList<Point2D.Double> points) {
+        glEnable(GL_STENCIL_TEST);
+        glClear(GL_STENCIL_BUFFER_BIT);
+        glColorMask(false, false, false, false);
+        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_ZERO);
+
+        glBegin(GL_POLYGON);
+        for (Point2D.Double p : points) {
+            glVertex2f((float) (scaleX * p.x + cameraOffSetX), (float) (scaleY * p.y + cameraOffSetY));
+        }
+        glEnd();
+
+        glColorMask(true, true, true, true);
+        glStencilFunc(GL_EQUAL, 0, 1);
+        glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
+
+        glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(core.getWidth(), 0);
+        glVertex2f(core.getWidth(), core.getHeight());
+        glVertex2f(0, core.getHeight());
+        glEnd();
+        //glUseProgram(0);
+    }
+
+    public void drawReversedPolygon(ArrayList<Point2D.Double> points) {
+
+        glColorMask(false, false, false, false);
+        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_ZERO);
+
+        glBegin(GL_POLYGON);
+        for (Point2D.Double p : points) {
+            glVertex2f((float) (scaleX * p.x + cameraOffSetX), (float) (scaleY * p.y + cameraOffSetY));
+        }
+        glEnd();
+
+        glColorMask(true, true, true, true);
+        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
+
+        glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(core.getWidth(), 0);
+        glVertex2f(core.getWidth(), core.getHeight());
+        glVertex2f(0, core.getHeight());
+        glEnd();
+        glUseProgram(0);
+    }
+
+    public void drawLight(ArrayList<Point2D.Double> points, Light light) {
+        glEnable(GL_STENCIL_TEST);
+        glClear(GL_STENCIL_BUFFER_BIT);
+        glColorMask(false, false, false, false);
+        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_ZERO);
+
+        glBegin(GL_POLYGON);
+        for (Point2D.Double p : points) {
+            glVertex2f((float) (scaleX * p.x + cameraOffSetX), (float) (scaleY * p.y + cameraOffSetY));
+        }
+        glEnd();
+
+        glColorMask(true, true, true, true);
+        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
+
+        Point2D.Double lightLocation = getScaledPoint(light.getLocation());
+        Color lightColor = light.getColor();
+
+        glUseProgram(lightShader);
+        glUniform1f(glGetUniformLocation(lightShader, "power"), (float) light.power);
+        glUniform2f(glGetUniformLocation(lightShader, "lightLocation"), (float) lightLocation.x, Display.getHeight() - (float) lightLocation.y+15);
+        glUniform3f(glGetUniformLocation(lightShader, "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
+        glUniform1f(glGetUniformLocation(lightShader, "scale"), scaleX);
+
+        glBegin(GL_QUADS);
+        glVertex2f(0, 0);
+        glVertex2f(core.getWidth(), 0);
+        glVertex2f(core.getWidth(), core.getHeight());
+        glVertex2f(0, core.getHeight());
+        glEnd();
+        glUseProgram(0);
+
+    }
+
+    private void initLightShader() {
+        lightShader = glCreateProgram();
+        lightFragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        StringBuilder fragmentShaderSource = new StringBuilder();
+
+        try {
+            String line;
+            BufferedReader reader = new BufferedReader(new FileReader("C:\\Users\\Zeus\\Desktop\\OPENGL test\\ShadowEngine\\src\\render\\lightShader.frag"));
+            while ((line = reader.readLine()) != null) {
+                fragmentShaderSource.append(line).append("\n");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        glShaderSource(lightFragmentShader, fragmentShaderSource);
+        glCompileShader(lightFragmentShader);
+        if (glGetShaderi(lightFragmentShader, GL_COMPILE_STATUS) == GL_FALSE) {
+            System.err.println("light fragment shader shader not compiled!");
+        } else {
+            System.out.println("shader loaded successfuly");
+        }
+
+        glAttachShader(lightShader, lightFragmentShader);
+        glLinkProgram(lightShader);
+        glValidateProgram(lightShader);
+    }
+
+    
+    public void setTextures(boolean enable){
+        if(enable){
+            glEnable(GL_TEXTURE_2D);
+        }
+        else
+            glDisable(GL_TEXTURE_2D);
+    }
+
+    public float getCameraOffSetX() {
+        return cameraOffSetX;
+    }
+
+    public float getCameraOffSetY() {
+        return cameraOffSetY;
+    }
+    
+    public void unbindTexture(){
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+    
+    public void bindTexture(Texture tex){
+        glBindTexture(GL_TEXTURE_2D,tex.getTextureID());
+    }
+    
+    public void drawLightMap() {
+        int textureBuffer = lightMap.getFrameBuffer();
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_DST_COLOR, GL_ZERO);
+
+        glColor3f(1.0f, 1.0f, 1.0f);
+        setTextures(true);
+        glBindTexture(GL_TEXTURE_2D, textureBuffer);
+            glBegin(GL_QUADS);
+                glTexCoord2f(0f, 0f);
+                glVertex2f(0, 0);
+                glTexCoord2f(1f, 0f);
+                glVertex2f(core.getWidth(), 0);
+                glTexCoord2f(1f, 1f);
+                glVertex2f(core.getWidth(), core.getHeight());
+                glTexCoord2f(0f, 1f);
+                glVertex2f(0, core.getHeight());
+            glEnd();
+        setTextures(false);
+        unbindTexture();
+        glDisable(GL_BLEND);
+        
+ 
+    }
+
+    public void drawMaterial(Material mat){
+        setTextures(true);
+        bindTexture(mat.getTexture());
+        glColor3f(1.0f,1.0f,1.0f);
+        float matScaleX = mat.getScaleX();
+        float matScaleY = mat.getScaleY();
+        float width = mat.getWidth();
+        float height = mat.getHeight();
+        
+        Point2D.Float location = mat.getLocation();
+        
+        glBegin(GL_QUADS);
+            glTexCoord2f(0,0);
+            glVertex2f(location.x * scaleX+cameraOffSetX,location.y * scaleY + cameraOffSetY);
+            glTexCoord2f(matScaleX,0);
+            glVertex2f((location.x + width) * scaleX + cameraOffSetX,location.y * scaleY + cameraOffSetY);
+            glTexCoord2f(matScaleX,matScaleY);
+            glVertex2f((location.x + width) * scaleX + cameraOffSetX,(location.y + height) * scaleY + cameraOffSetY);
+            glTexCoord2f(0,matScaleY);
+            glVertex2f(location.x * scaleX + cameraOffSetX,(location.y + height) * scaleY + cameraOffSetY);
+        glEnd();
+        
+        unbindTexture();
+        setTextures(false);
+
+    }
+    
+    public void drawRotatedMaterial(Material mat){
+        
     }
 }
