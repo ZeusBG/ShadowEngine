@@ -10,6 +10,7 @@ import engine.Core;
 import render.Renderer;
 import gameObjects.Weapon;
 import java.awt.geom.Point2D;
+import org.newdawn.slick.opengl.Texture;
 import render.Material;
 
 /**
@@ -17,7 +18,7 @@ import render.Material;
  * @author Zeus
  */
 public class Game extends AbstractGame{
-    
+        
 
     
     public static void main(String[] args) {
@@ -29,7 +30,11 @@ public class Game extends AbstractGame{
         core.getObjectManager().getRayCollisionTree().printTree();
         core.start();
     }
-
+    
+    public Game(){
+        super();
+    }
+    
     private void test(Core core){
         Player player = new Player();
         player.setCurrentPosition(new Point2D.Double(150,150));
@@ -45,13 +50,13 @@ public class Game extends AbstractGame{
         for(int i=1;i<10;i++){
             for(int j=1;j<10;j++){
                 
-                String path = "res/textures/box.jpg";
-                String type = "JPEG";
-                Material.MaterialBuilder matBuilder = new Material.MaterialBuilder(type,path,new Point2D.Float(i*100,j*100)).color(org.newdawn.slick.Color.white).scale(80/128f, 80/128f).dimension(50, 50);
+                String path = "res/textures/box2.png";
+                String type = "PNG";
+                Texture texture = textures.get("box2.png", type, path);
+                Material.MaterialBuilder matBuilder = new Material.MaterialBuilder(texture,new Point2D.Float(i*100,j*100)).color(org.newdawn.slick.Color.white).scale(/*80/128f*/1, /*80/128f*/1).dimension(50, 50);
                 Material mat = new Material(matBuilder);
         
                 Wall w = new Wall(0,0);
-                
                 w.addPoint(new Point2D.Double(i*100,j*100));
                 w.addPoint(new Point2D.Double(i*100+50,j*100));
                 w.addPoint(new Point2D.Double(i*100+50,j*100+50));

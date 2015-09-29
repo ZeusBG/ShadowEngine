@@ -10,16 +10,11 @@ import components.ObjectManager;
 import components.Physics;
 import components.SoundManager;
 import gameObjects.GameObject;
-import java.awt.event.KeyEvent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.scene.input.KeyCode;
-import org.lwjgl.LWJGLException;
+
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.PixelFormat;
+
 
 /**
  *
@@ -137,7 +132,6 @@ public class Core implements Runnable {
                 System.out.println("Time for a frame : " + (System.nanoTime() - FPSCounter) / 1000000);
 
         }
-        cleanUp();
 
     }
 
@@ -149,9 +143,6 @@ public class Core implements Runnable {
 
     }
 
-    public void cleanUp() {
-        window.cleanUp();
-    }
 
     public void setSize(int width, int height) {
         //window.setSize(width, height);

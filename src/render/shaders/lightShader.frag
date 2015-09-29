@@ -1,29 +1,28 @@
 uniform vec2 lightLocation;
 uniform vec3 lightColor;
-uniform vec3 objectColor;
-uniform float screenHeight;
-uniform float screenWidth;
-uniform sampler2D backbuffer;
-uniform float scale;
 uniform float power;
+uniform float screenHeight;
+uniform float scale;
 void main() {
 	vec2 position;
         position.x = gl_FragCoord.x/1920;
         position.y = gl_FragCoord.y/1080;
-        vec4 texcolor = texture2D(backbuffer, position);
         float distance = length(lightLocation - gl_FragCoord.xy);
         distance/=scale;
         float attenuation;
+        
+        float lastThreshold = 0.0005-50/100000.0;
 
         if(distance<50)
-            attenuation = 1;
+            attenuation = power*0.0005;
         else if(distance<100)
-            attenuation = power*1-(distance-50)/300;
+            attenuation = power*0.0005-(distance-50)/100000;
         else{
-            attenuation = power*1-50/300.0-(distance-100)/200;
+            attenuation = power*lastThreshold-(distance-100)/100000;
         }
- 
-	vec4 color = vec4(texcolor.x+attenuation, texcolor.y+attenuation, texcolor.z+attenuation,1.0f);
+        
+        
+	vec4 color = vec4(attenuation, attenuation, attenuation,0.5) * vec4(lightColor, 1);
 
 	gl_FragColor = color;
 }

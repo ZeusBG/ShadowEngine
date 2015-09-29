@@ -6,7 +6,6 @@
 package test;
 
 import gameObjects.ExplodingGameObject;
-import utils.ObjectType;
 
 /**
  *

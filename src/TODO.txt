@@ -1,8 +1,10 @@
 1.Add Z-index to objects so that they can render properly one after another;
-2.Add object components to hold textures.
-3.Make AI and AI control on separate thread.
+1.5 Make each Point.Double to Float !
+1.6 Make more customizable lights.
+2.Add object components to hold textures so that objects can have multiplale textures(for example head,body,legs, etc. ).
+3.Make AI path finding on separate thread.
 4.Make a way to serialize the whole map into a file and then read from it.
 5.Make map editor
-6.Networking and Multiplayer.
-7.After everything is done start extending the game and make different weapons, bots, maps, etc..
+6.After everything is done start extending the game and make different weapons, bots, maps, etc..
+7.Networking and Multiplayer.
 8.Game Release (definitely not soon :D)

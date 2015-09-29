@@ -7,8 +7,6 @@ package components;
 
 import gameObjects.GameObject;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Polygon;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
@@ -17,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import math.Ray;
+import render.Renderer;
 import utils.GeometryUtil;
 
 /**
@@ -98,24 +97,17 @@ public class QuadTree<T extends GameObject> {
             objects = new ArrayList<>();
         }
 
-        public void draw(Graphics2D g2d, int offSetX, int offSetY,double scaleX,double scaleY) {
-            Polygon p = new Polygon();
-            p.addPoint((int) (scaleX*aabb.getMinX() + offSetX), (int) (scaleY*aabb.getMinY() + offSetY));
-            p.addPoint((int) (scaleX*aabb.getMaxX() + offSetX), (int) (scaleY*aabb.getMinY() + offSetY));
-            p.addPoint((int) (scaleX*aabb.getMaxX() + offSetX), (int) (scaleY*aabb.getMaxY() + offSetY));
-            p.addPoint((int) (scaleX*aabb.getMinX() + offSetX), (int) (scaleY*aabb.getMaxY() + offSetY));
-
-            g2d.setColor(Color.BLACK);
+        public void draw(Renderer r) {
+            
             if (children == null) {
-
-                g2d.drawPolygon(p);
+                
+                r.drawRect((int)aabb.getMinX(), (int)aabb.getMinY(), (int)(aabb.getMaxX()-aabb.getMinX()), (int)(aabb.getMaxY()-aabb.getMinY()));
                 return;
             }
-            children[0].draw(g2d, offSetX, offSetY,scaleX,scaleY);
-            children[1].draw(g2d, offSetX, offSetY,scaleX,scaleY);
-            children[2].draw(g2d, offSetX, offSetY,scaleX,scaleY);
-            children[3].draw(g2d, offSetX, offSetY,scaleX,scaleY);
-            g2d.drawPolygon(p);
+            for(int i=0;i<4;i++){
+                children[i].draw(r);
+            }
+            r.drawRect((int)aabb.getMinX(), (int)aabb.getMinY(), (int)(aabb.getMaxX()-aabb.getMinX()), (int)(aabb.getMaxY()-aabb.getMinY()));
 
         }
 
@@ -348,8 +340,9 @@ public class QuadTree<T extends GameObject> {
         root.insert(object);
     }
 
-    public void drawTree(Graphics2D g2d, int offSetX, int offSetY,double scaleX,double scaleY) {
-        root.draw(g2d, offSetX, offSetY,scaleX,scaleY);
+    public void drawTree(Renderer r) {
+        r.setColor(Color.white);
+        root.draw(r);
     }
 
     public void printTree() {

@@ -20,7 +20,7 @@ public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
-        speed=300;
+        speed=100;
         light = new Light(this);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
         light.setColor(c);

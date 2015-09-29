@@ -13,7 +13,6 @@ import gameObjects.Weapon;
 import java.awt.Color;
 import java.awt.Point;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import render.Light;
 import utils.ObjectType;
 import utils.Sounds;

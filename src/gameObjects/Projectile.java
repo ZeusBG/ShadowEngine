@@ -5,7 +5,7 @@
  */
 package gameObjects;
 
-import math.Vector;
+
 import utils.ObjectType;
 
 /**

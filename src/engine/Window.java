@@ -5,8 +5,7 @@
  */
 package engine;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
+
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferStrategy;
@@ -31,12 +30,6 @@ import org.lwjgl.opengl.PixelFormat;
  * @author Zeus
  */
 public class Window {
-    
-    private JFrame frame;
-    private JPanel gameArea;
-    private Graphics g;
-    private BufferStrategy bs;
-    
     
     public Window(Core core)
     {
@@ -70,34 +63,8 @@ public class Window {
     }
     public void update()
     {
-        //nqkakuv render
+        
         //bs.show();
-    }
-
-    public JPanel getGameArea() {
-        return gameArea;
-    }
-    
-    public Graphics getGraphics(){
-        return g;
-    }
-    
-    public void cleanUp()
-    {
-        g.dispose();
-        bs.dispose();
-        frame.dispose();
-    }
-    
-    public BufferStrategy getBufferStrategy(){
-        return frame.getBufferStrategy();
-    }
-    
-    public void setSize(int width, int height){
-        //frame.setSize(width, height);
-        gameArea.setSize(width, height);
-        Dimension s = new Dimension(width,height);
-        gameArea.setPreferredSize(s);
     }
     
 }

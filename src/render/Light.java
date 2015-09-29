@@ -15,7 +15,7 @@ import java.awt.geom.Point2D;
  * @author Zeus
  */
 public class Light {
-    public float radius= 300;
+    public float radius= 180;
     public float power = 1;
     public Color color;
     public Point2D.Double location;

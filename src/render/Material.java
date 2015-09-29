@@ -31,6 +31,7 @@ public class Material {
     private float width,height;
     
     
+    
     public Material(Texture texture, Point2D.Float location, Color color) {
         this.texture = texture;
         this.location = location;
@@ -62,7 +63,7 @@ public class Material {
         if(owner==null)
             return location;
         else
-            return location;//
+            return location;
     }
 
     public float getOffsetx() {
@@ -190,7 +191,7 @@ public class Material {
                 private float scaleY = 1;
                 private float width = 0;
                 private float height = 0;
-
+                
 
 		public MaterialBuilder(Texture tex, Point2D.Float location) {
                     this.tex = tex;

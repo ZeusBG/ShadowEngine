@@ -59,7 +59,4 @@ public class Collidable {
         addCollidableWithType("all");
         addCollideType("all");
     }
-    
-    
-    
 }
