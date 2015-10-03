@@ -38,7 +38,7 @@ public class Physics {
         mapSizeX = 1700;
         mapSizeY = 1300;
         treeMaxDepth = 6;
-        treeMaxCapacity = 4;
+        treeMaxCapacity = 2;
         collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
     }
 
@@ -59,10 +59,13 @@ public class Physics {
     }
 
     public void update(float _dt) {
+        collisionTree.clean();
         collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
         for (GameObject go : core.getObjectManager().getAllObjects()) {
             collisionTree.insert(go);
         }
+        //System.out.println("objects in tree: "+collisionTree.getNumOfObjects());
+        //System.out.println("Nodes in the tree: "+collisionTree.getNumOfNodes());
         this.dt = _dt;
         updateObjects();
         collisionTree.checkCollision(this);

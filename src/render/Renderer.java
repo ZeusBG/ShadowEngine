@@ -5,6 +5,7 @@
  */
 package render;
 
+import components.AABB;
 import components.ObjectManager;
 import engine.Core;
 import gameObjects.GameObject;
@@ -157,6 +158,7 @@ public class Renderer {
         glClear(GL_STENCIL_BUFFER_BIT);
         glDisable(GL_STENCIL_TEST);
         glDisable(GL_BLEND);
+        //core.getPhysics().getCollisionTree().drawTree(this);
         //core.getPhysics().getCollisionTree().drawTree(this);
 
         Display.update();
@@ -454,7 +456,7 @@ public class Renderer {
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
-        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilFunc(GL_EQUAL, 0, 1);
         glStencilOp(GL_REPLACE, GL_KEEP, GL_INCR);
 
         glBegin(GL_POLYGON);
@@ -484,13 +486,13 @@ public class Renderer {
         glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), (float) lightLocation.x, Display.getHeight() - (float) lightLocation.y + 15);
         glUniform3f(glGetUniformLocation(lightShader.getProgramID(), "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX);
-
+        AABB aabb = light.getAABB();
         glBegin(GL_QUADS);
         {
-            glVertex2f(0, 0);
-            glVertex2f(core.getWidth(), 0);
-            glVertex2f(core.getWidth(), core.getHeight());
-            glVertex2f(0, core.getHeight());
+            glVertex2f(scaleX*(float)aabb.getMinX()+cameraOffSetX, scaleY*(float)aabb.getMinY()+cameraOffSetY);
+            glVertex2f(scaleX*(float)aabb.getMaxX()+cameraOffSetX, scaleY*(float)aabb.getMinY()+cameraOffSetY);
+            glVertex2f(scaleX*(float)aabb.getMaxX()+cameraOffSetX, scaleY*(float)aabb.getMaxY()+cameraOffSetY);
+            glVertex2f(scaleX*(float)aabb.getMinX()+cameraOffSetX, scaleY*(float)aabb.getMaxY()+cameraOffSetY);
         }
         glEnd();
         lightShader.unbind();

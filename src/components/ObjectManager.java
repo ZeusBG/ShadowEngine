@@ -47,7 +47,7 @@ public class ObjectManager {
         lines = new ArrayList<>();
         staticObjPoints = new ArrayList<>();
         //should be map.getWidth() and map.getHeight() nut there isnt a map for now
-        rayCollisionTree = new QuadTree<StaticGameObject>(4,6,new AABB(0,0,1700,1300));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
+        rayCollisionTree = new QuadTree<StaticGameObject>(2,7,new AABB(0,0,1700,1300));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
         allObjects = new ArrayList<>();
         camera = new Camera(0,0,400,300);
         camera.setCore(core);
@@ -101,7 +101,7 @@ public class ObjectManager {
     }
     
     public void addObject(GameObject obj){
-        System.out.println("ADDING: "+obj.getType()+" ID: "+obj.getID());
+        //System.out.println("ADDING: "+obj.getType()+" ID: "+obj.getID());
         
         allObjects.add(obj);
         obj.setCore(core);

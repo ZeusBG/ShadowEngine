@@ -48,10 +48,12 @@ public class QuadTree<T extends GameObject> {
            
             
         }
-
+        
+        
+        
         public void insert(T object) {
 
-            if (!aabb.intersect(object.getAabb())) {
+            if (!aabb.intersect(object.getAabb()) || object.getAabb().contains(aabb)) {
                 return;
             }
             if (capacity > objects.size() && children == null) {
@@ -74,6 +76,7 @@ public class QuadTree<T extends GameObject> {
             }
         }
 
+        
         public void subDivide() {
             children = new Node[4];
             double minX = aabb.getMinX();
@@ -315,6 +318,42 @@ public class QuadTree<T extends GameObject> {
             }
 
         }
+        
+        public int getNumOfObjects(){
+            
+            if(children == null){
+                return objects.size();
+            }
+            else{
+                return children[0].getNumOfObjects()+
+                        children[1].getNumOfObjects()+
+                        children[2].getNumOfObjects()+
+                        children[3].getNumOfObjects();
+            }
+        }
+        
+        public int getNumOfONodes(){
+            if(children == null){
+                return 1;
+            }
+            else{
+                return 1+children[0].getNumOfObjects()+
+                        children[1].getNumOfObjects()+
+                        children[2].getNumOfObjects()+
+                        children[3].getNumOfObjects();
+            }
+        }
+        public void clean(){
+            if(children==null){
+                objects = null;
+                return;
+                
+            }
+            for(int i=0;i<4;i++){
+                children[i].clean();
+            }
+            children = null;
+        }
 
     }
     
@@ -370,6 +409,17 @@ public class QuadTree<T extends GameObject> {
         return root.getRenderableObjectsInRange(aabb);
     }
         
+    public int getNumOfObjects(){
+        return root.getNumOfObjects();
+    }
+    public int getNumOfNodes(){
+        return root.getNumOfONodes();
+    }
+
+    protected void clean() {
+        root.clean();
+        root =null;
+    }
     
     
 }

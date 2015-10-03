@@ -20,7 +20,7 @@ public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
-        speed=400;
+        speed=100;
         light = new Light(this);
         light.setSpanAngle(60);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
@@ -31,7 +31,7 @@ public class Bullet extends Projectile {
 
     @Override
     public void update(float dt) {
-        aabb.reset(currentPosition.x-1,currentPosition.y-1,currentPosition.x+1,currentPosition.y+1);
+        aabb.reset(currentPosition.x,currentPosition.y,currentPosition.x,currentPosition.y);
         nextPosition.x = currentPosition.x + speed * dt * direction.x;
         nextPosition.y = currentPosition.y + speed * dt * direction.y;
     }

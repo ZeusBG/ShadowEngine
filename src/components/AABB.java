@@ -99,8 +99,11 @@ public class AABB {
 
     boolean intersect(AABB b) {
         return !(maxX < b.getMinX() || b.getMaxX() < minX || maxY < b.getMinY() || b.getMaxY() < minY);
+    }
+    
+    boolean contains(AABB b) {
         
-        
+        return (minX<b.getMinX() && minY<b.getMinY() && maxY>b.getMaxY() && maxX>b.getMaxX());
     }
 
     public double getMinX() {

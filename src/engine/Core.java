@@ -113,7 +113,6 @@ public class Core implements Runnable {
             if (render) {
                 game.render(this, renderer);
                 
-                if(count%20==0)
                     System.out.println("FPS: " + (int)(1000/((System.nanoTime() - FPSCounter) / 1000000)));
             } else {
                 try {
