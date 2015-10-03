@@ -8,3 +8,23 @@
 6.After everything is done start extending the game and make different weapons, bots, maps, etc..
 7.Networking and Multiplayer.
 8.Game Release (definitely not soon :D)
+
+
+
+
+-Engine
+    -Make class which holds all static fields(hp,armor, minimap, etc.)
+    -Separate enemies and allies so that bots can check enemies for line of sight
+    -Make particle engine
+    -Make static light map for lights which are not changing and moving
+    -Optimize QuadTree
+
+    
+-UI
+    Make game states(pause,play,menu)
+    Make health bar, bullets in the clip, minimap
+    
+
+-LivingObjects
+    -Make custom armor class with damage absorb and damage absorb type;
+    

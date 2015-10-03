@@ -32,6 +32,8 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     protected int currentRadius;
     private int previousRadius;
     private HashMap<GameObject,Boolean> damageDealtTo;
+    private AABB explosionRange;
+        
     
     public ExplodingGameObject(int x, int y) {
         
@@ -47,6 +49,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         currentRadius = 0;
         exploded = false;
         aabb = new AABB(x-1,y-1,x+1,y+1);
+        explosionRange = new AABB(x-1,y-1,x+1,y+1);
     }
     
     public void explode(){
@@ -59,7 +62,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         
     }
     
-    public void update(Core core,float dt){
+    public void update(float dt){
         if(exploded){
             damageDealtTo = new HashMap<>();
             if(System.currentTimeMillis()-timeExploded>lifeTime*1000){
@@ -81,7 +84,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         }
     }
     
-    public void render(Core core,Renderer r){
+    public void render(Renderer r){
         if(exploded){
             r.setColor(Color.WHITE);
             r.drawCircle((int)currentPosition.x,(int)currentPosition.y,currentRadius);
@@ -114,8 +117,9 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     }
     
     public AABB getCurrentAABB(){
-        AABB currentAABB = new AABB(x-currentRadius,y-currentRadius,x+currentRadius,y+currentRadius);
-        return currentAABB;
+        //AABB currentAABB = new AABB(x-currentRadius,y-currentRadius,x+currentRadius,y+currentRadius);
+        explosionRange.reset(x-currentRadius,y-currentRadius,x+currentRadius,y+currentRadius);
+        return explosionRange;
     }
 
     public int getPreviousRadius() {

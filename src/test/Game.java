@@ -40,10 +40,28 @@ public class Game extends AbstractGame{
         player.setCurrentPosition(new Point2D.Double(150,150));
         player.setNextPosition(new Point2D.Double(150,150));
         core.addObject(player);
-        
         Weapon wep = new AK(0,0,null);
         core.addObject(wep);
         player.addWeapon(wep);
+        
+        
+        RandomBot bot = new RandomBot();
+        bot.setCurrentPosition(new Point2D.Double(160,160));
+        bot.setNextPosition(new Point2D.Double(160,160));
+        core.addObject(bot);
+        wep = new AK(0,0,null);
+        core.addObject(wep);
+        bot.addWeapon(wep);
+        
+        bot = new RandomBot();
+        bot.setCurrentPosition(new Point2D.Double(360,160));
+        bot.setNextPosition(new Point2D.Double(360,160));
+        core.addObject(bot);
+        wep = new AK(0,0,null);
+        core.addObject(wep);
+        bot.addWeapon(wep);
+        
+        
         
         
         
@@ -79,7 +97,7 @@ public class Game extends AbstractGame{
          */
         
         Wall w = new Wall(0,0);
-        w.removeCollidableType("all");
+        //w.removeCollidableType("all");
         w.addPoint(new Point2D.Double(0,0));
         w.addPoint(new Point2D.Double(1600,0));
         w.addPoint(new Point2D.Double(1600,1200));

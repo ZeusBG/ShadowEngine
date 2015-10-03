@@ -3,6 +3,7 @@ uniform vec3 lightColor;
 uniform float power;
 uniform float screenHeight;
 uniform float scale;
+
 void main() {
 	vec2 position;
         position.x = gl_FragCoord.x/1920;
@@ -11,15 +12,13 @@ void main() {
         distance/=scale;
         float attenuation;
         
-        float lastThreshold = 0.0005-50/100000.0;
+
 
         if(distance<50)
-            attenuation = power*0.0005;
-        else if(distance<100)
-            attenuation = power*0.0005-(distance-50)/100000;
-        else{
-            attenuation = power*lastThreshold-(distance-100)/100000;
-        }
+            attenuation = power*0.001;
+        else 
+            attenuation = power*0.001-(distance-50)/110000.0;
+        
         
         
 	vec4 color = vec4(attenuation, attenuation, attenuation,0.5) * vec4(lightColor, 1);

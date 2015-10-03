@@ -7,6 +7,7 @@ uniform sampler2D backbuffer;
 uniform float lightRadius;
 uniform float scale;
 uniform float power;
+uniform float radius;
 void main() {
 	vec2 position;
         position.x = gl_FragCoord.x/1920;
@@ -19,9 +20,9 @@ void main() {
         if(distance<50)
             attenuation = 1;
         else if(distance<100)
-            attenuation = power*1-(distance-50)/300;
+            attenuation = power*1-(distance-50)/200;
         else{
-            attenuation = power*1-50/300.0-(distance-100)/200;
+            attenuation = power*1-50/200.0-(distance-100)/(radius/2);
         }
  
 	vec4 color = vec4(texcolor.x+attenuation, texcolor.y+attenuation, texcolor.z+attenuation,1.0f);

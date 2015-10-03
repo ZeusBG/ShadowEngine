@@ -42,7 +42,7 @@ public class AK extends Weapon {
     }
 
     @Override
-    public void update(Core gc, float dt) {
+    public void update(float dt) {
         if (owner != null) {
             orientation = owner.getOrientation();
             currentPosition.x = owner.getCurrentPosition().x;
@@ -55,7 +55,7 @@ public class AK extends Weapon {
     }
 
     @Override
-    public void render(Core gc, Renderer r) {
+    public void render(Renderer r) {
         //orientation.normalize();
         Point2D.Double p1 = new Point2D.Double(currentPosition.x + 10 * orientation.x,
                 currentPosition.y + 10 * orientation.y);

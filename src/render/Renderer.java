@@ -34,7 +34,6 @@ import static org.lwjgl.opengl.GL20.*;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import render.Material.MaterialBuilder;
-import utils.GeometryUtil;
 
 /**
  *
@@ -43,6 +42,7 @@ import utils.GeometryUtil;
 public class Renderer {
 
     private Core core;
+    public static final int CIRCLE_ACCURACY = 50;
     //private Graphics2D g2d;
     private Graphics2D g2d;
     private BufferStrategy bs;
@@ -128,7 +128,7 @@ public class Renderer {
         drawLightMap();
 
         if (core.getObjectManager().getPlayer() != null) {
-            core.getObjectManager().getPlayer().render(core, this);
+            core.getObjectManager().getPlayer().render(this);
         }
 
         glColor3f(1.0f, 1.0f, 1.0f);
@@ -136,7 +136,7 @@ public class Renderer {
             if (obj.getMaterial() != null) {
                 drawMaterial(obj.getMaterial());
             } else {
-                obj.render(core, this);
+                obj.render(this);
             }
         }
 
@@ -175,23 +175,55 @@ public class Renderer {
     }
 
     public void drawCircle(double cx, double cy, double r) {
+        cx = scaleX * cx + cameraOffSetX;
+        cy = scaleY * cy + cameraOffSetY;
+        r = scaleX * r;
+
+        float step = 2.0f * 3.1415926f / (float) CIRCLE_ACCURACY;
+        float theta = 0;
         glBegin(GL_LINE_LOOP);
         {
-            int num_segments = 100;
-            cx = scaleX * cx + cameraOffSetX;
-            cy = scaleY * cy + cameraOffSetY;
-            r = scaleX * r;
-            for (int ii = 0; ii < num_segments; ii++) {
-                float theta = ii * 2.0f * 3.1415926f / (float) num_segments;//get the current angle 
+            for (int i = 0; i < CIRCLE_ACCURACY; i++) {
+                theta += step;//get the current angle 
 
                 double x = r * Math.cos(theta);//calculate the x component 
                 double y = r * Math.sin(theta);//calculate the y component 
 
                 glVertex2f((float) (x + cx), (float) (y + cy));//output vertex 
-
             }
         }
         glEnd();
+    }
+
+    public void drawDirectedPartCircle(float cx, float cy, float r, Vector direction, float spanAngle) {
+        float spanAngleRadians = (float) (spanAngle * Math.PI / 180);
+        float startAngle = (float) (Math.atan2(direction.y, direction.x) - spanAngleRadians / 2);
+
+        cx = scaleX * cx + cameraOffSetX;
+        cy = scaleY * cy + cameraOffSetY;
+        r = scaleX * r;
+        float step = (float) (spanAngle * Math.PI / 180 / CIRCLE_ACCURACY);
+        float x=  (float)(r * Math.cos(startAngle));
+        float y = (float)(r * Math.sin(startAngle));
+        float prevX,prevY;
+        for (int i = 0; i < CIRCLE_ACCURACY; i++) {
+            startAngle += step;//get the current angle 
+            prevX=x;
+            prevY=y;
+            x = (float)(r * Math.cos(startAngle));//calculate the x component 
+            y = (float)(r * Math.sin(startAngle));//calculate the y component 
+
+            //output vertex 
+            glBegin(GL_TRIANGLES);
+            {
+                glVertex2f(cx,cy);
+                glVertex2f(x + cx,y + cy);
+                glVertex2f(prevX + cx,prevY + cy);
+            }
+            glEnd();
+
+        }
+
     }
 
     public void clear() {
@@ -284,7 +316,7 @@ public class Renderer {
             }
             for (Point2D.Double cPoint : s.getPoints()) {
                 Ray tmpRay = new Ray(lightSource, cPoint);
-                if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null))) {
+                if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects))) {
                     addSecondaryPoints(cPoint, lightSource, sPoints);
                 }
             }
@@ -292,7 +324,7 @@ public class Renderer {
 
         for (Point2D.Double cPoint : sPoints) {
             Ray tmpRay = new Ray(lightSource, cPoint);
-            Point2D.Double intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null);
+            Point2D.Double intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects);
             if (intersection != null) {
                 intersectionPoints.add(intersection);
             }
@@ -423,7 +455,7 @@ public class Renderer {
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
         glStencilFunc(GL_EQUAL, 1, 1);
-        glStencilOp(GL_REPLACE, GL_KEEP, GL_ZERO);
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_INCR);
 
         glBegin(GL_POLYGON);
         {
@@ -432,16 +464,23 @@ public class Renderer {
             }
         }
         glEnd();
-
+        
+       
+        glStencilFunc(GL_EQUAL, 1,1);
+        glStencilOp(GL_ZERO, GL_ZERO, GL_INCR);
+        drawDirectedPartCircle((float)light.getLocation().x, (float)light.getLocation().y, light.getRadius(), light.getDirection(), light.getSpanAngle());
+        
+        
+        
         glColorMask(true, true, true, true);
-        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilFunc(GL_EQUAL, 2, 2);
         glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 
         Point2D.Double lightLocation = getScaledPoint(light.getLocation());
         Color lightColor = light.getColor();
 
         lightShader.bind();
-        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), (float) light.power);
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), (float) light.getPower());
         glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), (float) lightLocation.x, Display.getHeight() - (float) lightLocation.y + 15);
         glUniform3f(glGetUniformLocation(lightShader.getProgramID(), "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX);

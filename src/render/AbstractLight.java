@@ -9,40 +9,31 @@ import components.AABB;
 import gameObjects.DynamicGameObject;
 import java.awt.Color;
 import java.awt.geom.Point2D;
-import math.Vector;
 
 /**
  *
  * @author Zeus
  */
-public class Light {
-    private float radius= 180;
-    private float power = 1;
-    private Color color;
-    private Point2D.Double location;
-    private DynamicGameObject owner;
-    private AABB aabb;
-    private float spanAngle;
-    private Vector direction;
+public abstract class AbstractLight {
+    public float radius= 180;
+    public float power = 1;
+    public Color color;
+    public Point2D.Double location;
+    public DynamicGameObject owner;
+    public AABB aabb;
     
     
-    
-    public Light(float radius, Color color, DynamicGameObject owner) {
+    public AbstractLight(float radius, Color color, DynamicGameObject owner) {
         this.radius = radius;
         this.color = color;
         this.owner = owner;
         aabb = new AABB();
-        spanAngle = 360;
-        direction = new Vector(0,0);
     }
 
-    public Light(DynamicGameObject owner) {
+    public AbstractLight(DynamicGameObject owner) {
         this.owner = owner;
-        radius = 200;
         color = new Color(1.0f,1.0f,1.0f);
         aabb = new AABB();
-        spanAngle = 360;
-        direction = new Vector(0,0);
     }
 
     public float getRadius() {
@@ -78,9 +69,7 @@ public class Light {
     }
     
     public Point2D.Double getLocation(){
-        if(owner==null){
-            return location;
-        }
+        
         Point2D.Double loc = new Point2D.Double();
         loc.x = owner.getCurrentPosition().x;
         loc.y = owner.getCurrentPosition().y;
@@ -95,27 +84,4 @@ public class Light {
     public void setPower(float power) {
         this.power = power;
     }
-
-    public float getSpanAngle() {
-        return spanAngle;
-    }
-
-    public void setSpanAngle(float spanAngle) {
-        this.spanAngle = spanAngle;
-    }
-
-    public Vector getDirection() {
-        if(owner==null)
-            return direction;
-        direction.x = -owner.getDirection().x;
-        direction.y = -owner.getDirection().y;
-        return direction;
-    }
-
-    public void setDirection(Vector direction) {
-        this.direction = direction;
-    }
-
-
-    
 }

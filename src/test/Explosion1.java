@@ -17,8 +17,8 @@ public class Explosion1 extends ExplodingGameObject{
         super(x, y);
         expansionSpeed = 500;
         damage = 200;
-        lifeTime = 1.1;
-        timer = 2;
+        lifeTime = 1;
+        timer = 0;
         maxRadius = 600;
         
         
@@ -28,8 +28,8 @@ public class Explosion1 extends ExplodingGameObject{
         super(-10000,-10000);
         expansionSpeed = 500;
         damage = 200;
-        lifeTime = 1.1;
-        timer = 2;
+        lifeTime = 1;
+        timer = 0;
         maxRadius = 600;
         
         

@@ -12,9 +12,10 @@ import utils.ObjectType;
  * @author Zeus
  */
 public abstract class NPC extends LivingObject{
-
-    public NPC(int x, int y) {
-        super(x, y, ObjectType.NPC);
+    
+    
+    public NPC() {
+        super(ObjectType.NPC);
     }
     
 }

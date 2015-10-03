@@ -14,6 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
 
 
 /**
@@ -89,10 +90,9 @@ public class Core implements Runnable {
         int count = 0;
         while (isRunning) {
             count++;
-            if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE))
+            if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Display.isCloseRequested())
                 System.exit(0);
             FPSCounter = System.nanoTime();
-            //System.out.println("asdasd");
             boolean render = false;
 
             firstTime = System.nanoTime() / 1000000000.0;
@@ -102,9 +102,6 @@ public class Core implements Runnable {
             input.update();
             while (unprocessedTime >= frameCap) {
                 
-                //System.out.printf("inner While - %d\n",count++);
-
-                //game.update(this,(float) frameCap);
                 game.update(this, (float) frameCap);
                 physics.update((float) frameCap);
                 objManager.update();
@@ -114,13 +111,10 @@ public class Core implements Runnable {
             }
 
             if (render) {
-                //clear screen
-                //game.render(this,r)
-                //window.update();
-
                 game.render(this, renderer);
-                //renderer.clear();
-
+                
+                if(count%20==0)
+                    System.out.println("FPS: " + (int)(1000/((System.nanoTime() - FPSCounter) / 1000000)));
             } else {
                 try {
                     Thread.sleep(1);
@@ -128,8 +122,7 @@ public class Core implements Runnable {
                     Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            if(count%60==0);
-                System.out.println("Time for a frame : " + (System.nanoTime() - FPSCounter) / 1000000);
+            
 
         }
 
@@ -183,7 +176,6 @@ public class Core implements Runnable {
     }
 
     public void addObject(GameObject obj) {
-        System.out.println("adding " + obj.getType());
         objManager.addObject(obj);
     }
 

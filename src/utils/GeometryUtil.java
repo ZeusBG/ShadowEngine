@@ -80,17 +80,10 @@ public class GeometryUtil {
     }
     
     public static boolean checkIntersectionLineAABB(Line2D.Double line,AABB aabb){
-        for(int i=0;i<4;i++){
-            if(line.intersectsLine(aabb.getLines()[i])){
-                return true;
-            }
-        }
+        boolean containsP1 = aabb.contains(line.getP1());
+        boolean containsP2 = aabb.contains(line.getP2());
         
-        if(aabb.contains(line.getP1()) && aabb.contains(line.getP2())){
-            return true;
-        }
-        
-        return false;
+        return (containsP1 && containsP2) ||(containsP1 ^ containsP2);
     }
     
     public static Point2D.Double getIntersectionLines(Line2D.Double line1, Line2D.Double line2){
@@ -151,16 +144,15 @@ public class GeometryUtil {
         
         
         for(GameObject go: objects){
-            Point2D.Double currentIntersection;
-            if(GeometryUtil.checkIntersectionLineAABB(path, go.getAabb())){
+            
                 for(Line2D.Double line: go.getLines()){
-                    currentIntersection = GeometryUtil.getIntersectionLines(path, line);
+                    Point2D.Double currentIntersection = GeometryUtil.getIntersectionLines(path, line);
                     if(currentIntersection!=null && GeometryUtil.getDistance(currentIntersection,path.getP1())<currentDistance){
                         currentDistance = GeometryUtil.getDistance(currentIntersection,path.getP1());
                         intersection = currentIntersection;
                     }
                 }
-            }
+            
         }
         return intersection;
     }

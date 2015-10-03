@@ -71,6 +71,12 @@ public class Vector {
         return new Vector(-y,x);
     }
     
+    public void reset(Point2D.Double a,Point2D.Double b){
+
+        x = b.x - a.x;
+        y = b.y - a.y;
+    }
+    
     public Vector getPerpendicularCloserTo(Point2D.Double p,Point2D.Double startPoint) {
 
         Point2D.Double tmp = new Point2D.Double(startPoint.x + y, startPoint.y - x);

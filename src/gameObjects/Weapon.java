@@ -115,7 +115,6 @@ public abstract class Weapon extends DynamicGameObject{
                 
                 ammonition.remove(ammonition.size()-1);
                 timeLastFired = System.currentTimeMillis();
-                
                 //core.getSoundManager().play(Sounds.AK47_SHOT);
  
             }
@@ -147,5 +146,9 @@ public abstract class Weapon extends DynamicGameObject{
             ammonition.add(new Bullet(0,0));
             
         }
+    }
+    
+    public boolean isClipEmpty(){
+        return currentAmmo==0;
     }
 }

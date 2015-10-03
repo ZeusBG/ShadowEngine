@@ -26,25 +26,27 @@ public class Player extends LivingObject{
     private Point crosshair;
     private Weapon weapon;
     
-    public Player(int x, int y, ObjectType type) {
-        super(x, y, type);
+    public Player(ObjectType type) {
+        super(type);
         speed = 500;
         aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
         
     }
     
     public Player(){
-        super(200,210,ObjectType.PLAYER);
+        super(ObjectType.PLAYER);
         crosshair = new Point();
         weapon = null;
         aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
         light = new Light(this);
         light.setRadius(300);
+        light.setPower(0.9f);
         
     }
     
     
-    public void update(Core core, float dt) {
+    @Override
+    public void update(float dt) {
         
         crosshair.x = core.getInput().getMouseX();
         crosshair.y = core.getInput().getMouseY();
@@ -97,7 +99,7 @@ public class Player extends LivingObject{
             core.getSoundManager().stop(Sounds.MOVEMENT_PLAYER);
         }
         
-        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+        aabb.reset(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
     }
     
     public void addWeapon(Weapon w){
@@ -108,8 +110,8 @@ public class Player extends LivingObject{
     }
     
     @Override
-    public void render(Core core, Renderer r) {
-        r.setColor(Color.black);
+    public void render(Renderer r) {
+        r.setColor(Color.WHITE);
         r.drawCircle((int)currentPosition.x,(int)currentPosition.y,5);
         r.setColor(Color.red);
         r.drawRay((int)currentPosition.x, (int)currentPosition.y,crosshair.x, crosshair.y);

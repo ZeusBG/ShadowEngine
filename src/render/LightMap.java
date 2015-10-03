@@ -21,6 +21,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 
 import static org.lwjgl.opengl.GL20.*;
+import static render.Renderer.CIRCLE_ACCURACY;
 import utils.GeometryUtil;
 
 /**
@@ -86,8 +87,8 @@ public class LightMap {
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
-        glStencilFunc(GL_EQUAL, 1, 1);
-        glStencilOp(GL_REPLACE, GL_KEEP, GL_ZERO);
+        glStencilFunc(GL_EQUAL, 0, 1);
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_INCR);
 
         glBegin(GL_POLYGON);
         for (Point2D.Double p : points) {
@@ -96,15 +97,25 @@ public class LightMap {
         }
         glEnd();
 
+        
+        glStencilFunc(GL_EQUAL, 1,1);
+        glStencilOp(GL_ZERO, GL_ZERO, GL_INCR);
+        drawDirectedPartCircle((float)light.getLocation().x, (float)light.getLocation().y, light.getRadius(), light.getDirection(), light.getSpanAngle());
+        
+        
+        
+        
+        
         glColorMask(true, true, true, true);
-        glStencilFunc(GL_EQUAL, 1, 1);
+        glStencilFunc(GL_EQUAL, 2, 2);
         glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 
         lightShader.bind();
 
         glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), (float) pos.x, (float) pos.y);
-        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.power);
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), renderer.getScale());
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "radius"), light.getRadius());
 
         glBegin(GL_QUADS);
         glVertex2f(0, 0);
@@ -123,6 +134,42 @@ public class LightMap {
         glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, buffer);
         glPushAttrib(GL_VIEWPORT_BIT);
         glViewport(0, 0, width, height);
+    }
+    
+    public void drawDirectedPartCircle(float cx, float cy, float r, Vector direction, float spanAngle) {
+        float spanAngleRadians = (float) (spanAngle * Math.PI / 180);
+        float startAngle = (float) (Math.atan2(direction.y, direction.x) - spanAngleRadians / 2);
+        
+        float scaleX = renderer.getScale();
+        float scaleY = renderer.getScale();
+        float cameraOffSetX = renderer.getCameraOffSetX();
+        float cameraOffSetY = renderer.getCameraOffSetY();
+        
+        cx = scaleX * cx + cameraOffSetX;
+        cy = Display.getHeight()-scaleY * cy - cameraOffSetY+10;
+        r = scaleX * r;
+        float step = (float) (spanAngle * Math.PI / 180 / CIRCLE_ACCURACY);
+        float x=  (float)(r * Math.cos(startAngle));
+        float y = (float)(r * Math.sin(startAngle));
+        float prevX,prevY;
+        for (int i = 0; i < CIRCLE_ACCURACY; i++) {
+            startAngle += step;//get the current angle 
+            prevX=x;
+            prevY=y;
+            x = (float)(r * Math.cos(startAngle));//calculate the x component 
+            y = (float)(r * Math.sin(startAngle));//calculate the y component 
+
+            //output vertex 
+            glBegin(GL_TRIANGLES);
+            {
+                glVertex2f(cx,cy);
+                glVertex2f(x+cx,cy-y);
+                glVertex2f(prevX+ cx, cy-prevY);
+            }
+            glEnd();
+
+        }
+
     }
 
     public void removeFrameBuffer() {
@@ -176,7 +223,10 @@ public class LightMap {
             }
         }
         glEnd();
-
+        glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
+        drawDirectedPartCircle((float)pointOfView.getCurrentPosition().x, (float)pointOfView.getCurrentPosition().y, 10, pointOfView.getOrientation(), 360);
+        
+        
         glColorMask(true, true, true, true);
         glStencilFunc(GL_EQUAL, 1, 1);
         glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);

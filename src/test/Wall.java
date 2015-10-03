@@ -28,12 +28,12 @@ public class Wall extends StaticGameObject{
     }
     
     @Override
-    public void update(Core gc, float dt) {
+    public void update(float dt) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void render(Core gc, Renderer r) {
+    public void render(Renderer r) {
         r.setColor(Color.BLUE);
         for(int i=0;i<points.size()-1;i++){
             r.drawLine((int)points.get(i).x,(int) points.get(i).y, (int)points.get(i+1).x, (int)points.get(i+1).y);

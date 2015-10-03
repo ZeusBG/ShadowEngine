@@ -17,7 +17,7 @@ public abstract class PlayerObject extends LivingObject {
     
     
     public PlayerObject(int x, int y) {
-        super(x, y,ObjectType.PLAYER);
+        super(ObjectType.PLAYER);
     }
 
 

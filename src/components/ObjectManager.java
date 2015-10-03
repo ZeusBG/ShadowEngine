@@ -19,6 +19,7 @@ import utils.ObjectType;
 /**
  *
  * @author Zeus
+ * 
  */
 public class ObjectManager {
     
@@ -100,12 +101,10 @@ public class ObjectManager {
     }
     
     public void addObject(GameObject obj){
-        //System.out.println("OBJECT ID: "+obj.getID());
         System.out.println("ADDING: "+obj.getType()+" ID: "+obj.getID());
         
         allObjects.add(obj);
         obj.setCore(core);
-        //System.out.println("asdad");
         if(obj.getType()==ObjectType.PLAYER)
             player = (LivingObject) obj;
         else if(obj.getType()==ObjectType.PROJECTILE)

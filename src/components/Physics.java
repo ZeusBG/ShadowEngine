@@ -28,18 +28,26 @@ public class Physics {
     private Core core;
     private float dt;
     private QuadTree<GameObject> collisionTree;
-
+    private int mapSizeX;
+    private int mapSizeY;
+    private int treeMaxDepth;
+    private int treeMaxCapacity;
+    
     public Physics(Core core) {
         this.core = core;
-        collisionTree = new QuadTree<>(4, 6, new AABB(0, 0, 1700, 1300));
+        mapSizeX = 1700;
+        mapSizeY = 1300;
+        treeMaxDepth = 6;
+        treeMaxCapacity = 4;
+        collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
     }
 
     public void moveObjects(float dt) {
         for (int i = 0; i < core.getObjectManager().getProjectiles().size(); i++) {
             Projectile p = core.getObjectManager().getProjectiles().get(i);
 
-            if (p.getCurrentPosition().x > core.getWidth() || p.getCurrentPosition().y > core.getHeight()
-                    || p.getCurrentPosition().x < 0 || p.getCurrentPosition().y < 0) {
+            if (p.getCurrentPosition().x > mapSizeX || p.getCurrentPosition().y > mapSizeY
+                    || p.getCurrentPosition().x < 0-50 || p.getCurrentPosition().y < 0-50) {
                 core.getObjectManager().getProjectiles().remove(i);
                 core.getObjectManager().getAllObjects().remove(p);
             } else {
@@ -51,7 +59,7 @@ public class Physics {
     }
 
     public void update(float _dt) {
-        collisionTree = new QuadTree<>(4, 6, new AABB(0, 0, 1700, 1300));
+        collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
         for (GameObject go : core.getObjectManager().getAllObjects()) {
             collisionTree.insert(go);
         }
@@ -63,7 +71,7 @@ public class Physics {
 
     public void updateObjects() {
         for (int i = 0; i < core.getObjectManager().getAllObjects().size(); i++) {
-            core.getObjectManager().getAllObjects().get(i).update(core, dt);
+            core.getObjectManager().getAllObjects().get(i).update(dt);
         }
     }
 
@@ -103,13 +111,12 @@ public class Physics {
                                 && distanceToExplosion > ego.getPreviousRadius()
                                 && distanceToExplosion < ego.getCurrentRadius()) {
 
-                            System.out.println("dealing damage to "+go.getID());
+                            //System.out.println("dealing damage to "+go.getID());
                             ego.getDamageDealtTo().put(go, Boolean.TRUE);
 
                         }
                     }
                 }
-
             }
             return;
         }
@@ -117,21 +124,20 @@ public class Physics {
         else if (go1.getType() == ObjectType.PROJECTILE) {
             //go1.update(core, dt);
             Projectile projectile = (Projectile) go1;
-            AABB ProjectilePathAABB = new AABB();
-            ProjectilePathAABB.update(projectile.getCurrentPosition());
-            ProjectilePathAABB.update(projectile.getNextPosition());
 
             Line2D.Double projectilePath = new Line2D.Double(projectile.getCurrentPosition(), projectile.getNextPosition());
-            ArrayList<GameObject> objects = collisionTree.getObjectsLineIntersect(projectilePath);
+            ArrayList<GameObject> objects = new ArrayList<>();
+            objects.addAll(collisionTree.getObjectsLineIntersect(projectilePath));
 
             Point2D.Double intersection = GeometryUtil.getClosestIntersection(projectilePath, objects);
             if (intersection != null) {
-                core.getObjectManager().removeObject(go1);
+                
                 Point2D.Double explosionSpawnPoint = new Point2D.Double();
-                explosionSpawnPoint.x = intersection.x - projectile.getDirection().x * 2;
-                explosionSpawnPoint.y = intersection.y - projectile.getDirection().y * 2;
+                explosionSpawnPoint.x = intersection.x - projectile.getDirection().x * 3;
+                explosionSpawnPoint.y = intersection.y - projectile.getDirection().y * 3;
                 core.getObjectManager().addObject(new Explosion1((int) explosionSpawnPoint.x, (int) explosionSpawnPoint.y));
                 collisionTree.remove(go1);
+                core.getObjectManager().removeObject(go1);
             }
 
         } else if (go1.getType() == ObjectType.PLAYER) {

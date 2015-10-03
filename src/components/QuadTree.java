@@ -239,8 +239,8 @@ public class QuadTree<T extends GameObject> {
         }
         
         
-        public ArrayList<GameObject> getObjectLineIntersect(Line2D.Double line){
-            ArrayList<GameObject> objectsLineIntersect = new ArrayList<>();
+        public HashSet<GameObject> getObjectLineIntersect(Line2D.Double line){
+            HashSet<GameObject> objectsLineIntersect = new HashSet<>();
             if(children!=null){
                 for(int i=0;i<4;i++){
                     if(GeometryUtil.checkIntersectionLineAABB(line, aabb)){
@@ -250,7 +250,7 @@ public class QuadTree<T extends GameObject> {
             }
             else{
                 for(GameObject go : objects){
-                    if(GeometryUtil.checkIntersectionLineAABB(line, aabb) &&
+                    if(GeometryUtil.checkIntersectionLineAABB(line, go.getAabb()) &&
                             !objectsLineIntersect.contains(go)){
                         objectsLineIntersect.add(go);
                     }
@@ -350,10 +350,11 @@ public class QuadTree<T extends GameObject> {
     }
     
     public HashSet<GameObject> getObjectsInRange(AABB aabb){
-        return root.getObjectsInRange(aabb);
+        HashSet<GameObject> objects = root.getObjectsInRange(aabb);
+        return objects;
     }
     
-    public ArrayList<GameObject> getObjectsLineIntersect(Line2D.Double line){
+    public HashSet<GameObject> getObjectsLineIntersect(Line2D.Double line){
         return root.getObjectLineIntersect(line);
     }
     

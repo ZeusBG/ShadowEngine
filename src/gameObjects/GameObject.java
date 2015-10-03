@@ -189,7 +189,7 @@ public abstract class GameObject {
     }
     
     
-    public abstract void update(Core gc, float dt);
-    public abstract void render(Core gc,Renderer r);
+    public abstract void update(float dt);
+    public abstract void render(Renderer r);
 }
 
