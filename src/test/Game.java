@@ -85,6 +85,12 @@ public class Game extends AbstractGame{
             }
         }
         
+         Wall w = new Wall(0,0);
+                w.addPoint(new Point2D.Double(1200,300));
+                w.addPoint(new Point2D.Double(1100,400));
+                w.addPoint(new Point2D.Double(1300,400));
+                w.addPoint(new Point2D.Double(1200,300));
+                core.addObject(w);
         
         /*Wall w = new Wall(0,0);
         
@@ -96,7 +102,7 @@ public class Game extends AbstractGame{
         core.addObject(w);
          */
         
-        Wall w = new Wall(0,0);
+        w = new Wall(0,0);
         //w.removeCollidableType("all");
         w.addPoint(new Point2D.Double(0,0));
         w.addPoint(new Point2D.Double(1600,0));

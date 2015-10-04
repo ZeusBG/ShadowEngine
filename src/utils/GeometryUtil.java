@@ -80,10 +80,17 @@ public class GeometryUtil {
     }
     
     public static boolean checkIntersectionLineAABB(Line2D.Double line,AABB aabb){
+        
+        Line2D.Double lines[] = aabb.getLines();
+        for(int i=0;i<4;i++){
+            if(line.intersectsLine(lines[i]))
+                return true;
+        }
+
         boolean containsP1 = aabb.contains(line.getP1());
         boolean containsP2 = aabb.contains(line.getP2());
         
-        return (containsP1 && containsP2) ||(containsP1 ^ containsP2);
+        return (containsP1 && containsP2);
     }
     
     public static Point2D.Double getIntersectionLines(Line2D.Double line1, Line2D.Double line2){
@@ -159,7 +166,43 @@ public class GeometryUtil {
     
     public static boolean pointsEqual(Point2D.Double p1,Point2D.Double p2){
         return  p1.x==p2.x && p1.y == p2.y;
+    }
+    
+    public static boolean checkLineAABBIntersection(Line2D.Double l){
+        return true;
+    }
+    /*
+    private static int CohenSutherland(Line2D.Double l,AABB aabb){
+        //0-top,1-right,2-bottom,3-left,4-inside
+        int code1[],code2[];        // initialised as being inside of clip window
+        
+        code1 = getCode(l.x1,l.y1,aabb);
+        code2 = getCode(l.x1,l.y1,aabb);
+        
+	if((code1[0]==0 && code2[0]==0)  || (code1[0]==1 && code2[0]==1) || (code1[0]==2 && code2[0]==2) ||(code1[0]==3 && code2[0]==3)){
+            return 1;
+        }
+        else if()
+            return
         
     }
-
+    
+    private static int[] getCode(double x,double y,AABB aabb){
+        int code[] = new int[2];
+        code[0] = 4;
+        code[0] = 4;
+        
+        if (x < aabb.getMinX())           // to the left of clip window
+		code[0] = 3;
+	else if (x > aabb.getMaxX())      // to the right of clip window
+		code[0] = 1;
+	if (y < aabb.getMinY())           // below the clip window
+		code[1] = 2;
+	else if (y > aabb.getMaxY())      // above the clip window
+		code[1] = 0;
+        
+        return code;
+    }
+    
+    */
 }

@@ -17,7 +17,6 @@
     -Separate enemies and allies so that bots can check enemies for line of sight
     -Make particle engine
     -Make static light map for lights which are not changing and moving
-    -Optimize QuadTree
 
     
 -UI
