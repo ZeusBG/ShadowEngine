@@ -32,12 +32,14 @@ public class Physics {
     private int mapSizeY;
     private int treeMaxDepth;
     private int treeMaxCapacity;
-    
+    private int collisionChecks;
+    //private long timeResolvedCollision;
+    //private long timeInsertedObjects;
     public Physics(Core core) {
         this.core = core;
-        mapSizeX = 1700;
-        mapSizeY = 1300;
-        treeMaxDepth = 6;
+        mapSizeX = 1600;
+        mapSizeY = 1200;
+        treeMaxDepth = 8;
         treeMaxCapacity = 2;
         collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
     }
@@ -51,6 +53,7 @@ public class Physics {
                 core.getObjectManager().getProjectiles().remove(i);
                 core.getObjectManager().getAllObjects().remove(p);
             } else {
+                
                 p.moveToNextPoint();
             }
 
@@ -59,17 +62,25 @@ public class Physics {
     }
 
     public void update(float _dt) {
-        collisionTree.clean();
-        collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
-        for (GameObject go : core.getObjectManager().getAllObjects()) {
-            collisionTree.insert(go);
-        }
+        //timeResolvedCollision = System.currentTimeMillis();
+        //timeInsertedObjects = System.currentTimeMillis();
+        //collisionChecks = 0;
+        //collisionTree.clean();
+        
+        //System.out.println("Time spent inserting objects: "+(System.currentTimeMillis()-timeInsertedObjects));
         //System.out.println("objects in tree: "+collisionTree.getNumOfObjects());
         //System.out.println("Nodes in the tree: "+collisionTree.getNumOfNodes());
         this.dt = _dt;
         updateObjects();
+        collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
+        for (GameObject go : core.getObjectManager().getAllObjects()) {
+            collisionTree.insert(go);
+        }
         collisionTree.checkCollision(this);
+        
         moveObjects(dt);
+        //System.out.println("Time spent for physics update objects: "+(System.currentTimeMillis()-timeResolvedCollision));
+        //System.out.println("collisions resolved: "+collisionChecks);
     }
 
     public void updateObjects() {
@@ -83,7 +94,7 @@ public class Physics {
     }
 
     public void checkCollision(GameObject go1, GameObject go2) {
-        
+        //collisionChecks++;
         if (go1 == go2) {
             return;
         }
@@ -134,7 +145,6 @@ public class Physics {
 
             Point2D.Double intersection = GeometryUtil.getClosestIntersection(projectilePath, objects);
             if (intersection != null) {
-                
                 Point2D.Double explosionSpawnPoint = new Point2D.Double();
                 explosionSpawnPoint.x = intersection.x - projectile.getDirection().x * 3;
                 explosionSpawnPoint.y = intersection.y - projectile.getDirection().y * 3;
