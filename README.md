@@ -7,4 +7,4 @@ This is the latest screenshot:
 
 The QuadTree is quite nice. Well i do not use it in that depth but this look awesome :D
 
-![alt tag](http://i.imgur.com/fCQkNMu.png)
+![alt tag](http://i.imgur.com/mb9RH95.jpg)
