@@ -18,7 +18,7 @@ public abstract class AbstractLight {
     public float radius= 180;
     public float power = 1;
     public Color color;
-    public Point2D.Double location;
+    public Point2D.Float location;
     public DynamicGameObject owner;
     public AABB aabb;
     
@@ -68,9 +68,9 @@ public abstract class AbstractLight {
         return aabb;
     }
     
-    public Point2D.Double getLocation(){
+    public Point2D.Float getLocation(){
         
-        Point2D.Double loc = new Point2D.Double();
+        Point2D.Float loc = new Point2D.Float();
         loc.x = owner.getCurrentPosition().x;
         loc.y = owner.getCurrentPosition().y;
         return loc;

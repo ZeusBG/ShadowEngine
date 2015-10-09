@@ -27,8 +27,7 @@ public class QuadTree<T extends GameObject> {
     int maxHeight;
     int capacity;
     Node root;
-    private HashMap<GameObject, Point2D.Double> cachedObjects;
-
+    private HashMap<GameObject, Point2D.Float> cachedObjects;
     private int numberOfObjectsChecked;
     
     private class Node<T extends GameObject> {
@@ -38,14 +37,14 @@ public class QuadTree<T extends GameObject> {
         private int height;
 
         private ArrayList<T> objects;
-        
+       
 
         public Node(AABB aabb, int height) {
             this.aabb = new AABB(aabb);
             children = null;
             objects = new ArrayList<>();
             this.height = height;
-           
+            
             
         }
         
@@ -69,7 +68,6 @@ public class QuadTree<T extends GameObject> {
             } else {
                 if (children == null) {
                     subDivide();
-
                 }
 
                 for (int i = 0; i < 4; i++) {
@@ -78,7 +76,7 @@ public class QuadTree<T extends GameObject> {
             }
         }
 
-        public void insertObject(Line2D.Double l,T object){
+        public void insertObject(Line2D.Float l,T object){
             
             if (!GeometryUtil.checkIntersectionLineAABB(l, aabb) ) {
                 return;
@@ -108,15 +106,15 @@ public class QuadTree<T extends GameObject> {
         
         public void subDivide() {
             children = new Node[4];
-            double minX = aabb.getMinX();
-            double minY = aabb.getMinY();
-            double halfWidth = (aabb.getMaxX() - minX) / 2.0;
-            double halfHeight = (aabb.getMaxY() - minY) / 2.0;
+            float minX = aabb.getMinX();
+            float minY = aabb.getMinY();
+            float halfWidth = (aabb.getMaxX() - minX) / 2.0f;
+            float halfHeight = (aabb.getMaxY() - minY) / 2.0f;
 
             children[0] = new Node(new AABB(minX, minY, minX + halfWidth, minY + halfHeight), height + 1);
-            children[1] = new Node(new AABB(minX + halfWidth, minY, minX + 2 * halfWidth, minY + halfHeight), height + 1);
-            children[2] = new Node(new AABB(minX + halfWidth, minY + halfHeight, minX + 2 * halfWidth, minY + 2 * halfHeight), height + 1);
-            children[3] = new Node(new AABB(minX, minY + halfHeight, minX + halfWidth, minY + 2 * halfHeight), height + 1);
+            children[1] = new Node(new AABB(minX + halfWidth, minY, aabb.getMaxX(), minY + halfHeight), height + 1);
+            children[2] = new Node(new AABB(minX + halfWidth, minY + halfHeight, aabb.getMaxX(), aabb.getMaxY()), height + 1);
+            children[3] = new Node(new AABB(minX, minY + halfHeight, minX + halfWidth, aabb.getMaxY()), height + 1);
 
             reinsertObjects();
 
@@ -124,7 +122,14 @@ public class QuadTree<T extends GameObject> {
 
         public void reinsertObjects() {
             for (int i = 0; i < objects.size(); i++) {
-                insert(objects.get(i));
+                if(objects.get(i).getLines().isEmpty()){
+                    insert(objects.get(i));
+                }
+                else
+                {
+                    for(Line2D.Float l : objects.get(i).getLines())
+                        insertObject(l,objects.get(i));
+                }
             }
             objects = new ArrayList<>();
         }
@@ -133,13 +138,13 @@ public class QuadTree<T extends GameObject> {
             
             if (children == null) {
                 
-                r.drawRect((int)aabb.getMinX(), (int)aabb.getMinY(), (int)(aabb.getMaxX()-aabb.getMinX()), (int)(aabb.getMaxY()-aabb.getMinY()));
+                r.drawRect((float)aabb.getMinX(), (float)aabb.getMinY(), (float)(aabb.getMaxX()-aabb.getMinX()), (float)(aabb.getMaxY()-aabb.getMinY()));
                 return;
             }
             for(int i=0;i<4;i++){
                 children[i].draw(r);
             }
-            r.drawRect((int)aabb.getMinX(), (int)aabb.getMinY(), (int)(aabb.getMaxX()-aabb.getMinX()), (int)(aabb.getMaxY()-aabb.getMinY()));
+            r.drawRect((float)aabb.getMinX(), (float)aabb.getMinY(), (float)(aabb.getMaxX()-aabb.getMinX()), (float)(aabb.getMaxY()-aabb.getMinY()));
 
         }
 
@@ -161,13 +166,13 @@ public class QuadTree<T extends GameObject> {
             children[3].print();
         }
 
-        public Point2D.Double intersect(Ray r,HashSet<GameObject> collidableObjects) {
+        public Point2D.Float intersect(Ray r,HashSet<GameObject> collidableObjects) {
             //System.out.println("checking aabb:"+aabb);
             if (children != null) {
                 Arrays.sort(children, new AABBComparator(r.source));
                 for (int i = 0; i < 4; i++) {
                     if (r.intersect(children[i].aabb)) {
-                        Point2D.Double intersection = children[i].intersect(r,collidableObjects);
+                        Point2D.Float intersection = children[i].intersect(r,collidableObjects);
                         if (intersection != null) {
                             return intersection;
                         }
@@ -188,10 +193,10 @@ public class QuadTree<T extends GameObject> {
             cachedObjects = new HashMap<>();
         }
 
-        public Point2D.Double getClosestIntersection(Ray r,HashSet<GameObject> collidableObjects) {
+        public Point2D.Float getClosestIntersection(Ray r,HashSet<GameObject> collidableObjects) {
             
-            Point2D.Double intersection = null;
-            double currentDistance = 100000;
+            Point2D.Float intersection = null;
+            float currentDistance = 100000;
             
             for (GameObject obj : objects) {
                 
@@ -201,7 +206,7 @@ public class QuadTree<T extends GameObject> {
                     continue;
                 
                 if (cachedObjects.get(obj) != null) {
-                    Point2D.Double tmpPoint = cachedObjects.get(obj);
+                    Point2D.Float tmpPoint = cachedObjects.get(obj);
                     if (GeometryUtil.getDistance(tmpPoint, r.source) < currentDistance && aabb.contains(tmpPoint)) {
                         intersection = tmpPoint;
                         currentDistance = GeometryUtil.getDistance(tmpPoint, r.source);
@@ -209,8 +214,8 @@ public class QuadTree<T extends GameObject> {
 
                 } else if (r.intersect(obj.getAabb())) {
                     numberOfObjectsChecked++;
-                    for (Line2D.Double line : obj.getLines()) {
-                        Point2D.Double tmpPoint = GeometryUtil.getIntersectionRayLine(r, line);
+                    for (Line2D.Float line : obj.getLines()) {
+                        Point2D.Float tmpPoint = GeometryUtil.getIntersectionRayLine(r, line);
                         if(tmpPoint!=null && !aabb.contains(tmpPoint)){
                             if(cachedObjects.get(obj)!=null){
                                 if(GeometryUtil.getDistance(cachedObjects.get(obj),r.source)>GeometryUtil.getDistance(tmpPoint,r.source)){
@@ -271,11 +276,11 @@ public class QuadTree<T extends GameObject> {
         }
         
         
-        public HashSet<GameObject> getObjectLineIntersect(Line2D.Double line){
+        public HashSet<GameObject> getObjectLineIntersect(Line2D.Float line){
             HashSet<GameObject> objectsLineIntersect = new HashSet<>();
             if(children!=null){
                 for(int i=0;i<4;i++){
-                    if(GeometryUtil.checkIntersectionLineAABB(line, aabb)){
+                    if(GeometryUtil.checkIntersectionLineAABB(line, children[i].aabb)){
                         objectsLineIntersect.addAll(children[i].getObjectLineIntersect(line));
                     }
                 }
@@ -325,9 +330,9 @@ public class QuadTree<T extends GameObject> {
         
         public class AABBComparator implements Comparator {
 
-            Point2D.Double origin;
+            Point2D.Float origin;
 
-            public AABBComparator(Point2D.Double _origin) {
+            public AABBComparator(Point2D.Float _origin) {
                 origin = _origin;
             }
 
@@ -335,7 +340,7 @@ public class QuadTree<T extends GameObject> {
             public int compare(Object o1, Object o2) {
                 Node n1 = (Node) o1;
                 Node n2 = (Node) o2;
-                double dist = GeometryUtil.getDistance(origin, n1.aabb.getCenter()) - GeometryUtil.getDistance(origin, n2.aabb.getCenter());
+                float dist = GeometryUtil.getDistance(origin, n1.aabb.getCenter()) - GeometryUtil.getDistance(origin, n2.aabb.getCenter());
                 if (dist > 0) {
                     return 1;
                 } else if (dist < 0) {
@@ -395,10 +400,10 @@ public class QuadTree<T extends GameObject> {
         this.maxHeight = maxHeight;
     }
 
-    public Point2D.Double intersect(Ray r,HashSet<GameObject> collidableObjects) {
+    public Point2D.Float intersect(Ray r,HashSet<GameObject> collidableObjects) {
         cachedObjects = new HashMap<>();
         numberOfObjectsChecked = 0;
-        Point2D.Double result = root.intersect(r,collidableObjects);
+        Point2D.Float result = root.intersect(r,collidableObjects);
         //System.out.println("NumberOfObjectsChecked: "+numberOfObjectsChecked);
         return result;
     }
@@ -413,7 +418,6 @@ public class QuadTree<T extends GameObject> {
         for(int i=0;i<object.getLines().size();i++){
             root.insertObject(object.getLines().get(i),object);
         }
-        
         //root.insert(object);
     }
 
@@ -431,7 +435,7 @@ public class QuadTree<T extends GameObject> {
         return objects;
     }
     
-    public HashSet<GameObject> getObjectsLineIntersect(Line2D.Double line){
+    public HashSet<GameObject> getObjectsLineIntersect(Line2D.Float line){
         return root.getObjectLineIntersect(line);
     }
     

@@ -78,7 +78,7 @@ public class LightMap {
 
     }
 
-    public void addLight(Light light, Point2D.Double pos, ArrayList<Point2D.Double> points) {
+    public void addLight(Light light, Point2D.Float pos, ArrayList<Point2D.Float> points) {
         glBindTexture(GL_TEXTURE_2D, 0);
         switchToFrameBuffer(frameBuffer);
 
@@ -91,16 +91,16 @@ public class LightMap {
         glStencilOp(GL_REPLACE, GL_KEEP, GL_INCR);
 
         glBegin(GL_POLYGON);
-        for (Point2D.Double p : points) {
-            Point2D.Double p1 = renderer.getScaledPoint(p);
-            glVertex2f((float) p1.x, (float) (Display.getHeight() - p1.y));
+        for (Point2D.Float p : points) {
+            Point2D.Float p1 = renderer.getScaledPoint(p);
+            glVertex2f( p1.x,  (Display.getHeight() - p1.y));
         }
         glEnd();
 
         
         glStencilFunc(GL_EQUAL, 1,1);
         glStencilOp(GL_ZERO, GL_ZERO, GL_INCR);
-        drawDirectedPartCircle((float)light.getLocation().x, (float)light.getLocation().y, light.getRadius(), light.getDirection(), light.getSpanAngle());
+        drawDirectedPartCircle(light.getLocation().x, light.getLocation().y, light.getRadius(), light.getDirection(), light.getSpanAngle());
         
         
         
@@ -112,7 +112,7 @@ public class LightMap {
 
         lightShader.bind();
 
-        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), (float) pos.x, (float) pos.y);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"),  pos.x,  pos.y);
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), renderer.getScale());
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "radius"), light.getRadius());
@@ -181,11 +181,11 @@ public class LightMap {
         switchToFrameBuffer(frameBuffer);
         glColor3f(1.0f, 1.0f, 1.0f);
         Vector p = pointOfView.getOrientation();
-        Point2D.Double p1 = new Point2D.Double();
+        Point2D.Float p1 = new Point2D.Float();
         p1.x = pointOfView.getCurrentPosition().x + p.x * 10;
         p1.y = pointOfView.getCurrentPosition().y + p.y * 10;
-        Point2D.Double p2 = new Point2D.Double();
-        Point2D.Double p3 = new Point2D.Double();
+        Point2D.Float p2 = new Point2D.Float();
+        Point2D.Float p3 = new Point2D.Float();
         p2.x = p1.x + p.getPerpendicular().x * 20;
         p2.y = p1.y + p.getPerpendicular().y * 20;
         p3.x = p1.x + p.getPerpendicular2().x * 20;
@@ -196,7 +196,7 @@ public class LightMap {
         p3.x += (p3.x - pointOfView.getCurrentPosition().x) * 1000;
         p3.y += (p3.y - pointOfView.getCurrentPosition().y) * 1000;
 
-        ArrayList<Point2D.Double> visibility = new ArrayList<>();
+        ArrayList<Point2D.Float> visibility = new ArrayList<>();
         visibility.add(pointOfView.getCurrentPosition());
         visibility.add(p2);
         visibility.add(p3);
@@ -218,13 +218,13 @@ public class LightMap {
 
         glBegin(GL_POLYGON);
         {
-            for (Point2D.Double point : visibility) {
-                glVertex2f((float) (scaleX * point.x + cameraOffSetX), (float) (height - (scaleY * point.y + cameraOffSetY)));
+            for (Point2D.Float point : visibility) {
+                glVertex2f( scaleX * point.x + cameraOffSetX, height - (scaleY * point.y + cameraOffSetY));
             }
         }
         glEnd();
         glStencilOp(GL_REPLACE, GL_KEEP, GL_KEEP);
-        drawDirectedPartCircle((float)pointOfView.getCurrentPosition().x, (float)pointOfView.getCurrentPosition().y, 10, pointOfView.getOrientation(), 360);
+        drawDirectedPartCircle(pointOfView.getCurrentPosition().x, pointOfView.getCurrentPosition().y, 10, pointOfView.getOrientation(), 360);
         
         
         glColorMask(true, true, true, true);
@@ -244,7 +244,7 @@ public class LightMap {
         removeFrameBuffer();
     }
 
-    public void drawVisibilityPolygon(Point2D.Double center) {
+    public void drawVisibilityPolygon(Point2D.Float center) {
         switchToFrameBuffer(frameBuffer);
         renderer.unbindTexture();
         renderer.setTextures(false);
@@ -256,22 +256,21 @@ public class LightMap {
 
         glColor3f(0.0f, 0.0f, 0.0f);
         ArrayList<StaticGameObject> staticObjects = core.getObjectManager().getStaticObjects();
-        Line2D.Double lineOfSight = new Line2D.Double();
+        Line2D.Float lineOfSight = new Line2D.Float();
         lineOfSight.x1 = center.x;
         lineOfSight.y1 = center.y;
         for (StaticGameObject so : staticObjects) {
 
-            int size = so.getPoints().size();
 
-            for (Line2D.Double line1 : so.getLines()) {
+            for (Line2D.Float line1 : so.getLines()) {
                 lineOfSight.x2 = line1.x1;
                 lineOfSight.y2 = line1.y1;
 
-                for (Line2D.Double line : so.getLines()) {
-                    Point2D.Double intersection = GeometryUtil.getIntersectionLines(lineOfSight, line);
-                    if (intersection != null && !GeometryUtil.pointsEqual(intersection, new Point2D.Double(lineOfSight.x2, lineOfSight.y2))) {
-                        Vector v = new Vector(center, new Point2D.Double(line1.x1, line1.y1));
-                        Vector v2 = new Vector(center, new Point2D.Double(line1.x2, line1.y2));
+                for (Line2D.Float line : so.getLines()) {
+                    Point2D.Float intersection = GeometryUtil.getIntersectionLines(lineOfSight, line);
+                    if (intersection != null && !GeometryUtil.pointsEqual(intersection, new Point2D.Float(lineOfSight.x2, lineOfSight.y2))) {
+                        Vector v = new Vector(center, new Point2D.Float(line1.x1, line1.y1));
+                        Vector v2 = new Vector(center, new Point2D.Float(line1.x2, line1.y2));
                         v.normalize();
                         v.multiply(1500);
                         v2.multiply(1500);
@@ -279,10 +278,10 @@ public class LightMap {
                         glDisable(GL_STENCIL_TEST);
                         glBegin(GL_QUADS);
                         {
-                            glVertex2f((float) (line1.x1 + v.x) * scaleX + cameraOffSetX, (float) (height - (line1.y1 + v.y) * scaleY + cameraOffSetY));
-                            glVertex2f((float) (line1.x2 + v2.x) * scaleX + cameraOffSetX, (float) (height - (line1.y2 + v2.y) * scaleY + cameraOffSetY));
-                            glVertex2f((float) (line1.x2) * scaleX + cameraOffSetX, (float) (height - (line1.y2) * scaleY + cameraOffSetY));
-                            glVertex2f((float) (line1.x1) * scaleX + cameraOffSetX, (float) (height - (line1.y1) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x1 + v.x) * scaleX + cameraOffSetX,  (height - (line1.y1 + v.y) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x2 + v2.x) * scaleX + cameraOffSetX,  (height - (line1.y2 + v2.y) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x2) * scaleX + cameraOffSetX,  (height - (line1.y2) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x1) * scaleX + cameraOffSetX,  (height - (line1.y1) * scaleY + cameraOffSetY));
                         }
                         glEnd();
                     }
@@ -291,21 +290,21 @@ public class LightMap {
                 lineOfSight.x2 = line1.x2;
                 lineOfSight.y2 = line1.y2;
 
-                for (Line2D.Double line : so.getLines()) {
-                    Point2D.Double intersection = GeometryUtil.getIntersectionLines(lineOfSight, line);
-                    if (intersection != null && !GeometryUtil.pointsEqual(intersection, new Point2D.Double(lineOfSight.x2, lineOfSight.y2))) {
-                        Vector v = new Vector(center, new Point2D.Double(line1.x1, line1.y1));
-                        Vector v2 = new Vector(center, new Point2D.Double(line1.x2, line1.y2));
+                for (Line2D.Float line : so.getLines()) {
+                    Point2D.Float intersection = GeometryUtil.getIntersectionLines(lineOfSight, line);
+                    if (intersection != null && !GeometryUtil.pointsEqual(intersection, new Point2D.Float(lineOfSight.x2, lineOfSight.y2))) {
+                        Vector v = new Vector(center, new Point2D.Float(line1.x1, line1.y1));
+                        Vector v2 = new Vector(center, new Point2D.Float(line1.x2, line1.y2));
                         v.normalize();
                         v.multiply(1500);
                         v2.multiply(1500);
 
                         glBegin(GL_QUADS);
                         {
-                            glVertex2f((float) (line1.x1 + v.x) * scaleX + cameraOffSetX, (float) (height - (line1.y1 + v.y) * scaleY + cameraOffSetY));
-                            glVertex2f((float) (line1.x2 + v2.x) * scaleX + cameraOffSetX, (float) (height - (line1.y2 + v2.y) * scaleY + cameraOffSetY));
-                            glVertex2f((float) (line1.x2) * scaleX + cameraOffSetX, (float) (height - (line1.y2) * scaleY + cameraOffSetY));
-                            glVertex2f((float) (line1.x1) * scaleX + cameraOffSetX, (float) (height - (line1.y1) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x1 + v.x) * scaleX + cameraOffSetX,  (height - (line1.y1 + v.y) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x2 + v2.x) * scaleX + cameraOffSetX,  (height - (line1.y2 + v2.y) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x2) * scaleX + cameraOffSetX,  (height - (line1.y2) * scaleY + cameraOffSetY));
+                            glVertex2f( (line1.x1) * scaleX + cameraOffSetX,  (height - (line1.y1) * scaleY + cameraOffSetY));
                         }
                         glEnd();
                     }
@@ -319,8 +318,8 @@ public class LightMap {
     public void blurShadows() {
         blurShader.bind();
         glUniform2f(glGetUniformLocation(blurShader.getProgramID(), "dir"), 0f, 1f);
-        Point2D.Double pos = core.getObjectManager().getPlayer().getCurrentPosition();
-        glUniform2f(glGetUniformLocation(blurShader.getProgramID(), "playerView"), (float) pos.x, (float) pos.y);
+        Point2D.Float pos = core.getObjectManager().getPlayer().getCurrentPosition();
+        glUniform2f(glGetUniformLocation(blurShader.getProgramID(), "playerView"),  pos.x,  pos.y);
         renderer.setTextures(true);
         glBindTexture(GL_TEXTURE_2D, frameBuffer);
         switchToFrameBuffer(tmpFrameBuffer);

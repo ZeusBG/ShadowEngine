@@ -14,9 +14,9 @@ import utils.GeometryUtil;
  */
 public class Vector {
 
-    public double x, y;
+    public float x, y;
 
-    public Vector(double _x, double _y) {
+    public Vector(float _x, float _y) {
         x = _x;
         y = _y;
     }
@@ -31,19 +31,22 @@ public class Vector {
         y = v.y;
     }
 
-    public Vector(Point2D.Double a, Point2D.Double b) {
+    public Vector(Point2D.Float a, Point2D.Float b) {
         x = b.x - a.x;
         y = b.y - a.y;
     }
 
     public Vector normalize() {
-        double length = Math.sqrt(x * x + y * y);
-        x = x / length;
-        y = y / length;
+        if(x==0 && y==0){
+            return this;
+        }
+        float length = (float)Math.sqrt(x * x + y * y);
+        x /= length;
+        y /= length;
         return this;
     }
 
-    public Vector multiply(double scalar) {
+    public Vector multiply(float scalar) {
         x *= scalar;
         y *= scalar;
         return this;
@@ -53,7 +56,7 @@ public class Vector {
         return String.format("Vector: %f %f\n", x, y);
     }
 
-    public double dotProduct(Vector v) {
+    public float dotProduct(Vector v) {
         return x * v.x + y * v.y;
     }
 
@@ -63,28 +66,33 @@ public class Vector {
         return this;
     }
 
-    public Vector getPerpendicular(){
-        return new Vector(y,-x);
+    public Vector getPerpendicular() {
+        return new Vector(y, -x);
     }
-    
-    public Vector getPerpendicular2(){
-        return new Vector(-y,x);
+
+    public Vector getPerpendicular2() {
+        return new Vector(-y, x);
     }
-    
-    public void reset(Point2D.Double a,Point2D.Double b){
+
+    public void reset(Point2D.Float a, Point2D.Float b) {
 
         x = b.x - a.x;
         y = b.y - a.y;
     }
-    
-    public Vector getPerpendicularCloserTo(Point2D.Double p,Point2D.Double startPoint) {
 
-        Point2D.Double tmp = new Point2D.Double(startPoint.x + y, startPoint.y - x);
-        Point2D.Double tmp2 = new Point2D.Double(startPoint.x - y, startPoint.y + x);
+    public Vector getPerpendicularCloserTo(Point2D.Float p, Point2D.Float startPoint) {
+
+        Point2D.Float tmp = new Point2D.Float(startPoint.x + y, startPoint.y - x);
+        Point2D.Float tmp2 = new Point2D.Float(startPoint.x - y, startPoint.y + x);
         if (GeometryUtil.getDistance(p, tmp) < GeometryUtil.getDistance(p, tmp2)) {
             return new Vector(y, -x);
         } else {
             return new Vector(-y, x);
         }
+    }
+
+    public void reset() {
+        x = 0;
+        y = 0;
     }
 }

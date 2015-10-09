@@ -12,14 +12,14 @@ import java.util.Comparator;
  *
  * @author Zeus
  */
-public class SortPointsClockWise implements Comparator<Point2D.Double>{
+public class SortPointsClockWise implements Comparator<Point2D.Float>{
         
-        private Point2D.Double center;
-        public SortPointsClockWise(Point2D.Double _center){
+        private Point2D.Float center;
+        public SortPointsClockWise(Point2D.Float _center){
             center = _center;
         }
         @Override
-        public int compare(Point2D.Double o1, Point2D.Double o2) {
+        public int compare(Point2D.Float o1, Point2D.Float o2) {
             if(o1.equals(o2)){
                 return 0;
             }

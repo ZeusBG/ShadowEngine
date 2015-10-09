@@ -22,7 +22,7 @@ public class Input{
     private boolean mouseButtons[];
     private boolean previousMouseButtons[];
     
-    private int mouseX,mouseY;
+    private float mouseX,mouseY;
     
     public Input(Core core){
         this.core = core;
@@ -71,12 +71,12 @@ public class Input{
         return !Mouse.isButtonDown(button);
     }
     
-     public int getMouseX(){
-        return (int)(mouseX/core.getObjectManager().getCamera().getWidthScale() - core.getObjectManager().getCamera().getX());
+     public float getMouseX(){
+        return (float)(mouseX/core.getObjectManager().getCamera().getWidthScale() - core.getObjectManager().getCamera().getX());
     }
     
-    public int getMouseY(){
-        return (int)(mouseY/core.getObjectManager().getCamera().getHeightScale() - core.getObjectManager().getCamera().getY());
+    public float getMouseY(){
+        return (float)(mouseY/core.getObjectManager().getCamera().getHeightScale() - core.getObjectManager().getCamera().getY());
     }
     
 }

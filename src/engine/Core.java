@@ -36,7 +36,7 @@ public class Core implements Runnable {
     private SoundManager soundManager;
     private long timeStarted;
 
-    private double frameCap = 1.0 / 60.0;
+    private float frameCap = 1.0f / 60.0f;
     private boolean isRunning = false;
 
     public Core(AbstractGame game) {
@@ -87,9 +87,11 @@ public class Core implements Runnable {
         double lastTime = System.nanoTime() / 1000000000.0;
         double passedTime = 0;
         double unprocessedTime = 0;
+        long testTime;
         int count = 0;
         while (isRunning) {
-            count++;
+            count=0;
+            //count=0;
             if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Display.isCloseRequested())
                 System.exit(0);
             FPSCounter = System.nanoTime();
@@ -101,19 +103,23 @@ public class Core implements Runnable {
             unprocessedTime += passedTime;
             input.update();
             while (unprocessedTime >= frameCap) {
+                count++;
+                testTime = System.currentTimeMillis();
                 
-                game.update(this, (float) frameCap);
-                physics.update((float) frameCap);
+                physics.update( frameCap);
+                game.update(this,  frameCap);
                 objManager.update();
 
                 unprocessedTime -= frameCap;
                 render = true;
+                //if(count>1)
+                  //  break;
+                //System.out.println("Test time per cycle: "+(System.currentTimeMillis()-testTime));
             }
-
+            //System.out.println("count is "+count);
             if (render) {
                 game.render(this, renderer);
-                
-                    System.out.println("FPS: " + (int)(1000/((System.nanoTime() - FPSCounter) / 1000000)));
+                System.out.println("FPS: " + (int)(1000/((System.nanoTime() - FPSCounter) / 1000000)));
             } else {
                 try {
                     Thread.sleep(1);

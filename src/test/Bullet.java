@@ -5,8 +5,6 @@
  */
 package test;
 
-import components.AABB;
-import engine.Core;
 import render.Renderer;
 import gameObjects.Projectile;
 import java.awt.Color;
@@ -20,9 +18,9 @@ public class Bullet extends Projectile {
 
     public Bullet(int x, int y) {
         super(x, y);
-        speed=100;
+        speed=60;
         light = new Light(this);
-        light.setSpanAngle(60);
+        light.setSpanAngle(360);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
         light.setColor(c);
         explosive = new Explosion1();
@@ -39,7 +37,7 @@ public class Bullet extends Projectile {
     @Override
     public void render(Renderer r) {
         r.setColor(Color.WHITE);
-        r.drawCircle((int) currentPosition.x, (int) currentPosition.y, 1);
+        r.drawCircle(currentPosition.x, currentPosition.y, 1);
     }
 
 }

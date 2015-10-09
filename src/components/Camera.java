@@ -8,7 +8,6 @@ package components;
 import engine.Core;
 import gameObjects.DynamicGameObject;
 import java.awt.geom.Point2D;
-import utils.GeometryUtil;
 
 /**
  *
@@ -16,17 +15,17 @@ import utils.GeometryUtil;
  */
 public class Camera {
     private DynamicGameObject target;
-    private Point2D.Double offset;
-    private Point2D.Double cameraCenter;
-    private double cameraSpeed;
-    private double width,height;
+    private Point2D.Float offset;
+    private Point2D.Float cameraCenter;
+    private float cameraSpeed;
+    private float width,height;
     private Core core;
-    private Point2D.Double dynamicLock;
+    private Point2D.Float dynamicLock;
     private boolean dynamic = false;
-    private double widthScale = 1.0f;
-    private double heightScale = 1.0f;
+    private float widthScale = 1.0f;
+    private float heightScale = 1.0f;
 
-    public double getWidthScale() {
+    public float getWidthScale() {
         return widthScale;
     }
 
@@ -34,7 +33,7 @@ public class Camera {
         this.widthScale = widthScale;
     }
 
-    public double getHeightScale() {
+    public float getHeightScale() {
         return heightScale;
     }
 
@@ -43,24 +42,24 @@ public class Camera {
     }
 
     public Camera(Core core){
-        offset = new Point2D.Double(0,0);
+        offset = new Point2D.Float(0,0);
         width=0;
         height=0;
-        cameraCenter = new Point2D.Double(0,0);
+        cameraCenter = new Point2D.Float(0,0);
         cameraSpeed = 10;
         this.core = core;
-        dynamicLock = new Point2D.Double(0,0);
+        dynamicLock = new Point2D.Float(0,0);
         widthScale = core.getWidth()/width;
         heightScale = core.getHeight()/height;
     }
     
     public Camera(int x, int y, int width, int height) {
-        offset = new Point2D.Double(x,y);
-        cameraCenter = new Point2D.Double(x+width/2,y+height/2);
+        offset = new Point2D.Float(x,y);
+        cameraCenter = new Point2D.Float(x+width/2,y+height/2);
         this.width = width;
         this.height = height;
         cameraSpeed = 10;
-        dynamicLock = new Point2D.Double(0,0);
+        dynamicLock = new Point2D.Float(0,0);
         
     }
 
@@ -74,8 +73,8 @@ public class Camera {
     
     public void update(){
         cameraSpeed =5;
-        double targetX = target.getCurrentPosition().x;
-        double targetY = target.getCurrentPosition().y;
+        float targetX = target.getCurrentPosition().x;
+        float targetY = target.getCurrentPosition().y;
         
         //cameraCenter.x += (targetX - cameraCenter.x)*cameraSpeed/100.0;
         //cameraCenter.y += (targetY - cameraCenter.y)*cameraSpeed/100.0;
@@ -117,16 +116,16 @@ public class Camera {
         this.target = target;
     }
 
-    public Point2D.Double getPosition() {
+    public Point2D.Float getPosition() {
         return offset;
     }
 
-    public void setPosition(Point2D.Double position) {
+    public void setPosition(Point2D.Float position) {
         this.offset = position;
     }
     
  
-    public double getWidth() {
+    public float getWidth() {
         return width;
     }
 
@@ -144,19 +143,19 @@ public class Camera {
         
     }
     
-    public double getX(){
+    public float getX(){
         return offset.x;
     }
     
-    public double getY(){
+    public float getY(){
         return offset.y;
     }
     
-    public double getDynamicX(){
+    public float getDynamicX(){
         return dynamicLock.x;
     }
     
-    public double getDynamicY(){
+    public float getDynamicY(){
         return dynamicLock.y;
     }
     
@@ -164,7 +163,7 @@ public class Camera {
         this.width = width;
     }
 
-    public double getHeight() {
+    public float getHeight() {
         return height;
     }
 
@@ -172,7 +171,7 @@ public class Camera {
         this.height = height;
     }
 
-    public double getCameraSpeed() {
+    public float getCameraSpeed() {
         return cameraSpeed;
     }
     
@@ -200,7 +199,7 @@ public class Camera {
         }
     }
     
-    public void setCameraSpeed(double cameraSpeed) {
+    public void setCameraSpeed(float cameraSpeed) {
         if(cameraSpeed<=100 && cameraSpeed>=0)
             this.cameraSpeed = cameraSpeed;
     }

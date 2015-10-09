@@ -32,7 +32,7 @@ public class AK extends Weapon {
         blockedTime = 0;
         fireRate = 600;
         timePerProjectile = 60000 / (double) fireRate;
-        currentPosition = new Point2D.Double();
+        currentPosition = new Point2D.Float();
         aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
         for (int i = 0; i < clipSize; i++) {
             ammonition.add(new Bullet(0, 0));
@@ -57,11 +57,11 @@ public class AK extends Weapon {
     @Override
     public void render(Renderer r) {
         //orientation.normalize();
-        Point2D.Double p1 = new Point2D.Double(currentPosition.x + 10 * orientation.x,
+        Point2D.Float p1 = new Point2D.Float(currentPosition.x + 10 * orientation.x,
                 currentPosition.y + 10 * orientation.y);
-        Point2D.Double p2 = new Point2D.Double(currentPosition.x - 5 * orientation.y,
+        Point2D.Float p2 = new Point2D.Float(currentPosition.x - 5 * orientation.y,
                 currentPosition.y + 5 * orientation.x);
-        Point2D.Double p3 = new Point2D.Double(currentPosition.x + 5 * orientation.y,
+        Point2D.Float p3 = new Point2D.Float(currentPosition.x + 5 * orientation.y,
                 currentPosition.y - 5 * orientation.x);
         r.drawTriangle(p1,p2,p3);
     }

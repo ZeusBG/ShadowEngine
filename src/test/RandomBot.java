@@ -32,7 +32,7 @@ public class RandomBot extends NPC{
     @Override
     public void update(float dt) {
         LivingObject player = core.getObjectManager().getPlayer();
-        Line2D.Double line = new Line2D.Double(player.getCurrentPosition(),currentPosition);
+        Line2D.Float line = new Line2D.Float(player.getCurrentPosition(),currentPosition);
         ArrayList<GameObject> objects = new ArrayList<>();
         objects.addAll(core.getObjectManager().getRayCollisionTree().getObjectsLineIntersect(line));
         if(GeometryUtil.getClosestIntersection(line, objects)==null){

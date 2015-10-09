@@ -35,7 +35,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     private AABB explosionRange;
         
     
-    public ExplodingGameObject(int x, int y) {
+    public ExplodingGameObject(float x, float y) {
         
         super(x, y, ObjectType.ITEM);
         timeSpawned = System.currentTimeMillis();
@@ -45,7 +45,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         light.setColor(c);
         
         
-        currentPosition = new Point2D.Double(x,y);
+        currentPosition = new Point2D.Float(x,y);
         currentRadius = 0;
         exploded = false;
         aabb = new AABB(x-1,y-1,x+1,y+1);

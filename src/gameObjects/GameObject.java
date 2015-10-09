@@ -22,12 +22,12 @@ import utils.ObjectType;
  */
 public abstract class GameObject {
     protected Core core;
-    protected int x,y;
+    protected float x,y;
     protected ObjectType type;
     protected ObjectState ObjState;
     protected AABB aabb;
-    protected ArrayList<Point2D.Double> points;
-    protected ArrayList<Line2D.Double> lines;
+    protected ArrayList<Point2D.Float> points;
+    protected ArrayList<Line2D.Float> lines;
     private static long IDGEN;
     private long id;
     protected Light light;
@@ -35,7 +35,7 @@ public abstract class GameObject {
     
     
     
-    public GameObject(int x, int y,ObjectType type){
+    public GameObject(float x, float y,ObjectType type){
         id = IDGEN++;
         this.type = type;
         this.x = x;
@@ -57,7 +57,7 @@ public abstract class GameObject {
         return type;
     }
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
@@ -65,7 +65,7 @@ public abstract class GameObject {
         this.x = x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
@@ -93,11 +93,11 @@ public abstract class GameObject {
         this.aabb = aabb;
     }
     
-    public ArrayList<Point2D.Double> getPoints(){
+    public ArrayList<Point2D.Float> getPoints(){
         return points;
     }
 
-    public ArrayList<Line2D.Double> getLines() {
+    public ArrayList<Line2D.Float> getLines() {
         return lines;
     }
 
@@ -109,20 +109,20 @@ public abstract class GameObject {
         this.material = material;
     }
     
-    public void addPoint(Point2D.Double point){
+    public void addPoint(Point2D.Float point){
         if(!points.isEmpty()){
-            lines.add(new Line2D.Double(points.get(points.size()-1),point));
+            lines.add(new Line2D.Float(points.get(points.size()-1),point));
         }
         points.add(point);
         aabb.update(point);
     }
     
     public void printPoints(){
-        for(Point2D.Double p : points){
+        for(Point2D.Float p : points){
             System.out.println(p);
             
         }
-        for(Line2D.Double l : lines){
+        for(Line2D.Float l : lines){
             System.out.printf("Line2D.Double[%.1f,%,1f] ->[%.1f,%.1f]\n",l.x1,l.y1,l.x2,l.y2);
         }
     }

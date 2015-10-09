@@ -18,14 +18,14 @@ import utils.ObjectType;
 public abstract class DynamicGameObject extends GameObject{
     protected Vector orientation;
     protected Vector direction;
-    protected int speed;
-    protected Point2D.Double currentPosition;
-    protected Point2D.Double nextPosition;
+    protected float speed;
+    protected Point2D.Float currentPosition;
+    protected Point2D.Float nextPosition;
     
-    public DynamicGameObject(int x, int y, ObjectType type) {
+    public DynamicGameObject(float x, float y, ObjectType type) {
         super(x, y, type);
-        currentPosition = new Point2D.Double();
-        nextPosition = new Point2D.Double();
+        currentPosition = new Point2D.Float();
+        nextPosition = new Point2D.Float();
         direction = new Vector(0,0);
         orientation = new Vector(1,0);
     }
@@ -35,13 +35,13 @@ public abstract class DynamicGameObject extends GameObject{
         speed = _speed;
     }
     
-    public void setCurrentPosition(Point2D.Double p){
-        currentPosition = new Point2D.Double();
+    public void setCurrentPosition(Point2D.Float p){
+        currentPosition = new Point2D.Float();
         currentPosition.x = p.x;
         currentPosition.y = p.y;
     }
 
-    public Point2D.Double getCurrentPosition() {
+    public Point2D.Float getCurrentPosition() {
         return currentPosition;
     }
 
@@ -53,7 +53,7 @@ public abstract class DynamicGameObject extends GameObject{
         this.orientation = orientation;
     }
 
-    public int getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 
@@ -61,12 +61,12 @@ public abstract class DynamicGameObject extends GameObject{
         this.speed = speed;
     }
     
-    public Point2D.Double getNextPosition() {
+    public Point2D.Float getNextPosition() {
         return nextPosition;
     }
 
-    public void setNextPosition(Point2D.Double p) {
-        nextPosition = new Point2D.Double();
+    public void setNextPosition(Point2D.Float p) {
+        nextPosition = new Point2D.Float();
         nextPosition.x = p.x;
         nextPosition.y = p.y;
     }
@@ -87,7 +87,7 @@ public abstract class DynamicGameObject extends GameObject{
         currentPosition.y = nextPosition.y;
     }
     
-    public void setDirection(Point2D.Double p){
+    public void setDirection(Point2D.Float p){
         direction = new Vector(currentPosition,p);
         direction.normalize();
         

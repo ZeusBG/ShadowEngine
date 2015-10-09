@@ -13,9 +13,9 @@ import gameObjects.ExplodingGameObject;
  */
 public class Explosion1 extends ExplodingGameObject{
 
-    public Explosion1(int x, int y) {
+    public Explosion1(float x, float y) {
         super(x, y);
-        expansionSpeed = 500;
+        expansionSpeed = 150;
         damage = 200;
         lifeTime = 1;
         timer = 0;
@@ -26,7 +26,7 @@ public class Explosion1 extends ExplodingGameObject{
     
     public Explosion1() {
         super(-10000,-10000);
-        expansionSpeed = 500;
+        expansionSpeed = 150;
         damage = 200;
         lifeTime = 1;
         timer = 0;

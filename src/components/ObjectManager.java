@@ -31,8 +31,8 @@ public class ObjectManager {
     private ArrayList<DynamicGameObject> dynamicObjects;
     private ArrayList<DynamicGameObject> bodies;
     private ArrayList<Projectile> projectiles;
-    private ArrayList<Line2D.Double> lines;
-    private ArrayList<Point2D.Double> staticObjPoints;
+    private ArrayList<Line2D.Float> lines;
+    private ArrayList<Point2D.Float> staticObjPoints;
     
     private QuadTree rayCollisionTree;
     
@@ -47,7 +47,7 @@ public class ObjectManager {
         lines = new ArrayList<>();
         staticObjPoints = new ArrayList<>();
         //should be map.getWidth() and map.getHeight() nut there isnt a map for now
-        rayCollisionTree = new QuadTree<StaticGameObject>(2,7,new AABB(0,0,1700,1300));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
+        rayCollisionTree = new QuadTree<StaticGameObject>(3,8,new AABB(0,0,1700,1300));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
         allObjects = new ArrayList<>();
         camera = new Camera(0,0,400,300);
         camera.setCore(core);
@@ -81,9 +81,9 @@ public class ObjectManager {
         
         staticObjects.add((StaticGameObject)obj);
         StaticGameObject tmp = (StaticGameObject) obj;
-        Line2D.Double tmpLine = null;
+        Line2D.Float tmpLine = null;
         for(int i=0;i<tmp.getPoints().size()-1;i++){
-            tmpLine = new Line2D.Double(tmp.getPoints().get(i),tmp.getPoints().get(i+1));
+            tmpLine = new Line2D.Float(tmp.getPoints().get(i),tmp.getPoints().get(i+1));
             lines.add(tmpLine);
             staticObjPoints.add(tmp.getPoints().get(i));
         }
@@ -92,11 +92,11 @@ public class ObjectManager {
         rayCollisionTree.insert(obj);
     }
     
-    public ArrayList<Point2D.Double> getPoints(){
+    public ArrayList<Point2D.Float> getPoints(){
         return staticObjPoints;
     }
     
-    public ArrayList<Line2D.Double> getLines(){
+    public ArrayList<Line2D.Float> getLines(){
         return lines;
     }
     

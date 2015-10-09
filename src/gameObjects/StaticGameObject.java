@@ -21,7 +21,7 @@ public abstract class StaticGameObject extends GameObject{
     
     
     
-    public StaticGameObject(int x, int y) {
+    public StaticGameObject(float x, float y) {
         super(x, y, ObjectType.ENVIRONMENT);
         
     }

@@ -43,10 +43,8 @@ import render.Material.MaterialBuilder;
 public class Renderer {
 
     private Core core;
-    public static final int CIRCLE_ACCURACY = 50;
-    //private Graphics2D g2d;
-    private Graphics2D g2d;
-    private BufferStrategy bs;
+    public static final int CIRCLE_ACCURACY = 30;
+
     private float cameraOffSetX;
     private float cameraOffSetY;
     private float scaleX;
@@ -78,14 +76,14 @@ public class Renderer {
 
         //get offsets and scales from the camera
         if (core.getObjectManager().getCamera().isDynamic()) {
-            cameraOffSetX = (float) core.getObjectManager().getCamera().getDynamicX();
-            cameraOffSetY = (float) core.getObjectManager().getCamera().getDynamicY();
+            cameraOffSetX =  core.getObjectManager().getCamera().getDynamicX();
+            cameraOffSetY =  core.getObjectManager().getCamera().getDynamicY();
         } else {
-            cameraOffSetX = (float) core.getObjectManager().getCamera().getX();
-            cameraOffSetY = (float) core.getObjectManager().getCamera().getY();
+            cameraOffSetX =  core.getObjectManager().getCamera().getX();
+            cameraOffSetY =  core.getObjectManager().getCamera().getY();
         }
-        scaleX = (float) core.getObjectManager().getCamera().getWidthScale();
-        scaleY = (float) core.getObjectManager().getCamera().getHeightScale();
+        scaleX =  core.getObjectManager().getCamera().getWidthScale();
+        scaleY =  core.getObjectManager().getCamera().getHeightScale();
 
         cameraOffSetX *= scaleX;
         cameraOffSetY *= scaleY;
@@ -160,6 +158,7 @@ public class Renderer {
         glDisable(GL_BLEND);
         //core.getPhysics().getCollisionTree().drawTree(this);
         //core.getPhysics().getCollisionTree().drawTree(this);
+        //core.getObjectManager().getPlayer().render(this);
 
         Display.update();
         Display.sync(60);
@@ -176,22 +175,22 @@ public class Renderer {
 
     }
 
-    public void drawCircle(double cx, double cy, double r) {
+    public void drawCircle(float cx, float cy, float r) {
         cx = scaleX * cx + cameraOffSetX;
         cy = scaleY * cy + cameraOffSetY;
         r = scaleX * r;
 
-        float step = 2.0f * 3.1415926f / (float) CIRCLE_ACCURACY;
+        float step = 2.0f * 3.1415926f /  CIRCLE_ACCURACY;
         float theta = 0;
         glBegin(GL_LINE_LOOP);
         {
             for (int i = 0; i < CIRCLE_ACCURACY; i++) {
                 theta += step;//get the current angle 
 
-                double x = r * Math.cos(theta);//calculate the x component 
-                double y = r * Math.sin(theta);//calculate the y component 
+                float x = r * (float)Math.cos(theta);//calculate the x component 
+                float y = r * (float)Math.sin(theta);//calculate the y component 
 
-                glVertex2f((float) (x + cx), (float) (y + cy));//output vertex 
+                glVertex2f( (x + cx),  (y + cy));//output vertex 
             }
         }
         glEnd();
@@ -244,32 +243,9 @@ public class Renderer {
 
     }
 
-    private void drawVisibilityTriangle(LivingObject pointOfView) {
-        glColor3f(0.0f, 0.0f, 0.0f);
-        Vector p = pointOfView.getOrientation();
-        Point2D.Double p1 = new Point2D.Double();
-        p1.x = pointOfView.getCurrentPosition().x + p.x * 10;
-        p1.y = pointOfView.getCurrentPosition().y + p.y * 10;
-        Point2D.Double p2 = new Point2D.Double();
-        Point2D.Double p3 = new Point2D.Double();
-        p2.x = p1.x + p.getPerpendicular().x * 20;
-        p2.y = p1.y + p.getPerpendicular().y * 20;
-        p3.x = p1.x + p.getPerpendicular2().x * 20;
-        p3.y = p1.y + p.getPerpendicular2().y * 20;
-        p2.x += (p2.x - pointOfView.getCurrentPosition().x) * 1000;
-        p2.y += (p2.y - pointOfView.getCurrentPosition().y) * 1000;
+   
 
-        p3.x += (p3.x - pointOfView.getCurrentPosition().x) * 1000;
-        p3.y += (p3.y - pointOfView.getCurrentPosition().y) * 1000;
-
-        ArrayList<Point2D.Double> visibility = new ArrayList<>();
-        visibility.add(pointOfView.getCurrentPosition());
-        visibility.add(p2);
-        visibility.add(p3);
-        drawPolygon(visibility);
-    }
-
-    private void drawSight(Point2D.Double lightSource) {
+    private void drawSight(Point2D.Float lightSource) {
 
         for (GameObject obj : core.getObjectManager().getAllObjects()) {
 
@@ -277,11 +253,10 @@ public class Renderer {
             if (light == null) {
                 continue;
             }
-            Point2D.Double pos = getScaledPoint(light.getLocation());
+            Point2D.Float pos = getScaledPoint(light.getLocation());
 
             //gets the points for the visibility polygon from the rayCollisionTree in object manager
-            ArrayList<Point2D.Double> points = findIntersectionPoints(light);
-
+            ArrayList<Point2D.Float> points = findIntersectionPoints(light);
             //uses these points to draw the visibility polygon in the lightmap and in the gmae buffer
             lightMap.addLight(light, pos, points);
             drawLight(points, light);
@@ -290,25 +265,18 @@ public class Renderer {
 
     }
 
-    public Point2D.Double getScaledPoint(Point2D.Double p) {
-        Point2D.Double scaled = new Point2D.Double();
+    public Point2D.Float getScaledPoint(Point2D.Float p) {
+        Point2D.Float scaled = new Point2D.Float();
         scaled.x = scaleX * p.x + cameraOffSetX;
         scaled.y = scaleY * p.y + cameraOffSetY;
         return scaled;
     }
 
-    public Point2D.Float getScaledPoint(Point2D.Float p) {
-        Point2D.Float scaled = new Point2D.Float();
-        scaled.x = (float) (scaleX * p.x + cameraOffSetX);
-        scaled.y = (float) (scaleY * p.y + cameraOffSetY);
-        return scaled;
-    }
+    public ArrayList<Point2D.Float> findIntersectionPoints(Light lightSrc) {
 
-    public ArrayList<Point2D.Double> findIntersectionPoints(Light lightSrc) {
-
-        Point2D.Double lightSource = lightSrc.getOwner().getCurrentPosition();
-        ArrayList<Point2D.Double> intersectionPoints = new ArrayList<>(500);
-        ArrayList<Point2D.Double> sPoints = new ArrayList<>(500);
+        Point2D.Float lightSource = lightSrc.getOwner().getCurrentPosition();
+        ArrayList<Point2D.Float> intersectionPoints = new ArrayList<>(500);
+        ArrayList<Point2D.Float> sPoints = new ArrayList<>(500);
         HashSet<GameObject> objects = core.getObjectManager().getRayCollisionTree().getObjectsInRange(lightSrc.getAABB());
         ArrayList<StaticGameObject> allObjects = core.getObjectManager().getStaticObjects();
 
@@ -316,7 +284,7 @@ public class Renderer {
             if (!s.getObjState().isRenderable()) {
                 continue;
             }
-            for (Point2D.Double cPoint : s.getPoints()) {
+            for (Point2D.Float cPoint : s.getPoints()) {
                 Ray tmpRay = new Ray(lightSource, cPoint);
                 if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects))) {
                     addSecondaryPoints(cPoint, lightSource, sPoints);
@@ -324,9 +292,9 @@ public class Renderer {
             }
         }
 
-        for (Point2D.Double cPoint : sPoints) {
+        for (Point2D.Float cPoint : sPoints) {
             Ray tmpRay = new Ray(lightSource, cPoint);
-            Point2D.Double intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects);
+            Point2D.Float intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects);
             if (intersection != null) {
                 intersectionPoints.add(intersection);
             }
@@ -338,38 +306,38 @@ public class Renderer {
 
     }
 
-    public void addSecondaryPoints(Point2D.Double p, Point2D.Double lightSource, ArrayList<Point2D.Double> sPoints) {
-        double x, y;
+    public void addSecondaryPoints(Point2D.Float p, Point2D.Float lightSource, ArrayList<Point2D.Float> sPoints) {
+        float x, y;
 
         y = p.x - lightSource.x;
         x = p.y - lightSource.y;
 
-        double newX, newY;
-        newX = p.x - x * 0.001;
-        newY = p.y + y * 0.001;
-        sPoints.add(new Point2D.Double(newX, newY));
+        float newX, newY;
+        newX = p.x - x * 0.001f;
+        newY = p.y + y * 0.001f;
+        sPoints.add(new Point2D.Float(newX, newY));
 
-        newX = p.x + x * 0.001;
-        newY = p.y - y * 0.001;
-        sPoints.add(new Point2D.Double(newX, newY));
+        newX = p.x + x * 0.001f;
+        newY = p.y - y * 0.001f;
+        sPoints.add(new Point2D.Float(newX, newY));
 
     }
 
-    public void drawLine(int x1, int y1, int x2, int y2) {
+    public void drawLine(float x1, float y1, float x2, float y2) {
 
         glBegin(GL_LINE_LOOP);
         {
-            glVertex2f((float) (scaleX * x1 + cameraOffSetX), (float) (scaleY * y1 + cameraOffSetY));
-            glVertex2f((float) (scaleX * x2 + cameraOffSetX), (float) (scaleY * y2 + cameraOffSetY));
+            glVertex2f(scaleX * x1 + cameraOffSetX, scaleY * y1 + cameraOffSetY);
+            glVertex2f(scaleX * x2 + cameraOffSetX, scaleY * y2 + cameraOffSetY);
         }
         glEnd();
 
     }
 
-    public void drawRay(int x1, int y1, int x2, int y2) {
+    public void drawRay(float x1, float y1, float x2, float y2) {
 
         Ray r = new Ray(x1, y1, x2, y2);
-        Point2D.Double endPoint = core.getObjectManager().getRayCollisionTree().intersect(r, null);
+        Point2D.Float endPoint = core.getObjectManager().getRayCollisionTree().intersect(r, null);
 
         if (endPoint != null) {
             drawLine(x1, y1, (int) endPoint.x, (int) endPoint.y);
@@ -385,17 +353,17 @@ public class Renderer {
         glColor4f(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
     }
 
-    public void drawTriangle(Point2D.Double a, Point2D.Double b, Point2D.Double c) {
+    public void drawTriangle(Point2D.Float a, Point2D.Float b, Point2D.Float c) {
         glBegin(GL_QUADS);
         {
-            glVertex2f((float) (scaleX * a.x + cameraOffSetX), (float) (scaleY * a.y + cameraOffSetY));
-            glVertex2f((float) (scaleX * b.x + cameraOffSetX), (float) (scaleY * b.y + cameraOffSetY));
-            glVertex2f((float) (scaleX * c.x + cameraOffSetX), (float) (scaleY * c.y + cameraOffSetY));
+            glVertex2f(scaleX * a.x + cameraOffSetX, scaleY * a.y + cameraOffSetY);
+            glVertex2f(scaleX * b.x + cameraOffSetX, scaleY * b.y + cameraOffSetY);
+            glVertex2f(scaleX * c.x + cameraOffSetX, scaleY * c.y + cameraOffSetY);
         }
         glEnd();
     }
 
-    public void drawPolygon(ArrayList<Point2D.Double> points) {
+    public void drawPolygon(ArrayList<Point2D.Float> points) {
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
@@ -404,8 +372,8 @@ public class Renderer {
 
         glBegin(GL_POLYGON);
         {
-            for (Point2D.Double p : points) {
-                glVertex2f((float) (scaleX * p.x + cameraOffSetX), (float) (scaleY * p.y + cameraOffSetY));
+            for (Point2D.Float p : points) {
+                glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
             }
         }
         glEnd();
@@ -425,15 +393,15 @@ public class Renderer {
         //glUseProgram(0);
     }
 
-    public void drawReversedPolygon(ArrayList<Point2D.Double> points) {
+    public void drawReversedPolygon(ArrayList<Point2D.Float> points) {
 
         glColorMask(false, false, false, false);
         glStencilFunc(GL_EQUAL, 1, 1);
         glStencilOp(GL_REPLACE, GL_KEEP, GL_ZERO);
 
         glBegin(GL_POLYGON);
-        for (Point2D.Double p : points) {
-            glVertex2f((float) (scaleX * p.x + cameraOffSetX), (float) (scaleY * p.y + cameraOffSetY));
+        for (Point2D.Float p : points) {
+            glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
         }
         glEnd();
 
@@ -452,7 +420,7 @@ public class Renderer {
         glUseProgram(0);
     }
 
-    public void drawLight(ArrayList<Point2D.Double> points, Light light) {
+    public void drawLight(ArrayList<Point2D.Float> points, Light light) {
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
@@ -461,16 +429,16 @@ public class Renderer {
 
         glBegin(GL_POLYGON);
         {
-            for (Point2D.Double p : points) {
-                glVertex2f((float) (scaleX * p.x + cameraOffSetX), (float) (scaleY * p.y + cameraOffSetY));
+            for (Point2D.Float p : points) {
+                glVertex2f( scaleX * p.x + cameraOffSetX,scaleY * p.y + cameraOffSetY);
             }
         }
         glEnd();
         
-       
+       //the second drawing is because light can be less than 360 degrees
         glStencilFunc(GL_EQUAL, 1,1);
         glStencilOp(GL_ZERO, GL_ZERO, GL_INCR);
-        drawDirectedPartCircle((float)light.getLocation().x, (float)light.getLocation().y, light.getRadius(), light.getDirection(), light.getSpanAngle());
+        drawDirectedPartCircle(light.getLocation().x, light.getLocation().y, light.getRadius(), light.getDirection(), light.getSpanAngle());
         
         
         
@@ -478,21 +446,21 @@ public class Renderer {
         glStencilFunc(GL_EQUAL, 2, 2);
         glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 
-        Point2D.Double lightLocation = getScaledPoint(light.getLocation());
+        Point2D.Float lightLocation = getScaledPoint(light.getLocation());
         Color lightColor = light.getColor();
 
         lightShader.bind();
-        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), (float) light.getPower());
-        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), (float) lightLocation.x, Display.getHeight() - (float) lightLocation.y + 15);
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"),  light.getPower());
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"),  lightLocation.x, Display.getHeight() -  lightLocation.y + 15);
         glUniform3f(glGetUniformLocation(lightShader.getProgramID(), "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX);
         AABB aabb = light.getAABB();
         glBegin(GL_QUADS);
         {
-            glVertex2f(scaleX*(float)aabb.getMinX()+cameraOffSetX, scaleY*(float)aabb.getMinY()+cameraOffSetY);
-            glVertex2f(scaleX*(float)aabb.getMaxX()+cameraOffSetX, scaleY*(float)aabb.getMinY()+cameraOffSetY);
-            glVertex2f(scaleX*(float)aabb.getMaxX()+cameraOffSetX, scaleY*(float)aabb.getMaxY()+cameraOffSetY);
-            glVertex2f(scaleX*(float)aabb.getMinX()+cameraOffSetX, scaleY*(float)aabb.getMaxY()+cameraOffSetY);
+            glVertex2f(scaleX*aabb.getMinX()+cameraOffSetX, scaleY*aabb.getMinY()+cameraOffSetY);
+            glVertex2f(scaleX*aabb.getMaxX()+cameraOffSetX, scaleY*aabb.getMinY()+cameraOffSetY);
+            glVertex2f(scaleX*aabb.getMaxX()+cameraOffSetX, scaleY*aabb.getMaxY()+cameraOffSetY);
+            glVertex2f(scaleX*aabb.getMinX()+cameraOffSetX, scaleY*aabb.getMaxY()+cameraOffSetY);
         }
         glEnd();
         lightShader.unbind();
@@ -581,7 +549,7 @@ public class Renderer {
         setTextures(false);
     }
 
-    public void drawRect(int x, int y, int width, int height) {
+    public void drawRect(float x, float y, float width, float height) {
 
         glBegin(GL_LINE_LOOP);
         {
@@ -597,7 +565,7 @@ public class Renderer {
 
     public void drawRotatedMaterial(Material mat, int angle) {
         glPushMatrix();
-        glTranslatef((float) mat.getLocation().x * scaleX + cameraOffSetX, (float) mat.getLocation().y * scaleY + cameraOffSetY, 0);
+        glTranslatef( mat.getLocation().x * scaleX + cameraOffSetX,  mat.getLocation().y * scaleY + cameraOffSetY, 0);
         glRotatef(angle, 0, 0, 1);
         setTextures(true);
         bindTexture(mat.getTexture());

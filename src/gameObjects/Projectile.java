@@ -29,8 +29,5 @@ public abstract class Projectile extends DynamicGameObject{
         this.explosive = explosive;
     }
 
-
-    
-    
     
 }

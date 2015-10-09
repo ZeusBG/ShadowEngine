@@ -13,6 +13,7 @@ import gameObjects.Projectile;
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import math.Vector;
 import test.Explosion1;
@@ -33,13 +34,14 @@ public class Physics {
     private int treeMaxDepth;
     private int treeMaxCapacity;
     private int collisionChecks;
+    private HashMap<GameObject,Boolean> checkedProjectiles;
     //private long timeResolvedCollision;
     //private long timeInsertedObjects;
     public Physics(Core core) {
         this.core = core;
         mapSizeX = 1600;
         mapSizeY = 1200;
-        treeMaxDepth = 8;
+        treeMaxDepth = 7;
         treeMaxCapacity = 2;
         collisionTree = new QuadTree<>(treeMaxCapacity, treeMaxDepth, new AABB(0, 0, mapSizeX, mapSizeY));
     }
@@ -62,9 +64,10 @@ public class Physics {
     }
 
     public void update(float _dt) {
+        checkedProjectiles = new HashMap<>();
         //timeResolvedCollision = System.currentTimeMillis();
         //timeInsertedObjects = System.currentTimeMillis();
-        //collisionChecks = 0;
+        collisionChecks = 0;
         //collisionTree.clean();
         
         //System.out.println("Time spent inserting objects: "+(System.currentTimeMillis()-timeInsertedObjects));
@@ -80,7 +83,7 @@ public class Physics {
         
         moveObjects(dt);
         //System.out.println("Time spent for physics update objects: "+(System.currentTimeMillis()-timeResolvedCollision));
-        //System.out.println("collisions resolved: "+collisionChecks);
+        System.out.println("collisions resolved: "+collisionChecks);
     }
 
     public void updateObjects() {
@@ -94,16 +97,20 @@ public class Physics {
     }
 
     public void checkCollision(GameObject go1, GameObject go2) {
-        //collisionChecks++;
-        if (go1 == go2) {
-            return;
+        
+        if(checkedProjectiles.get(go1)!=null){
+            if (go1 == go2) {
+                return;
+            }
         }
-
         if (go1.getType() == ObjectType.ENVIRONMENT) {
             return;
         }
+        
         if(!go1.isCollidableWith(go2))
             return;
+        
+        collisionChecks++;
         if (go1.getType() == ObjectType.ITEM) {
             
             if (go1 instanceof ExplodingGameObject) {
@@ -119,7 +126,7 @@ public class Physics {
                     if (go instanceof LivingObject) {
                         LivingObject lo = (LivingObject) go;
 
-                        double distanceToExplosion = GeometryUtil.getDistance(lo.getCurrentPosition(), ego.getCurrentPosition());
+                        float distanceToExplosion = GeometryUtil.getDistance(lo.getCurrentPosition(), ego.getCurrentPosition());
                         //System.out.println("dealing damage to "+go1.getID());
                         if (ego.getDamageDealtTo().get(go) == null
                                 && distanceToExplosion > ego.getPreviousRadius()
@@ -127,7 +134,6 @@ public class Physics {
 
                             //System.out.println("dealing damage to "+go.getID());
                             ego.getDamageDealtTo().put(go, Boolean.TRUE);
-
                         }
                     }
                 }
@@ -137,33 +143,36 @@ public class Physics {
 
         else if (go1.getType() == ObjectType.PROJECTILE) {
             //go1.update(core, dt);
+            if(checkedProjectiles.get(go1)!=null){
+                return;
+            }
+            checkedProjectiles.put(go1, Boolean.TRUE);
             Projectile projectile = (Projectile) go1;
-
-            Line2D.Double projectilePath = new Line2D.Double(projectile.getCurrentPosition(), projectile.getNextPosition());
+            
+            Line2D.Float projectilePath = new Line2D.Float(projectile.getCurrentPosition(), projectile.getNextPosition());
             ArrayList<GameObject> objects = new ArrayList<>();
             objects.addAll(collisionTree.getObjectsLineIntersect(projectilePath));
-
-            Point2D.Double intersection = GeometryUtil.getClosestIntersection(projectilePath, objects);
+            Point2D.Float intersection = GeometryUtil.getClosestIntersection(projectilePath, objects);
             if (intersection != null) {
-                Point2D.Double explosionSpawnPoint = new Point2D.Double();
+                Point2D.Float explosionSpawnPoint = new Point2D.Float();
                 explosionSpawnPoint.x = intersection.x - projectile.getDirection().x * 3;
                 explosionSpawnPoint.y = intersection.y - projectile.getDirection().y * 3;
-                core.getObjectManager().addObject(new Explosion1((int) explosionSpawnPoint.x, (int) explosionSpawnPoint.y));
-                collisionTree.remove(go1);
+                core.getObjectManager().addObject(new Explosion1( explosionSpawnPoint.x, explosionSpawnPoint.y));
+                //collisionTree.remove(go1);
                 core.getObjectManager().removeObject(go1);
             }
 
         } else if (go1.getType() == ObjectType.PLAYER) {
             LivingObject player = (LivingObject) (go1);
-            Line2D.Double playerPath = new Line2D.Double(player.getCurrentPosition(), player.getNextPosition());
+            Line2D.Float playerPath = new Line2D.Float(player.getCurrentPosition(), player.getNextPosition());
 
             if (go2.getType() == ObjectType.ENVIRONMENT) {
                 if (GeometryUtil.checkIntersectionLineAABB(playerPath, go2.getAabb())) {
-                    for (Line2D.Double line : go2.getLines()) {
+                    for (Line2D.Float line : go2.getLines()) {
                         if (GeometryUtil.getIntersectionLines(playerPath, line) != null) {
                             //System.out.println("intersection !");
-                            Point2D.Double nextPoint = GeometryUtil.getIntersectionLines(playerPath, line);
-                            Vector v = new Vector((Point2D.Double) line.getP2(), (Point2D.Double) line.getP1());
+                            Point2D.Float nextPoint = GeometryUtil.getIntersectionLines(playerPath, line);
+                            Vector v = new Vector((Point2D.Float) line.getP2(), (Point2D.Float) line.getP1());
 
                             v.normalize();
                             Vector normal = v.getPerpendicularCloserTo(player.getCurrentPosition(), nextPoint);

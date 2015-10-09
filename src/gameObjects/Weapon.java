@@ -5,6 +5,7 @@
  */
 package gameObjects;
 
+import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import math.Vector;
 import test.Bullet;

@@ -19,12 +19,12 @@ public class Light {
     private float radius= 180;
     private float power = 1;
     private Color color;
-    private Point2D.Double location;
+    private Point2D.Float location;
     private DynamicGameObject owner;
     private AABB aabb;
     private float spanAngle;
     private Vector direction;
-    
+    private Vector offset;
     
     
     public Light(float radius, Color color, DynamicGameObject owner) {
@@ -77,11 +77,11 @@ public class Light {
         return aabb;
     }
     
-    public Point2D.Double getLocation(){
+    public Point2D.Float getLocation(){
         if(owner==null){
             return location;
         }
-        Point2D.Double loc = new Point2D.Double();
+        Point2D.Float loc = new Point2D.Float();
         loc.x = owner.getCurrentPosition().x;
         loc.y = owner.getCurrentPosition().y;
         return loc;
