@@ -109,7 +109,7 @@ public class Renderer {
         }
         glEnd();
 
-        //lightMap.blurShadows();
+        lightMap.blurShadows();
        // lightMap.blurShadows();
         //lightMap.blurShadows();
         //lightMap.blurShadows();
@@ -142,7 +142,7 @@ public class Renderer {
             //core.getObjectManager().getPlayer().render(this);
         }
         
-        //drawLightMap();
+        drawLightMap();
         for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
             if(!obj.getAabb().intersect(visibleArea))
                 continue;
@@ -161,12 +161,12 @@ public class Renderer {
         //so that he cant see behind walls and behind his back
         lightMap.drawVisibilityTriangle(objectsToRender.getPlayer());
         lightMap.drawVisibilityPolygon(new Vector2f(core.getObjectManager().getPlayer().getPosition().x,core.getObjectManager().getPlayer().getPosition().y));
-        //lightMap.blurShadows();
+        lightMap.blurShadows();
         //lightMap.blurShadows();
         //lightMap.blurShadows();
         //lightMap.blurShadows();
                 
-        //drawLightMap();
+        drawLightMap();
                 
         //core.getPhysics().getCollisionTree().drawTree(this);
         //core.getObjectManager().getRayCollisionTree().drawTree(this);

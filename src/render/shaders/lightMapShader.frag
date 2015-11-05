@@ -22,7 +22,7 @@ void main() {
         else if(distance<100)
             attenuation = power*(1-(distance-50)/200);
         else{
-            attenuation = power*(1-50/200.0-(distance-100)/50);
+            attenuation = power*(1-50/200.0-(distance-100)/150);
         }
  
 	vec4 color = vec4(texcolor.x+attenuation, texcolor.y+attenuation, texcolor.z+attenuation,1.0f);
