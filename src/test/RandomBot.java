@@ -10,10 +10,10 @@ import gameObjects.LivingObject;
 import gameObjects.NPC;
 import gameObjects.Weapon;
 import java.awt.Color;
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import math.Line2f;
 import render.Renderer;
-import utils.GeometryUtil;
+import math.GeometryUtil;
 
 
 
@@ -32,13 +32,13 @@ public class RandomBot extends NPC{
     @Override
     public void update(float dt) {
         LivingObject player = core.getObjectManager().getPlayer();
-        Line2D.Float line = new Line2D.Float(player.getCurrentPosition(),currentPosition);
+        Line2f line = new Line2f(player.getPosition().x,player.getPosition().y,position.x,position.y);
         ArrayList<GameObject> objects = new ArrayList<>();
         objects.addAll(core.getObjectManager().getRayCollisionTree().getObjectsLineIntersect(line));
         if(GeometryUtil.getClosestIntersection(line, objects)==null){
             
             
-            orientation.reset(currentPosition,player.getCurrentPosition());
+            orientation.reset(position,player.getPosition());
             if(weapon.isClipEmpty()){
                 weapon.reload();
                 
@@ -52,7 +52,7 @@ public class RandomBot extends NPC{
     public void render(Renderer r) {
         
         r.setColor(Color.ORANGE);
-        r.drawCircle((int)currentPosition.x,(int)currentPosition.y,5);
+        r.drawCircle(position.x,position.y,5);
 
     }
     

@@ -36,7 +36,7 @@ public class Core implements Runnable {
     private SoundManager soundManager;
     private long timeStarted;
 
-    private float frameCap = 1.0f / 60.0f;
+    private float frameCap = 1.0f / 30.0f;
     private boolean isRunning = false;
 
     public Core(AbstractGame game) {
@@ -83,7 +83,7 @@ public class Core implements Runnable {
 
         double FPSCounter;
 
-        double firstTime = 0;
+        double newCycleTime = 0;
         double lastTime = System.nanoTime() / 1000000000.0;
         double passedTime = 0;
         double unprocessedTime = 0;
@@ -97,9 +97,9 @@ public class Core implements Runnable {
             FPSCounter = System.nanoTime();
             boolean render = false;
 
-            firstTime = System.nanoTime() / 1000000000.0;
-            passedTime = firstTime - lastTime;
-            lastTime = firstTime;
+            newCycleTime = System.nanoTime() / 1000000000.0;
+            passedTime = newCycleTime - lastTime;
+            lastTime = newCycleTime;
             unprocessedTime += passedTime;
             input.update();
             while (unprocessedTime >= frameCap) {
@@ -107,21 +107,22 @@ public class Core implements Runnable {
                 testTime = System.currentTimeMillis();
                 
                 physics.update( frameCap);
-                game.update(this,  frameCap);
+                game.update(frameCap);
                 objManager.update();
 
                 unprocessedTime -= frameCap;
                 render = true;
-                //if(count>1)
-                  //  break;
+                //if(count>1)//for debuggin only
+                 //   break;
                 //System.out.println("Test time per cycle: "+(System.currentTimeMillis()-testTime));
             }
             //System.out.println("count is "+count);
             if (render) {
-                game.render(this, renderer);
+                game.render(renderer);
                 System.out.println("FPS: " + (int)(1000/((System.nanoTime() - FPSCounter) / 1000000)));
             } else {
                 try {
+                    System.out.println("sleeping for: "+ (frameCap-passedTime)*1000);
                     Thread.sleep(1);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);

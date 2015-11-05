@@ -6,13 +6,12 @@
 package test;
 
 import components.AABB;
-import engine.Core;
 import render.Renderer;
 import gameObjects.LivingObject;
 import gameObjects.Projectile;
 import gameObjects.Weapon;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import math.Vector2f;
 
 /**
  *
@@ -30,10 +29,10 @@ public class AK extends Weapon {
         currentAmmo = 1000;
         reloadTime = 1;
         blockedTime = 0;
-        fireRate = 600;
+        fireRate = 800;
         timePerProjectile = 60000 / (double) fireRate;
-        currentPosition = new Point2D.Float();
-        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+        position = new Vector2f();
+        aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
         for (int i = 0; i < clipSize; i++) {
             ammonition.add(new Bullet(0, 0));
         }
@@ -45,24 +44,24 @@ public class AK extends Weapon {
     public void update(float dt) {
         if (owner != null) {
             orientation = owner.getOrientation();
-            currentPosition.x = owner.getCurrentPosition().x;
-            currentPosition.y = owner.getCurrentPosition().y;
+            position.x = owner.getPosition().x;
+            position.y = owner.getPosition().y;
 
             nextPosition.x = owner.getNextPosition().x;
             nextPosition.y = owner.getNextPosition().y;
-            aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+            aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
         }
     }
 
     @Override
     public void render(Renderer r) {
         //orientation.normalize();
-        Point2D.Float p1 = new Point2D.Float(currentPosition.x + 10 * orientation.x,
-                currentPosition.y + 10 * orientation.y);
-        Point2D.Float p2 = new Point2D.Float(currentPosition.x - 5 * orientation.y,
-                currentPosition.y + 5 * orientation.x);
-        Point2D.Float p3 = new Point2D.Float(currentPosition.x + 5 * orientation.y,
-                currentPosition.y - 5 * orientation.x);
+        Vector2f p1 = new Vector2f(position.x + 10 * orientation.x,
+                position.y + 10 * orientation.y);
+        Vector2f p2 = new Vector2f(position.x - 5 * orientation.y,
+                position.y + 5 * orientation.x);
+        Vector2f p3 = new Vector2f(position.x + 5 * orientation.y,
+                position.y - 5 * orientation.x);
         r.drawTriangle(p1,p2,p3);
     }
 

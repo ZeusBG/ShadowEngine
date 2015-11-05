@@ -3,6 +3,7 @@ uniform vec3 lightColor;
 uniform float power;
 uniform float screenHeight;
 uniform float scale;
+uniform float radius;
 
 void main() {
 	vec2 position;

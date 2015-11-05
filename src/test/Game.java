@@ -5,11 +5,12 @@
  */
 package test;
 
+import components.emitter.Emitter;
 import engine.AbstractGame;
 import engine.Core;
 import render.Renderer;
 import gameObjects.Weapon;
-import java.awt.geom.Point2D;
+import math.Vector2f;
 import org.newdawn.slick.opengl.Texture;
 import render.Material;
 
@@ -37,8 +38,8 @@ public class Game extends AbstractGame{
     
     private void test(Core core){
         Player player = new Player();
-        player.setCurrentPosition(new Point2D.Float(150,150));
-        player.setNextPosition(new Point2D.Float(150,150));
+        player.setPosition(new Vector2f(150,150));
+        player.setNextPosition(new Vector2f(150,150));
         core.addObject(player);
         Weapon wep = new AK(0,0,null);
         core.addObject(wep);
@@ -47,16 +48,16 @@ public class Game extends AbstractGame{
         
         
         RandomBot bot = new RandomBot();
-        bot.setCurrentPosition(new Point2D.Float(160,160));
-        bot.setNextPosition(new Point2D.Float(160,160));
+        bot.setPosition(new Vector2f(160,160));
+        bot.setNextPosition(new Vector2f(160,160));
         //core.addObject(bot);
         wep = new AK(0,0,null);
         //core.addObject(wep);
         bot.addWeapon(wep);
         
         bot = new RandomBot();
-        bot.setCurrentPosition(new Point2D.Float(360,160));
-        bot.setNextPosition(new Point2D.Float(360,160));
+        bot.setPosition(new Vector2f(360,160));
+        bot.setNextPosition(new Vector2f(360,160));
         //core.addObject(bot);
         wep = new AK(0,0,null);
         //core.addObject(wep);
@@ -65,34 +66,36 @@ public class Game extends AbstractGame{
         
         
         
-        
+        Emitter em = new Emitter();
+        core.addObject(em);
         for(int i=1;i<10;i++){
             for(int j=1;j<10;j++){
                 
                 String path = "res/textures/box2.png";
                 String type = "PNG";
                 Texture texture = textures.get("box2.png", type, path);
-                Material.MaterialBuilder matBuilder = new Material.MaterialBuilder(texture,new Point2D.Float(i*100,j*100)).color(org.newdawn.slick.Color.white).scale(/*80/128f*/1, /*80/128f*/1).dimension(50, 50);
+                Material.MaterialBuilder matBuilder = new Material.MaterialBuilder(texture,new Vector2f(i*100,j*100)).color(org.newdawn.slick.Color.white).scale(/*80/128f*/1, /*80/128f*/1).dimension(50, 50);
                 Material mat = new Material(matBuilder);
-        
-                Wall w = new Wall(0,0);
-                w.addPoint(new Point2D.Float(i*100,j*100));
-                w.addPoint(new Point2D.Float(i*100+50,j*100));
-                w.addPoint(new Point2D.Float(i*100+50,j*100+50));
-                w.addPoint(new Point2D.Float(i*100,j*100+50));
-                w.addPoint(new Point2D.Float(i*100,j*100));
+                
+                StaticObject w = new StaticObject(0,0);
+                w.addPoint(new Vector2f(i*100,j*100));
+                w.addPoint(new Vector2f(i*100+50,j*100));
+                w.addPoint(new Vector2f(i*100+50,j*100+50));
+                w.addPoint(new Vector2f(i*100,j*100+50));
+                w.addPoint(new Vector2f(i*100,j*100));
                 w.setMaterial(mat);
                 core.addObject(w);
+                w.addEmitter(em);
             }
         }
         
-         Wall w = new Wall(0,0);
-                w.addPoint(new Point2D.Float(1200,300));
-                w.addPoint(new Point2D.Float(1100,400));
-                w.addPoint(new Point2D.Float(1300,400));
-                w.addPoint(new Point2D.Float(1200,300));
+         StaticObject w = new StaticObject(0,0);
+                w.addPoint(new Vector2f(1200,300));
+                w.addPoint(new Vector2f(1100,400));
+                w.addPoint(new Vector2f(1300,400));
+                w.addPoint(new Vector2f(1200,300));
                 core.addObject(w);
-        
+        w.addEmitter(em);
         /*Wall w = new Wall(0,0);
         
         w.addPoint(new Point2D.Float(460,330));
@@ -103,16 +106,16 @@ public class Game extends AbstractGame{
         core.addObject(w);
          */
         
-        w = new Wall(0,0);
+        w = new StaticObject(0,0);
         //w.removeCollidableType("all");
-        w.addPoint(new Point2D.Float(0,0));
-        w.addPoint(new Point2D.Float(1600,0));
-        w.addPoint(new Point2D.Float(1600,1200));
-        w.addPoint(new Point2D.Float(0,1200)); 
-        w.addPoint(new Point2D.Float(0,0));
+        w.addPoint(new Vector2f(0,0));
+        w.addPoint(new Vector2f(1600,0));
+        w.addPoint(new Vector2f(1600,1200));
+        w.addPoint(new Vector2f(0,1200)); 
+        w.addPoint(new Vector2f(0,0));
         core.addObject(w);
-        
-        w = new Wall(0,0);
+        w.addEmitter(em);
+        w = new StaticObject(0,0);
         /*
         String path = "res/textures/boxy.jpg";
         String type = "JPEG";
@@ -179,12 +182,12 @@ public class Game extends AbstractGame{
     }
     
     @Override
-    public void update(Core gc, float dt) {
+    public void update( float dt) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public void render(Core gc, Renderer r) {
+    public void render(Renderer r) {
         r.render();
     }
 

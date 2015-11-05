@@ -7,16 +7,16 @@ package components;
 
 import gameObjects.GameObject;
 import java.awt.Color;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import math.Line2f;
 import math.Ray;
+import math.Vector2f;
 import render.Renderer;
-import utils.GeometryUtil;
+import math.GeometryUtil;
 
 /**
  *
@@ -27,7 +27,7 @@ public class QuadTree<T extends GameObject> {
     int maxHeight;
     int capacity;
     Node root;
-    private HashMap<GameObject, Point2D.Float> cachedObjects;
+    private HashMap<GameObject, Vector2f> cachedObjects;
     private int numberOfObjectsChecked;
     
     private class Node<T extends GameObject> {
@@ -76,7 +76,7 @@ public class QuadTree<T extends GameObject> {
             }
         }
 
-        public void insertObject(Line2D.Float l,T object){
+        public void insertObject(Line2f l,T object){
             
             if (!GeometryUtil.checkIntersectionLineAABB(l, aabb) ) {
                 return;
@@ -127,7 +127,7 @@ public class QuadTree<T extends GameObject> {
                 }
                 else
                 {
-                    for(Line2D.Float l : objects.get(i).getLines())
+                    for(Line2f l : objects.get(i).getLines())
                         insertObject(l,objects.get(i));
                 }
             }
@@ -166,13 +166,13 @@ public class QuadTree<T extends GameObject> {
             children[3].print();
         }
 
-        public Point2D.Float intersect(Ray r,HashSet<GameObject> collidableObjects) {
+        public Vector2f intersect(Ray r,HashSet<GameObject> collidableObjects) {
             //System.out.println("checking aabb:"+aabb);
             if (children != null) {
                 Arrays.sort(children, new AABBComparator(r.source));
                 for (int i = 0; i < 4; i++) {
                     if (r.intersect(children[i].aabb)) {
-                        Point2D.Float intersection = children[i].intersect(r,collidableObjects);
+                        Vector2f intersection = children[i].intersect(r,collidableObjects);
                         if (intersection != null) {
                             return intersection;
                         }
@@ -193,9 +193,9 @@ public class QuadTree<T extends GameObject> {
             cachedObjects = new HashMap<>();
         }
 
-        public Point2D.Float getClosestIntersection(Ray r,HashSet<GameObject> collidableObjects) {
+        public Vector2f getClosestIntersection(Ray r,HashSet<GameObject> collidableObjects) {
             
-            Point2D.Float intersection = null;
+            Vector2f intersection = null;
             float currentDistance = 100000;
             
             for (GameObject obj : objects) {
@@ -206,7 +206,7 @@ public class QuadTree<T extends GameObject> {
                     continue;
                 
                 if (cachedObjects.get(obj) != null) {
-                    Point2D.Float tmpPoint = cachedObjects.get(obj);
+                    Vector2f tmpPoint = cachedObjects.get(obj);
                     if (GeometryUtil.getDistance(tmpPoint, r.source) < currentDistance && aabb.contains(tmpPoint)) {
                         intersection = tmpPoint;
                         currentDistance = GeometryUtil.getDistance(tmpPoint, r.source);
@@ -214,8 +214,8 @@ public class QuadTree<T extends GameObject> {
 
                 } else if (r.intersect(obj.getAabb())) {
                     numberOfObjectsChecked++;
-                    for (Line2D.Float line : obj.getLines()) {
-                        Point2D.Float tmpPoint = GeometryUtil.getIntersectionRayLine(r, line);
+                    for (Line2f line : obj.getLines()) {
+                        Vector2f tmpPoint = GeometryUtil.getIntersectionRayLine(r, line);
                         if(tmpPoint!=null && !aabb.contains(tmpPoint)){
                             if(cachedObjects.get(obj)!=null){
                                 if(GeometryUtil.getDistance(cachedObjects.get(obj),r.source)>GeometryUtil.getDistance(tmpPoint,r.source)){
@@ -276,7 +276,7 @@ public class QuadTree<T extends GameObject> {
         }
         
         
-        public HashSet<GameObject> getObjectLineIntersect(Line2D.Float line){
+        public HashSet<GameObject> getObjectLineIntersect(Line2f line){
             HashSet<GameObject> objectsLineIntersect = new HashSet<>();
             if(children!=null){
                 for(int i=0;i<4;i++){
@@ -330,9 +330,9 @@ public class QuadTree<T extends GameObject> {
         
         public class AABBComparator implements Comparator {
 
-            Point2D.Float origin;
+            Vector2f origin;
 
-            public AABBComparator(Point2D.Float _origin) {
+            public AABBComparator(Vector2f _origin) {
                 origin = _origin;
             }
 
@@ -400,10 +400,10 @@ public class QuadTree<T extends GameObject> {
         this.maxHeight = maxHeight;
     }
 
-    public Point2D.Float intersect(Ray r,HashSet<GameObject> collidableObjects) {
+    public Vector2f intersect(Ray r,HashSet<GameObject> collidableObjects) {
         cachedObjects = new HashMap<>();
         numberOfObjectsChecked = 0;
-        Point2D.Float result = root.intersect(r,collidableObjects);
+        Vector2f result = root.intersect(r,collidableObjects);
         //System.out.println("NumberOfObjectsChecked: "+numberOfObjectsChecked);
         return result;
     }
@@ -435,7 +435,7 @@ public class QuadTree<T extends GameObject> {
         return objects;
     }
     
-    public HashSet<GameObject> getObjectsLineIntersect(Line2D.Float line){
+    public HashSet<GameObject> getObjectsLineIntersect(Line2f line){
         return root.getObjectLineIntersect(line);
     }
     

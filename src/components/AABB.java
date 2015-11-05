@@ -5,10 +5,9 @@
  */
 package components;
 
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import utils.AABBType;
+import math.Line2f;
+import math.Vector2f;
 
 /**
  *
@@ -18,19 +17,19 @@ public class AABB {
     
     private float minX, minY;
     private float maxX, maxY;
-    private Point2D.Float center;
-    private Line2D.Float[] lines;
+    private Vector2f center;
+    private Line2f[] lines;
     public AABB(float minX, float minY, float maxX, float maxY) {
         this.minX = minX;
         this.minY = minY;
         this.maxX = maxX;
         this.maxY = maxY;
-        center = new Point2D.Float(minX+(maxX-minX)/2.0f,minY+(maxY-minY)/2.0f);
-        lines = new Line2D.Float[4];
-        lines[0] = new Line2D.Float(minX,minY,maxX,minY);
-        lines[1] = new Line2D.Float(maxX,minY,maxX,maxY);
-        lines[2] = new Line2D.Float(maxX,maxY,minX,maxY);
-        lines[3] = new Line2D.Float(minX,maxY,minX,minY);
+        center = new Vector2f(minX+(maxX-minX)/2.0f,minY+(maxY-minY)/2.0f);
+        lines = new Line2f[4];
+        lines[0] = new Line2f(minX,minY,maxX,minY);
+        lines[1] = new Line2f(maxX,minY,maxX,maxY);
+        lines[2] = new Line2f(maxX,maxY,minX,maxY);
+        lines[3] = new Line2f(minX,maxY,minX,minY);
     }
     
     public AABB() {
@@ -38,11 +37,11 @@ public class AABB {
         minY = 100000;
         maxX = -100000;
         maxY = -100000;
-        lines = new Line2D.Float[4];
+        lines = new Line2f[4];
         for(int i=0;i<4;i++){
-            lines[i] = new Line2D.Float();
+            lines[i] = new Line2f();
         }
-        center = new Point2D.Float();
+        center = new Vector2f();
         
     }
     
@@ -51,16 +50,16 @@ public class AABB {
         maxX = aabb.maxX;
         minY = aabb.minY;
         maxY = aabb.maxY;
-        center = new Point2D.Float(aabb.center.x, aabb.center.y);
-        lines = new Line2D.Float[4];
-        lines[0] = new Line2D.Float(minX,minY,maxX,minY);
-        lines[1] = new Line2D.Float(maxX,minY,maxX,maxY);
-        lines[2] = new Line2D.Float(maxX,maxY,minX,maxY);
-        lines[3] = new Line2D.Float(minX,maxY,minX,minY);
+        center = new Vector2f(aabb.center.x, aabb.center.y);
+        lines = new Line2f[4];
+        lines[0] = new Line2f(minX,minY,maxX,minY);
+        lines[1] = new Line2f(maxX,minY,maxX,maxY);
+        lines[2] = new Line2f(maxX,maxY,minX,maxY);
+        lines[3] = new Line2f(minX,maxY,minX,minY);
     }
     
     
-    public AABB(ArrayList<Point2D.Float> points){
+    public AABB(ArrayList<Vector2f> points){
         if (points.isEmpty()) {
             return;
         }
@@ -69,7 +68,7 @@ public class AABB {
         maxX = points.get(0).x;
         maxY = points.get(0).y;
 
-        for (Point2D.Float p : points) {
+        for (Vector2f p : points) {
             if (minX > p.x) {
                 minX = p.x;
             }
@@ -84,22 +83,20 @@ public class AABB {
             }
         }
 
-        center = new Point2D.Float(minX+(maxX-minX)/2,minY+(maxY-minY)/2);
-        lines = new Line2D.Float[4];
-        lines[0] = new Line2D.Float(minX,minY,maxX,minY);
-        lines[1] = new Line2D.Float(maxX,minY,maxX,maxY);
-        lines[2] = new Line2D.Float(maxX,maxY,minX,maxY);
-        lines[3] = new Line2D.Float(minX,maxY,minX,minY);
+        center = new Vector2f(minX+(maxX-minX)/2,minY+(maxY-minY)/2);
+        lines = new Line2f[4];
+        lines[0] = new Line2f(minX,minY,maxX,minY);
+        lines[1] = new Line2f(maxX,minY,maxX,maxY);
+        lines[2] = new Line2f(maxX,maxY,minX,maxY);
+        lines[3] = new Line2f(minX,maxY,minX,minY);
         
     }
 
-    
-
-    boolean intersect(AABB b) {
+    public boolean intersect(AABB b) {
         return !(maxX < b.getMinX() || b.getMaxX() < minX || maxY < b.getMinY() || b.getMaxY() < minY);
     }
     
-    boolean contains(AABB b) {
+    public boolean contains(AABB b) {
         
         return (minX<b.getMinX() && minY<b.getMinY() && maxY>b.getMaxY() && maxX>b.getMaxX());
     }
@@ -120,16 +117,16 @@ public class AABB {
         return maxY;
     }
 
-    public Point2D.Float getCenter() {
+    public Vector2f getCenter() {
         return center;
     }
 
-    public Line2D.Float[] getLines() {
+    public Line2f[] getLines() {
         return lines;
     }
 
     
-    public void update(Point2D.Float p){
+    public void update(Vector2f p){
         boolean change = false;
         if (minX > p.x) {
             minX = p.x;
@@ -152,21 +149,20 @@ public class AABB {
             center.x =minX+(maxX-minX)/2.0f;
             center.y = minY+(maxY-minY)/2.0f;
             
-            lines[0].x1=minX; lines[0].y1=minY; lines[0].x2=maxX; lines[0].y2=minY;
-            
-            lines[1].x1=maxX; lines[1].y1=minY; lines[1].x2=maxX; lines[1].y2=maxY;
-            lines[2].x1=maxX; lines[2].y1=maxY; lines[2].x2=minX; lines[2].y2=maxY;
-            lines[3].x1=minX; lines[3].y1=maxY; lines[3].x2=minX; lines[3].y2=minY;
+        lines[0].setX1(minX); lines[0].setY1(minY); lines[0].setX2(maxX); lines[0].setY2(minY);
+        lines[1].setX1(maxX); lines[1].setY1(minY); lines[1].setX2(maxX); lines[1].setY2(maxY);
+        lines[2].setX1(maxX); lines[2].setY1(maxY); lines[2].setX2(minX); lines[2].setY2(maxY);
+        lines[3].setX1(minX); lines[3].setY1(maxY); lines[3].setX2(minX); lines[3].setY2(minY);
         }
         
     }
     
     @Override
     public String toString() {
-        return String.format("AABB: %.2f,%.2f,%.2f,%.2f", minX, minY, maxX, maxY);
+        return String.format("AABB: min(%.2f,%.2f),max(%.2f,%.2f)", minX, minY, maxX, maxY);
     }
 
-    public void createAABB(ArrayList<Point2D.Float> points) {
+    public void createAABB(ArrayList<Vector2f> points) {
         float minX, minY, maxX, maxY;
         if (points.isEmpty()) {
             return;
@@ -176,7 +172,7 @@ public class AABB {
         maxX = points.get(0).x;
         maxY = points.get(0).y;
 
-        for (Point2D.Float p : points) {
+        for (Vector2f p : points) {
             if (minX > p.x) {
                 minX = p.x;
             }
@@ -204,18 +200,14 @@ public class AABB {
         this.maxY = maxY;
         center.x =minX+(maxX-minX)/2.0f;
         center.y = minY+(maxY-minY)/2.0f;
-        lines[0].x1=minX; lines[0].y1=minY; lines[0].x2=maxX; lines[0].y2=minY;
-        lines[1].x1=maxX; lines[1].y1=minY; lines[1].x2=maxX; lines[1].y2=maxY;
-        lines[2].x1=maxX; lines[2].y1=maxY; lines[2].x2=minX; lines[2].y2=maxY;
-        lines[3].x1=minX; lines[3].y1=maxY; lines[3].x2=minX; lines[3].y2=minY;
+        lines[0].setX1(minX); lines[0].setY1(minY); lines[0].setX2(maxX); lines[0].setY2(minY);
+        lines[1].setX1(maxX); lines[1].setY1(minY); lines[1].setX2(maxX); lines[1].setY2(maxY);
+        lines[2].setX1(maxX); lines[2].setY1(maxY); lines[2].setX2(minX); lines[2].setY2(maxY);
+        lines[3].setX1(minX); lines[3].setY1(maxY); lines[3].setX2(minX); lines[3].setY2(minY);
     }
     
-    public boolean contains(Point2D.Float p){
+    public boolean contains(Vector2f p){
         return p.x>=minX-0.1 && p.y>=minY-0.1 && p.x<=maxX+0.1 && p.y<=maxY+0.1;
-    }
-    
-    public boolean contains(Point2D p){
-        return p.getX()>=minX-0.1 && p.getY()>=minY-0.1 && p.getX()<=maxX+0.1 && p.getY()<=maxY+0.1;
     }
     
 }

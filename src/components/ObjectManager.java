@@ -5,15 +5,16 @@
  */
 package components;
 
+import components.emitter.IParticle;
 import engine.Core;
 import gameObjects.DynamicGameObject;
 import gameObjects.GameObject;
 import gameObjects.LivingObject;
 import gameObjects.Projectile;
 import gameObjects.StaticGameObject;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import math.Line2f;
+import math.Vector2f;
 import utils.ObjectType;
 
 /**
@@ -31,9 +32,8 @@ public class ObjectManager {
     private ArrayList<DynamicGameObject> dynamicObjects;
     private ArrayList<DynamicGameObject> bodies;
     private ArrayList<Projectile> projectiles;
-    private ArrayList<Line2D.Float> lines;
-    private ArrayList<Point2D.Float> staticObjPoints;
-    
+    private ArrayList<Line2f> lines;
+    private ArrayList<Vector2f> staticObjPoints;
     private QuadTree rayCollisionTree;
     
     private Camera camera;
@@ -81,22 +81,24 @@ public class ObjectManager {
         
         staticObjects.add((StaticGameObject)obj);
         StaticGameObject tmp = (StaticGameObject) obj;
-        Line2D.Float tmpLine = null;
+        Line2f tmpLine = null;
         for(int i=0;i<tmp.getPoints().size()-1;i++){
-            tmpLine = new Line2D.Float(tmp.getPoints().get(i),tmp.getPoints().get(i+1));
+            tmpLine = new Line2f(tmp.getPoints().get(i),tmp.getPoints().get(i+1));
             lines.add(tmpLine);
             staticObjPoints.add(tmp.getPoints().get(i));
         }
         staticObjPoints.add(tmp.getPoints().get(tmp.getPoints().size()-1));
         
         rayCollisionTree.insert(obj);
+        
     }
     
-    public ArrayList<Point2D.Float> getPoints(){
+    public ArrayList<Vector2f> getPoints(){
+       
         return staticObjPoints;
     }
     
-    public ArrayList<Line2D.Float> getLines(){
+    public ArrayList<Line2f> getLines(){
         return lines;
     }
     
@@ -107,8 +109,10 @@ public class ObjectManager {
         obj.setCore(core);
         if(obj.getType()==ObjectType.PLAYER)
             player = (LivingObject) obj;
-        else if(obj.getType()==ObjectType.PROJECTILE)
+        else if(obj.getType()==ObjectType.PROJECTILE){
             projectiles.add((Projectile)obj);
+            dynamicObjects.add((Projectile)obj);
+        }
         else if(obj.getType()==ObjectType.NPC)
             dynamicObjects.add((LivingObject)obj);
         else if(obj.getType()==ObjectType.ITEM)
@@ -142,6 +146,7 @@ public class ObjectManager {
         
         if(obj.getType()==ObjectType.PROJECTILE){
             projectiles.remove(obj);
+            dynamicObjects.remove(obj);
         }
         else if(obj.getType()==ObjectType.ENVIRONMENT){
             staticObjects.remove(obj);

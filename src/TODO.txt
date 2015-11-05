@@ -1,6 +1,4 @@
 1.Add Z-index to objects so that they can render properly one after another;
-1.5 Make each Point.Double to Float !
-1.6 Make more customizable lights.
 2.Add object components to hold textures so that objects can have multiplale textures(for example head,body,legs, etc. ).
 3.Make AI path finding on separate thread.
 4.Make a way to serialize the whole map into a file and then read from it.
@@ -15,9 +13,9 @@
 -Engine
     -Make class which holds all static fields(hp,armor, minimap, etc.)
     -Separate enemies and allies so that bots can check enemies for line of sight
-    -Make particle engine
+    -Make emitters for particles
     -Make static light map for lights which are not changing and moving
-
+    -Make different tree for the raytracing which will hold only lines in it.(Minor priority)
     
 -UI
     Make game states(pause,play,menu)
@@ -26,4 +24,8 @@
 
 -LivingObjects
     -Make custom armor class with damage absorb and damage absorb type;
+
+-Weapons
+    -Add scopes, which zoomout and zoomin the viewpoint.
+
     

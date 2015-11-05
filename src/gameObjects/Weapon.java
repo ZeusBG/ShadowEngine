@@ -5,9 +5,8 @@
  */
 package gameObjects;
 
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
-import math.Vector;
+import math.Vector2f;
 import test.Bullet;
 import utils.ObjectType;
 
@@ -19,7 +18,7 @@ import utils.ObjectType;
 public abstract class Weapon extends DynamicGameObject{
     protected LivingObject owner;
     protected ArrayList<Projectile> ammonition;
-    protected Vector orientation;
+    protected Vector2f orientation;
     
     protected int clipSize;
     protected int maxAmmo;
@@ -33,7 +32,7 @@ public abstract class Weapon extends DynamicGameObject{
     
     public Weapon(int x, int y,LivingObject owner) {
         super(x, y, ObjectType.ITEM);
-        orientation = new Vector(1,0);
+        orientation = new Vector2f(1,0);
         this.owner = owner;
         
         
@@ -56,11 +55,11 @@ public abstract class Weapon extends DynamicGameObject{
         this.ammonition = ammonition;
     }
 
-    public Vector getOrientation() {
+    public Vector2f getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(Vector orientation) {
+    public void setOrientation(Vector2f orientation) {
         this.orientation = orientation;
     }
 
@@ -91,7 +90,7 @@ public abstract class Weapon extends DynamicGameObject{
     
     @Override
     public void moveToNextPoint(){
-        currentPosition = owner.getCurrentPosition();
+        position = owner.getPosition();
     }
     
     public boolean canFire(){
@@ -109,7 +108,7 @@ public abstract class Weapon extends DynamicGameObject{
             
             if(ammonition.size()>0){
                 Projectile p = ammonition.get(ammonition.size()-1);
-                p.setCurrentPosition(currentPosition);
+                p.setPosition(position);
                 orientation.normalize();
                 p.setDirection(orientation);
                 core.addObject(p);

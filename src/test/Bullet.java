@@ -16,11 +16,12 @@ import render.Light;
  */
 public class Bullet extends Projectile {
 
-    public Bullet(int x, int y) {
+    public Bullet(float x, float y) {
         super(x, y);
         speed=60;
         light = new Light(this);
         light.setSpanAngle(360);
+        light.setRadius(160);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
         light.setColor(c);
         explosive = new Explosion1();
@@ -29,15 +30,15 @@ public class Bullet extends Projectile {
 
     @Override
     public void update(float dt) {
-        aabb.reset(currentPosition.x,currentPosition.y,currentPosition.x,currentPosition.y);
-        nextPosition.x = currentPosition.x + speed * dt * direction.x;
-        nextPosition.y = currentPosition.y + speed * dt * direction.y;
+        aabb.reset(position.x,position.y,position.x,position.y);
+        nextPosition.x = position.x + speed * dt * direction.x;
+        nextPosition.y = position.y + speed * dt * direction.y;
     }
 
     @Override
     public void render(Renderer r) {
         r.setColor(Color.WHITE);
-        r.drawCircle(currentPosition.x, currentPosition.y, 1);
+        r.drawCircle(position.x, position.y, 1);
     }
 
 }

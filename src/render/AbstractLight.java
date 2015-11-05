@@ -8,7 +8,7 @@ package render;
 import components.AABB;
 import gameObjects.DynamicGameObject;
 import java.awt.Color;
-import java.awt.geom.Point2D;
+import math.Vector2f;
 
 /**
  *
@@ -18,7 +18,7 @@ public abstract class AbstractLight {
     public float radius= 180;
     public float power = 1;
     public Color color;
-    public Point2D.Float location;
+    public Vector2f location;
     public DynamicGameObject owner;
     public AABB aabb;
     
@@ -61,18 +61,18 @@ public abstract class AbstractLight {
     }
     
     public AABB getAABB(){
-        aabb.reset(owner.getCurrentPosition().x-radius,
-                owner.getCurrentPosition().y-radius,
-                owner.getCurrentPosition().x+radius,
-                owner.getCurrentPosition().y+radius);
+        aabb.reset(owner.getPosition().x-radius,
+                owner.getPosition().y-radius,
+                owner.getPosition().x+radius,
+                owner.getPosition().y+radius);
         return aabb;
     }
     
-    public Point2D.Float getLocation(){
+    public Vector2f getLocation(){
         
-        Point2D.Float loc = new Point2D.Float();
-        loc.x = owner.getCurrentPosition().x;
-        loc.y = owner.getCurrentPosition().y;
+        Vector2f loc = new Vector2f();
+        loc.x = owner.getPosition().x;
+        loc.y = owner.getPosition().y;
         return loc;
         
     }

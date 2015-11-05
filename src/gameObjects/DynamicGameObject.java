@@ -5,8 +5,7 @@
  */
 package gameObjects;
 
-import java.awt.geom.Point2D;
-import math.Vector;
+import math.Vector2f;
 import utils.ObjectType;
 
 /**
@@ -16,40 +15,30 @@ import utils.ObjectType;
 
 /*This is the class for all the dynamic game objects - player, npc, etc.*/
 public abstract class DynamicGameObject extends GameObject{
-    protected Vector orientation;
-    protected Vector direction;
+    protected Vector2f orientation;
+    protected Vector2f direction;
     protected float speed;
-    protected Point2D.Float currentPosition;
-    protected Point2D.Float nextPosition;
+    protected Vector2f nextPosition;
     
     public DynamicGameObject(float x, float y, ObjectType type) {
         super(x, y, type);
-        currentPosition = new Point2D.Float();
-        nextPosition = new Point2D.Float();
-        direction = new Vector(0,0);
-        orientation = new Vector(1,0);
+        nextPosition = new Vector2f();
+        direction = new Vector2f(0,0);
+        orientation = new Vector2f(1,0);
+        zIndex = 1000;
     }
-    public DynamicGameObject(int x, int y, ObjectType type,Vector _direction,int _speed) {
+    public DynamicGameObject(int x, int y, ObjectType type,Vector2f _direction,int _speed) {
         super(x, y, type);
-        direction = new Vector(_direction);
+        direction = new Vector2f(_direction);
         speed = _speed;
     }
-    
-    public void setCurrentPosition(Point2D.Float p){
-        currentPosition = new Point2D.Float();
-        currentPosition.x = p.x;
-        currentPosition.y = p.y;
-    }
+  
 
-    public Point2D.Float getCurrentPosition() {
-        return currentPosition;
-    }
-
-    public Vector getOrientation() {
+    public Vector2f getOrientation() {
         return orientation;
     }
 
-    public void setOrientation(Vector orientation) {
+    public void setOrientation(Vector2f orientation) {
         this.orientation = orientation;
     }
 
@@ -61,21 +50,19 @@ public abstract class DynamicGameObject extends GameObject{
         this.speed = speed;
     }
     
-    public Point2D.Float getNextPosition() {
+    public Vector2f getNextPosition() {
         return nextPosition;
     }
 
-    public void setNextPosition(Point2D.Float p) {
-        nextPosition = new Point2D.Float();
-        nextPosition.x = p.x;
-        nextPosition.y = p.y;
+    public void setNextPosition(Vector2f p) {
+        nextPosition = new Vector2f(p);
     }
     
     //this moves the object using the vector 
     //based on the delta time and the speed of the object
     public void move(float dt){
-        currentPosition.x = nextPosition.x;
-        currentPosition.y = nextPosition.y;
+        position.x = nextPosition.x;
+        position.y = nextPosition.y;
         
         nextPosition.x += dt*speed*direction.x;
         nextPosition.y += dt*speed*direction.y;
@@ -83,22 +70,24 @@ public abstract class DynamicGameObject extends GameObject{
     
     //instantly moves the object
     public void moveToNextPoint(){
-        currentPosition.x = nextPosition.x;
-        currentPosition.y = nextPosition.y;
+        position.x = nextPosition.x;
+        position.y = nextPosition.y;
     }
     
-    public void setDirection(Point2D.Float p){
-        direction = new Vector(currentPosition,p);
+    public void setDirectionTo(Vector2f p){
+        direction = new Vector2f(p.x-position.x,p.y-position.y);
         direction.normalize();
         
     }
-    public void setDirection(Vector dir){
-        direction = new Vector(dir);
+    public void setDirection(Vector2f dir){
+        direction = new Vector2f(dir);
         direction.normalize();
         
     }
     
-    public Vector getDirection(){
+    public Vector2f getDirection(){
         return direction;
     }
+    
+    
 }

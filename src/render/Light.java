@@ -8,8 +8,7 @@ package render;
 import components.AABB;
 import gameObjects.DynamicGameObject;
 import java.awt.Color;
-import java.awt.geom.Point2D;
-import math.Vector;
+import math.Vector2f;
 
 /**
  *
@@ -19,12 +18,12 @@ public class Light {
     private float radius= 180;
     private float power = 1;
     private Color color;
-    private Point2D.Float location;
+    private Vector2f location;
     private DynamicGameObject owner;
     private AABB aabb;
     private float spanAngle;
-    private Vector direction;
-    private Vector offset;
+    private Vector2f direction;
+    private Vector2f offset;
     
     
     public Light(float radius, Color color, DynamicGameObject owner) {
@@ -33,7 +32,7 @@ public class Light {
         this.owner = owner;
         aabb = new AABB();
         spanAngle = 360;
-        direction = new Vector(0,0);
+        direction = new Vector2f(0,0);
     }
 
     public Light(DynamicGameObject owner) {
@@ -42,7 +41,7 @@ public class Light {
         color = new Color(1.0f,1.0f,1.0f);
         aabb = new AABB();
         spanAngle = 360;
-        direction = new Vector(0,0);
+        direction = new Vector2f(0,0);
     }
 
     public float getRadius() {
@@ -70,20 +69,20 @@ public class Light {
     }
     
     public AABB getAABB(){
-        aabb.reset(owner.getCurrentPosition().x-radius,
-                owner.getCurrentPosition().y-radius,
-                owner.getCurrentPosition().x+radius,
-                owner.getCurrentPosition().y+radius);
+        aabb.reset(owner.getPosition().x-radius,
+                owner.getPosition().y-radius,
+                owner.getPosition().x+radius,
+                owner.getPosition().y+radius);
         return aabb;
     }
     
-    public Point2D.Float getLocation(){
+    public Vector2f getLocation(){
         if(owner==null){
             return location;
         }
-        Point2D.Float loc = new Point2D.Float();
-        loc.x = owner.getCurrentPosition().x;
-        loc.y = owner.getCurrentPosition().y;
+        Vector2f loc = new Vector2f();
+        loc.x = owner.getPosition().x;
+        loc.y = owner.getPosition().y;
         return loc;
         
     }
@@ -104,7 +103,7 @@ public class Light {
         this.spanAngle = spanAngle;
     }
 
-    public Vector getDirection() {
+    public Vector2f getDirection() {
         if(owner==null)
             return direction;
         direction.x = -owner.getDirection().x;
@@ -112,7 +111,7 @@ public class Light {
         return direction;
     }
 
-    public void setDirection(Vector direction) {
+    public void setDirection(Vector2f direction) {
         this.direction = direction;
     }
 

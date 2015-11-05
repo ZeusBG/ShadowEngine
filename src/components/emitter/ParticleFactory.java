@@ -3,17 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package utils;
+package components.emitter;
 
 /**
  *
  * @author Zeus
  */
-public enum ObjectType {
-    PROJECTILE,
-    PLAYER,
-    NPC,
-    ITEM,
-    ENVIRONMENT,
-    EMMITER;
+public class ParticleFactory {
+    
+    
+    
 }

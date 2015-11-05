@@ -5,6 +5,8 @@
  */
 package gameObjects;
 
+import math.Line2f;
+import math.Vector2f;
 import utils.ObjectType;
 
 /**
@@ -19,10 +21,11 @@ public abstract class StaticGameObject extends GameObject{
     protected boolean visible;
     protected boolean collidable;
     
-    
+    public abstract void reactionOnHit(GameObject other, Vector2f hitPoint,Line2f lineHit);
     
     public StaticGameObject(float x, float y) {
         super(x, y, ObjectType.ENVIRONMENT);
+        zIndex = -1000;
         
     }
    

@@ -6,11 +6,12 @@
 package gameObjects;
 
 import components.AABB;
+import components.emitter.Emitter;
 import engine.Core;
 import render.Renderer;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
 import java.util.ArrayList;
+import math.Line2f;
+import math.Vector2f;
 import render.Light;
 import render.Material;
 import utils.ObjectState;
@@ -22,32 +23,35 @@ import utils.ObjectType;
  */
 public abstract class GameObject {
     protected Core core;
-    protected float x,y;
+    protected Vector2f position;
     protected ObjectType type;
     protected ObjectState ObjState;
     protected AABB aabb;
-    protected ArrayList<Point2D.Float> points;
-    protected ArrayList<Line2D.Float> lines;
+    protected ArrayList<Vector2f> points;
+    protected ArrayList<Line2f> lines;
     private static long IDGEN;
     private long id;
     protected Light light;
     protected Material material;//later it will have arrayList of components
-    
+    protected Emitter emitter;
+    protected int zIndex;
     
     
     public GameObject(float x, float y,ObjectType type){
         id = IDGEN++;
         this.type = type;
-        this.x = x;
-        this.y = y;
+        position = new Vector2f(x,y);
         ObjState = new ObjectState();
         points = new ArrayList<>();
         lines = new ArrayList<>();
         aabb = new AABB();
         light = null;
+        zIndex = 0;
     }
     
-    
+    public void addEmitter(Emitter em){
+        emitter = em;
+    }
     
     public void setType(ObjectType newType){
         type = newType;
@@ -58,19 +62,19 @@ public abstract class GameObject {
     }
 
     public float getX() {
-        return x;
+        return position.x;
     }
 
-    public void setX(int x) {
-        this.x = x;
+    public void setX(float x) {
+        position.x = x;
     }
 
     public float getY() {
-        return y;
+        return position.y;
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public void setY(float y) {
+        position.y = y;
     }
 
     public ObjectState getObjState() {
@@ -92,12 +96,20 @@ public abstract class GameObject {
     public void setAabb(AABB aabb) {
         this.aabb = aabb;
     }
+
+    public int getzIndex() {
+        return zIndex;
+    }
+
+    public void setzIndex(int zIndex) {
+        this.zIndex = zIndex;
+    }
     
-    public ArrayList<Point2D.Float> getPoints(){
+    public ArrayList<Vector2f> getPoints(){
         return points;
     }
 
-    public ArrayList<Line2D.Float> getLines() {
+    public ArrayList<Line2f> getLines() {
         return lines;
     }
 
@@ -109,23 +121,15 @@ public abstract class GameObject {
         this.material = material;
     }
     
-    public void addPoint(Point2D.Float point){
+    public void addPoint(Vector2f point){
         if(!points.isEmpty()){
-            lines.add(new Line2D.Float(points.get(points.size()-1),point));
+            lines.add(new Line2f(points.get(points.size()-1),point));
         }
         points.add(point);
         aabb.update(point);
     }
     
-    public void printPoints(){
-        for(Point2D.Float p : points){
-            System.out.println(p);
-            
-        }
-        for(Line2D.Float l : lines){
-            System.out.printf("Line2D.Double[%.1f,%,1f] ->[%.1f,%.1f]\n",l.x1,l.y1,l.x2,l.y2);
-        }
-    }
+    
     
     @Override
     public int hashCode() {
@@ -187,6 +191,19 @@ public abstract class GameObject {
     public boolean isRenderable(){
         return ObjState.isRenderable();
     }
+
+    public Vector2f getPosition() {
+        return position;
+    }
+
+    public void setPosition(Vector2f position) {
+        this.position = new Vector2f(position);
+    }
+    
+    public boolean isDead(){
+        return false;
+    }
+    
     
     
     public abstract void update(float dt);

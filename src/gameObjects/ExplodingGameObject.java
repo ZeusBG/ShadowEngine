@@ -6,9 +6,7 @@
 package gameObjects;
 
 import components.AABB;
-import engine.Core;
 import java.awt.Color;
-import java.awt.geom.Point2D;
 import java.util.HashMap;
 import render.Light;
 import render.Renderer;
@@ -44,8 +42,6 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
         light.setColor(c);
         
-        
-        currentPosition = new Point2D.Float(x,y);
         currentRadius = 0;
         exploded = false;
         aabb = new AABB(x-1,y-1,x+1,y+1);
@@ -87,7 +83,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     public void render(Renderer r){
         if(exploded){
             r.setColor(Color.WHITE);
-            r.drawCircle((int)currentPosition.x,(int)currentPosition.y,currentRadius);
+            r.drawCircle(position.x,position.y,currentRadius);
         }
         
     }
@@ -118,7 +114,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     
     public AABB getCurrentAABB(){
         //AABB currentAABB = new AABB(x-currentRadius,y-currentRadius,x+currentRadius,y+currentRadius);
-        explosionRange.reset(x-currentRadius,y-currentRadius,x+currentRadius,y+currentRadius);
+        explosionRange.reset(position.x-currentRadius,position.y-currentRadius,position.x+currentRadius,position.y+currentRadius);
         return explosionRange;
     }
 

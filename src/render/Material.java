@@ -6,12 +6,12 @@
 package render;
 
 import gameObjects.GameObject;
-import java.awt.geom.Point2D;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import math.Vector2f;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
@@ -22,9 +22,9 @@ import org.newdawn.slick.opengl.TextureLoader;
  */
 public class Material {
     private Texture texture;
-    private Point2D.Float location;
+    private Vector2f location;
     private float offSetX,offSetY;
-    private Point2D.Float direction;
+    private Vector2f direction;
     private Color color;
     private GameObject owner;
     private float scaleX,scaleY;
@@ -32,7 +32,7 @@ public class Material {
     
     
     
-    public Material(Texture texture, Point2D.Float location, Color color) {
+    public Material(Texture texture, Vector2f location, Color color) {
         this.texture = texture;
         this.location = location;
         this.color = color;
@@ -43,7 +43,7 @@ public class Material {
     
     public Material(Texture texture, float x,float y, Color color) {
         this.texture = texture;
-        location = new Point2D.Float(x,y);
+        location = new Vector2f(x,y);
         this.color = color;
         offSetX = 0;
         offSetY = 0;
@@ -52,14 +52,14 @@ public class Material {
     
     public Material(Texture texture, float x,float y) {
         this.texture = texture;
-        location = new Point2D.Float(x,y);
+        location = new Vector2f(x,y);
         this.color = new Color(1.0f,1.0f,1.0f);
         offSetX = 0;
         offSetY = 0;
         owner = null;
     }
     
-    public Point2D.Float getLocation(){
+    public Vector2f getLocation(){
         if(owner==null)
             return location;
         else
@@ -82,11 +82,11 @@ public class Material {
         this.offSetY = offsety;
     }
 
-    public Point2D.Float getDirection() {
+    public Vector2f getDirection() {
         return direction;
     }
 
-    public void setDirection(Point2D.Float direction) {
+    public void setDirection(Vector2f direction) {
         this.direction = direction;
     }
 
@@ -179,13 +179,13 @@ public class Material {
     public static class MaterialBuilder {
         // Required parameters
                 private Texture tex = null;
-		private Point2D.Float location = null;
+		private Vector2f location = null;
 
 		// Optional parameters - initialize with default values
 		private Color color = Color.white;
                 private float offSetX = 0;
                 private float offSetY = 0;
-                private Point2D.Float direction = null;
+                private Vector2f direction = null;
                 private GameObject owner = null;
                 private float scaleX = 1;
                 private float scaleY = 1;
@@ -193,12 +193,12 @@ public class Material {
                 private float height = 0;
                 
 
-		public MaterialBuilder(Texture tex, Point2D.Float location) {
+		public MaterialBuilder(Texture tex, Vector2f location) {
                     this.tex = tex;
                     this.location = location;
 		}
                 
-                public MaterialBuilder(String type,String path, Point2D.Float location) {
+                public MaterialBuilder(String type,String path, Vector2f location) {
                     
                     try {
                         tex = TextureLoader.getTexture(type,new FileInputStream(new File(path)));

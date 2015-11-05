@@ -3,17 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package utils;
+package components.hitbox;
+
+import math.Vector2f;
 
 /**
  *
  * @author Zeus
  */
-public enum ObjectType {
-    PROJECTILE,
-    PLAYER,
-    NPC,
-    ITEM,
-    ENVIRONMENT,
-    EMMITER;
+//dali da e v komponentite ili v obekta
+public class RectangleHitBox extends HitBox{
+    float width;
+    float height;
 }

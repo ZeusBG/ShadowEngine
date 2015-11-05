@@ -5,21 +5,21 @@
  */
 package utils;
 
-import java.awt.geom.Point2D;
 import java.util.Comparator;
+import math.Vector2f;
 
 /**
  *
  * @author Zeus
  */
-public class SortPointsClockWise implements Comparator<Point2D.Float>{
+public class SortPointsClockWise implements Comparator<Vector2f>{
         
-        private Point2D.Float center;
-        public SortPointsClockWise(Point2D.Float _center){
+        private Vector2f center;
+        public SortPointsClockWise(Vector2f _center){
             center = _center;
         }
         @Override
-        public int compare(Point2D.Float o1, Point2D.Float o2) {
+        public int compare(Vector2f o1, Vector2f o2) {
             if(o1.equals(o2)){
                 return 0;
             }

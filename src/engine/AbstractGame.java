@@ -13,14 +13,15 @@ import render.TextureHolder;
  * @author Zeus
  */
 public abstract class AbstractGame {
-    
+    protected Core core;
     protected TextureHolder textures;
     public AbstractGame(){
         textures = new TextureHolder();
+        core = null;
     }
     
-    public abstract void update(Core gc, float dt);
-    public abstract void render(Core gc, Renderer r);
-    public abstract void init(Core gc);
+    public abstract void update(float dt);
+    public abstract void render(Renderer r);
+    public abstract void init(Core core);
     
 }

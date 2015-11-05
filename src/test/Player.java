@@ -10,9 +10,7 @@ import render.Renderer;
 import gameObjects.LivingObject;
 import gameObjects.Weapon;
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.geom.Point2D;
-import math.Vector;
+import math.Vector2f;
 import org.lwjgl.input.Keyboard;
 import render.Light;
 import utils.ObjectType;
@@ -24,25 +22,25 @@ import utils.Sounds;
  */
 public class Player extends LivingObject{
 
-    private Point2D.Float crosshair;
+    private Vector2f crosshair;
     private Weapon weapon;
     private boolean laserActivated;
     public Player(ObjectType type) {
         super(type);
         speed = 500;
-        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+        aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
         
     }
     
     public Player(){
         super(ObjectType.PLAYER);
-        crosshair = new Point2D.Float();
+        crosshair = new Vector2f();
         weapon = null;
-        aabb = new AABB(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+        aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
         light = new Light(this);
-        light.setRadius(300);
+        light.setRadius(200);
         light.setPower(0.9f);
-        direction = new Vector(0,0);
+        direction = new Vector2f(0,0);
     }
     
     
@@ -51,8 +49,8 @@ public class Player extends LivingObject{
         direction.reset();
         crosshair.x = core.getInput().getMouseX();
         crosshair.y = core.getInput().getMouseY();
-        orientation.x = crosshair.x - currentPosition.x;
-        orientation.y = crosshair.y - currentPosition.y;
+        orientation.x = crosshair.x - position.x;
+        orientation.y = crosshair.y - position.y;
         orientation.normalize();
         speed =150;
         if(core.getInput().isMouseButtonPressed(0)){
@@ -71,27 +69,27 @@ public class Player extends LivingObject{
         
         if(core.getInput().isKeyPressed(Keyboard.KEY_W)){
             direction.y -= 1;
-            nextPosition.y = currentPosition.y-2;
+            nextPosition.y = position.y-2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(Keyboard.KEY_S)){
             direction.y += 1;
-            nextPosition.y = currentPosition.y+2;
+            nextPosition.y = position.y+2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(Keyboard.KEY_A)){
             direction.x -=1;
-            nextPosition.x = currentPosition.x-2;
+            nextPosition.x = position.x-2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(Keyboard.KEY_D)){
             direction.x+=1;
-            nextPosition.x = currentPosition.x+2;
+            nextPosition.x = position.x+2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         direction.normalize();
-        nextPosition.x = currentPosition.x+direction.x*speed*dt;
-        nextPosition.y = currentPosition.y+direction.y*speed*dt;
+        nextPosition.x = position.x+direction.x*speed*dt;
+        nextPosition.y = position.y+direction.y*speed*dt;
         
         if(core.getInput().isKeyPressed(Keyboard.KEY_O)){
             //core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.8f);
@@ -110,7 +108,7 @@ public class Player extends LivingObject{
             core.getSoundManager().stop(Sounds.MOVEMENT_PLAYER);
         }
         
-        aabb.reset(currentPosition.x-5,currentPosition.y-5,currentPosition.x+5,currentPosition.y+5);
+        aabb.reset(position.x-5,position.y-5,position.x+5,position.y+5);
     }
     
     public void addWeapon(Weapon w){
@@ -123,10 +121,17 @@ public class Player extends LivingObject{
     @Override
     public void render(Renderer r) {
         r.setColor(Color.WHITE);
-        r.drawCircle(currentPosition.x,currentPosition.y,10);
+        r.drawCircle(position.x,position.y,10);
         r.setColor(Color.red);
         if(laserActivated){
-            r.drawRay(currentPosition.x, currentPosition.y,crosshair.x, crosshair.y);
+            r.drawRay(position.x, position.y,crosshair.x, crosshair.y);
+        }
+        else{
+            
+            r.drawLine(crosshair.x, crosshair.y-2, crosshair.x, crosshair.y-6);
+            r.drawLine(crosshair.x-2, crosshair.y, crosshair.x-6, crosshair.y);
+            r.drawLine(crosshair.x, crosshair.y+2, crosshair.x, crosshair.y+6);
+            r.drawLine(crosshair.x+2, crosshair.y, crosshair.x+6, crosshair.y);
         }
     }
     

@@ -8,13 +8,10 @@ package render;
 import components.AABB;
 import components.ObjectManager;
 import engine.Core;
+import gameObjects.DynamicGameObject;
 import gameObjects.GameObject;
-import gameObjects.LivingObject;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.geom.Point2D;
-import java.awt.image.BufferStrategy;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,9 +22,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import math.GeometryUtil;
 import math.Ray;
-import math.Vector;
+import math.Vector2f;
+import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.*;
 
 import utils.SortPointsClockWise;
@@ -53,20 +53,24 @@ public class Renderer {
     private LightMap lightMap;
     private Texture tex;//for test until Z-index is added 
     private Texture floor;
+    private Material mat;
 
     public Renderer(Core core) {
         this.core = core;
         initialize();
-        lightMap = new LightMap(core.getWidth(), core.getHeight(), this, core);
+        lightMap = new LightMap(this, core);
         lightMap.init();
         glEnable(GL_TEXTURE_2D);
         tex = null;
         try {
             tex = TextureLoader.getTexture("JPEG", new FileInputStream(new File("res/textures/car.jpg")));
-            floor = TextureLoader.getTexture("JPEG", new FileInputStream(new File("res/textures/plates6.jpg")));
+            floor = TextureLoader.getTexture("JPEG", new FileInputStream(new File("res/textures/plates6_512x512.jpg")));
         } catch (IOException ex) {
             Logger.getLogger(Renderer.class.getName()).log(Level.SEVERE, null, ex);
         }
+        MaterialBuilder matBuilder = new MaterialBuilder(floor, new Vector2f(0, 0)).color(org.newdawn.slick.Color.white).scale(45, 45).dimension(2000, 2000);
+
+         mat = new Material(matBuilder);
 
     }
 
@@ -75,36 +79,26 @@ public class Renderer {
         ObjectManager objectsToRender = core.getObjectManager();
 
         //get offsets and scales from the camera
-        if (core.getObjectManager().getCamera().isDynamic()) {
-            cameraOffSetX =  core.getObjectManager().getCamera().getDynamicX();
-            cameraOffSetY =  core.getObjectManager().getCamera().getDynamicY();
-        } else {
-            cameraOffSetX =  core.getObjectManager().getCamera().getX();
-            cameraOffSetY =  core.getObjectManager().getCamera().getY();
-        }
-        scaleX =  core.getObjectManager().getCamera().getWidthScale();
-        scaleY =  core.getObjectManager().getCamera().getHeightScale();
+        cameraOffSetX = core.getObjectManager().getCamera().getX();
+        cameraOffSetY = core.getObjectManager().getCamera().getY();
+
+        scaleX = core.getObjectManager().getCamera().getWidthScale();
+        scaleY = core.getObjectManager().getCamera().getHeightScale();
 
         cameraOffSetX *= scaleX;
         cameraOffSetY *= scaleY;
 
         //just for test because there isnt a z-index
-        MaterialBuilder matBuilder = new MaterialBuilder(floor, new Point2D.Float(0, 0)).color(org.newdawn.slick.Color.white).scale(45, 45).dimension(2000, 2000);
+        
 
-        Material mat = new Material(matBuilder);
         drawMaterial(mat);
-
+ 
         //later will remove this random glEnables :D
-        glEnable(GL_STENCIL_TEST);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_ONE, GL_ONE);
+        
 
         //draws light visibility polygons in normal buffer and in lightMap buffer
-        castShadows(objectsToRender.getPlayer());
+        castShadows();
 
-        glDisable(GL_BLEND);
-        glDisable(GL_STENCIL_TEST);
-        //glDisable(GL_BLEND);
         glColor3f(1.0f, 0.0f, 0.0f);
         glBegin(GL_QUADS);
         {
@@ -115,53 +109,82 @@ public class Renderer {
         }
         glEnd();
 
-        glColor4f(0.0f, 0.0f, 0.0f, 1.0f);
-        glEnable(GL_STENCIL_TEST);
-        glDisable(GL_STENCIL_TEST);
+        //lightMap.blurShadows();
+       // lightMap.blurShadows();
+        //lightMap.blurShadows();
+        //lightMap.blurShadows();
 
-        lightMap.blurShadows();
-        lightMap.blurShadows();
-        lightMap.blurShadows();
-        lightMap.blurShadows();
 
-        drawLightMap();
-
-        if (core.getObjectManager().getPlayer() != null) {
-            core.getObjectManager().getPlayer().render(this);
+        
+        
+        AABB visibleArea = core.getObjectManager().getCamera().getVisibleArea();
+        int objectsRendered = 0;
+        for (DynamicGameObject obj : core.getObjectManager().getDynamicObjects()) {
+            if(!obj.getAabb().intersect(visibleArea))
+                continue;
+            if (obj.getMaterial() != null ) {
+                drawMaterial(obj.getMaterial());
+            } else {
+                obj.render(this);
+            }
+            
+            /*if(obj.getLight()!=null){
+                glColor3f(1.0f,0,0);
+                AABB lightAABB = obj.getLight().getAABB();
+                drawRect(lightAABB.getMinX(),lightAABB.getMinY(),2*obj.getLight().getRadius(),2*obj.getLight().getRadius());
+                System.out.println(lightAABB);
+            }*/
+            
+            objectsRendered++;
         }
-
-        glColor3f(1.0f, 1.0f, 1.0f);
-        for (GameObject obj : core.getObjectManager().getAllObjects()) {
+        
+        if (core.getObjectManager().getPlayer() != null) {
+            //core.getObjectManager().getPlayer().render(this);
+        }
+        
+        //drawLightMap();
+        for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
+            if(!obj.getAabb().intersect(visibleArea))
+                continue;
             if (obj.getMaterial() != null) {
                 drawMaterial(obj.getMaterial());
             } else {
                 obj.render(this);
             }
+            objectsRendered++;
         }
+        System.out.println("objectsRendered: "+objectsRendered);
 
-        glDisable(GL_BLEND);
 
         lightMap.clear();
         //draws the visibility polygon for the player
         //so that he cant see behind walls and behind his back
         lightMap.drawVisibilityTriangle(objectsToRender.getPlayer());
-        lightMap.drawVisibilityPolygon(core.getObjectManager().getPlayer().getCurrentPosition());
+        lightMap.drawVisibilityPolygon(new Vector2f(core.getObjectManager().getPlayer().getPosition().x,core.getObjectManager().getPlayer().getPosition().y));
+        //lightMap.blurShadows();
+        //lightMap.blurShadows();
+        //lightMap.blurShadows();
+        //lightMap.blurShadows();
+                
         //drawLightMap();
-        lightMap.blurShadows();
-        lightMap.blurShadows();
-        lightMap.blurShadows();
-        lightMap.blurShadows();
-
-        drawLightMap();
-        glClear(GL_STENCIL_BUFFER_BIT);
-        glDisable(GL_STENCIL_TEST);
-        glDisable(GL_BLEND);
+                
         //core.getPhysics().getCollisionTree().drawTree(this);
-        //core.getPhysics().getCollisionTree().drawTree(this);
-        //core.getObjectManager().getPlayer().render(this);
-
+        //core.getObjectManager().getRayCollisionTree().drawTree(this);
+        core.getObjectManager().getPlayer().render(this);
+        glColor3f(1f,0f,0f);
+        /*
+        {
+            glVertex2f(visibleArea.getMinX(),visibleArea.getMinY());
+            glVertex2f(visibleArea.getMaxX(),visibleArea.getMinY());
+            glVertex2f(visibleArea.getMaxX(),visibleArea.getMaxY());
+            glVertex2f(visibleArea.getMinX(),visibleArea.getMaxY());
+            glVertex2f(visibleArea.getMinX(),visibleArea.getMinY());
+        }
+        glEnd();//remove glEnd() for drun effect !
+                */
+        //glBegin(GL_LINE_LOOP);
         Display.update();
-        Display.sync(60);
+        Display.sync(30);
 
         clear();
     }
@@ -180,23 +203,23 @@ public class Renderer {
         cy = scaleY * cy + cameraOffSetY;
         r = scaleX * r;
 
-        float step = 2.0f * 3.1415926f /  CIRCLE_ACCURACY;
+        float step = 2.0f * 3.1415926f / CIRCLE_ACCURACY;
         float theta = 0;
         glBegin(GL_LINE_LOOP);
         {
             for (int i = 0; i < CIRCLE_ACCURACY; i++) {
                 theta += step;//get the current angle 
 
-                float x = r * (float)Math.cos(theta);//calculate the x component 
-                float y = r * (float)Math.sin(theta);//calculate the y component 
+                float x = r * (float) Math.cos(theta);//calculate the x component 
+                float y = r * (float) Math.sin(theta);//calculate the y component 
 
-                glVertex2f( (x + cx),  (y + cy));//output vertex 
+                glVertex2f((x + cx), (y + cy));//output vertex 
             }
         }
         glEnd();
     }
 
-    public void drawDirectedPartCircle(float cx, float cy, float r, Vector direction, float spanAngle) {
+    public void drawDirectedPartCircle(float cx, float cy, float r, Vector2f direction, float spanAngle) {
         float spanAngleRadians = (float) (spanAngle * Math.PI / 180);
         float startAngle = (float) (Math.atan2(direction.y, direction.x) - spanAngleRadians / 2);
 
@@ -204,22 +227,22 @@ public class Renderer {
         cy = scaleY * cy + cameraOffSetY;
         r = scaleX * r;
         float step = (float) (spanAngle * Math.PI / 180 / CIRCLE_ACCURACY);
-        float x=  (float)(r * Math.cos(startAngle));
-        float y = (float)(r * Math.sin(startAngle));
-        float prevX,prevY;
+        float x = (float) (r * Math.cos(startAngle));
+        float y = (float) (r * Math.sin(startAngle));
+        float prevX, prevY;
         for (int i = 0; i < CIRCLE_ACCURACY; i++) {
             startAngle += step;//get the current angle 
-            prevX=x;
-            prevY=y;
-            x = (float)(r * Math.cos(startAngle));//calculate the x component 
-            y = (float)(r * Math.sin(startAngle));//calculate the y component 
+            prevX = x;
+            prevY = y;
+            x = (float) (r * Math.cos(startAngle));//calculate the x component 
+            y = (float) (r * Math.sin(startAngle));//calculate the y component 
 
             //output vertex 
             glBegin(GL_TRIANGLES);
             {
-                glVertex2f(cx,cy);
-                glVertex2f(x + cx,y + cy);
-                glVertex2f(prevX + cx,prevY + cy);
+                glVertex2f(cx, cy);
+                glVertex2f(x + cx, y + cy);
+                glVertex2f(prevX + cx, prevY + cy);
             }
             glEnd();
 
@@ -232,81 +255,119 @@ public class Renderer {
         glClear(GL_COLOR_BUFFER_BIT);
         glClear(GL_STENCIL_BUFFER_BIT);
         glDisable(GL_STENCIL_TEST);
+        glDisable(GL_BLEND);
         lightMap.clear();
     }
 
-    public void castShadows(LivingObject pointOfView) {
-
-        drawSight(pointOfView.getCurrentPosition());
-        glDisable(GL_BLEND);
-        glClear(GL_STENCIL_BUFFER_BIT);
+    private void castShadows() {
+        
+        
+        drawSight();
+        
+        
 
     }
 
-   
-
-    private void drawSight(Point2D.Float lightSource) {
-
+    private void drawSight() {
+        int lightCounter = 0;
         for (GameObject obj : core.getObjectManager().getAllObjects()) {
-
+            
             Light light = obj.getLight();
             if (light == null) {
                 continue;
             }
-            Point2D.Float pos = getScaledPoint(light.getLocation());
-
+            if(!light.getAABB().intersect(core.getObjectManager().getCamera().getVisibleArea()))
+                continue;
+            LightArea area = new LightArea();
+            Vector2f pos = getScaledPoint(light.getLocation());
+            lightCounter++;
             //gets the points for the visibility polygon from the rayCollisionTree in object manager
-            ArrayList<Point2D.Float> points = findIntersectionPoints(light);
+            ArrayList<Vector2f> points = findIntersectionPoints(light);
+            /*
+            for(int i=0;i<points.size();i++){
+                drawLine(light.getLocation().x, light.getLocation().y, points.get(i).x, points.get(i).y);
+            }
+            */
+            shrunkLight(points, light.getLocation(),light.getRadius());//so that there wont be a lot of overdraw
+            
+            
+            ArrayList<Vector2f> scaledPoints = new ArrayList<>();
+            for(int i=0;i<points.size();i++){
+                scaledPoints.add(getScaledPoint(points.get(i)));
+            }
             //uses these points to draw the visibility polygon in the lightmap and in the gmae buffer
-            lightMap.addLight(light, pos, points);
-            drawLight(points, light);
+            area.generateTriangles(scaledPoints, pos);
+            lightMap.addLight(area,light);
+            //shrunkLight(scaledPoints, pos,light.getRadius());
+            
+            glColor3f(1.0f,1.0f,1.0f);
+            drawLightProperly(area,light);
 
         }
-
+        System.out.println("number of lights rendered: "+lightCounter);
     }
 
-    public Point2D.Float getScaledPoint(Point2D.Float p) {
-        Point2D.Float scaled = new Point2D.Float();
+    public Vector2f getScaledPoint(Vector2f p) {
+        Vector2f scaled = new Vector2f();
         scaled.x = scaleX * p.x + cameraOffSetX;
         scaled.y = scaleY * p.y + cameraOffSetY;
         return scaled;
     }
 
-    public ArrayList<Point2D.Float> findIntersectionPoints(Light lightSrc) {
+    public ArrayList<Vector2f> findIntersectionPoints(Light lightSrc) {
 
-        Point2D.Float lightSource = lightSrc.getOwner().getCurrentPosition();
-        ArrayList<Point2D.Float> intersectionPoints = new ArrayList<>(500);
-        ArrayList<Point2D.Float> sPoints = new ArrayList<>(500);
+        Vector2f lightSource = new Vector2f(lightSrc.getOwner().getPosition().x,lightSrc.getOwner().getPosition().y);
+        ArrayList<Vector2f> intersectionPoints = new ArrayList<>(500);
+        ArrayList<Vector2f> sPoints = new ArrayList<>(500);
         HashSet<GameObject> objects = core.getObjectManager().getRayCollisionTree().getObjectsInRange(lightSrc.getAABB());
         ArrayList<StaticGameObject> allObjects = core.getObjectManager().getStaticObjects();
+        
 
         for (GameObject s : objects) {
             if (!s.getObjState().isRenderable()) {
                 continue;
             }
-            for (Point2D.Float cPoint : s.getPoints()) {
+            for (Vector2f cPoint : s.getPoints()) {
                 Ray tmpRay = new Ray(lightSource, cPoint);
                 if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects))) {
                     addSecondaryPoints(cPoint, lightSource, sPoints);
                 }
             }
         }
-
-        for (Point2D.Float cPoint : sPoints) {
+        
+        Vector2f lightCenter = lightSrc.getLocation();
+        float step = (float)(2*Math.PI/8.0f);
+        float start = 0;
+        Vector2f tmp;
+        for(int i=0;i<8;i++){
+            tmp = new Vector2f();
+            tmp.x = lightCenter.x+(float)Math.cos(start);
+            tmp.y = lightCenter.y+(float)Math.sin(start);
+            
+            Ray tmpRay = new Ray(lightCenter, tmp);
+            Vector2f intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null);
+            if(intersection!=null){
+                intersectionPoints.add(intersection);
+            }
+            start+=step;
+        }
+        
+        
+        for (Vector2f cPoint : sPoints) {
             Ray tmpRay = new Ray(lightSource, cPoint);
-            Point2D.Float intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects);
+            Vector2f intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null);
             if (intersection != null) {
                 intersectionPoints.add(intersection);
             }
         }
 
         Collections.sort(intersectionPoints, new SortPointsClockWise(lightSource));
-
+        
         return intersectionPoints;
 
     }
 
-    public void addSecondaryPoints(Point2D.Float p, Point2D.Float lightSource, ArrayList<Point2D.Float> sPoints) {
+    public void addSecondaryPoints(Vector2f p, Vector2f lightSource, ArrayList<Vector2f> sPoints) {
         float x, y;
 
         y = p.x - lightSource.x;
@@ -315,11 +376,11 @@ public class Renderer {
         float newX, newY;
         newX = p.x - x * 0.001f;
         newY = p.y + y * 0.001f;
-        sPoints.add(new Point2D.Float(newX, newY));
+        sPoints.add(new Vector2f(newX, newY));
 
         newX = p.x + x * 0.001f;
         newY = p.y - y * 0.001f;
-        sPoints.add(new Point2D.Float(newX, newY));
+        sPoints.add(new Vector2f(newX, newY));
 
     }
 
@@ -337,7 +398,7 @@ public class Renderer {
     public void drawRay(float x1, float y1, float x2, float y2) {
 
         Ray r = new Ray(x1, y1, x2, y2);
-        Point2D.Float endPoint = core.getObjectManager().getRayCollisionTree().intersect(r, null);
+        Vector2f endPoint = core.getObjectManager().getRayCollisionTree().intersect(r, null);
 
         if (endPoint != null) {
             drawLine(x1, y1, (int) endPoint.x, (int) endPoint.y);
@@ -353,7 +414,7 @@ public class Renderer {
         glColor4f(c.getRed(), c.getGreen(), c.getBlue(), c.getAlpha());
     }
 
-    public void drawTriangle(Point2D.Float a, Point2D.Float b, Point2D.Float c) {
+    public void drawTriangle(Vector2f a, Vector2f b, Vector2f c) {
         glBegin(GL_QUADS);
         {
             glVertex2f(scaleX * a.x + cameraOffSetX, scaleY * a.y + cameraOffSetY);
@@ -363,7 +424,7 @@ public class Renderer {
         glEnd();
     }
 
-    public void drawPolygon(ArrayList<Point2D.Float> points) {
+    public void drawPolygon(ArrayList<Vector2f> points) {
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
@@ -372,7 +433,7 @@ public class Renderer {
 
         glBegin(GL_POLYGON);
         {
-            for (Point2D.Float p : points) {
+            for (Vector2f p : points) {
                 glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
             }
         }
@@ -393,14 +454,14 @@ public class Renderer {
         //glUseProgram(0);
     }
 
-    public void drawReversedPolygon(ArrayList<Point2D.Float> points) {
+    public void drawReversedPolygon(ArrayList<Vector2f> points) {
 
         glColorMask(false, false, false, false);
         glStencilFunc(GL_EQUAL, 1, 1);
         glStencilOp(GL_REPLACE, GL_KEEP, GL_ZERO);
 
         glBegin(GL_POLYGON);
-        for (Point2D.Float p : points) {
+        for (Vector2f p : points) {
             glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
         }
         glEnd();
@@ -420,7 +481,13 @@ public class Renderer {
         glUseProgram(0);
     }
 
-    public void drawLight(ArrayList<Point2D.Float> points, Light light) {
+    public void drawLight(ArrayList<Vector2f> points, Light light) {
+        
+        glEnable(GL_STENCIL_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+        
+        
         glEnable(GL_STENCIL_TEST);
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
@@ -429,41 +496,70 @@ public class Renderer {
 
         glBegin(GL_POLYGON);
         {
-            for (Point2D.Float p : points) {
-                glVertex2f( scaleX * p.x + cameraOffSetX,scaleY * p.y + cameraOffSetY);
+            for (Vector2f p : points) {
+                glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
             }
         }
         glEnd();
-        
-       //the second drawing is because light can be less than 360 degrees
-        glStencilFunc(GL_EQUAL, 1,1);
+
+        //the second drawing is because light can be less than 360 degrees
+        glStencilFunc(GL_EQUAL, 1, 1);
         glStencilOp(GL_ZERO, GL_ZERO, GL_INCR);
         drawDirectedPartCircle(light.getLocation().x, light.getLocation().y, light.getRadius(), light.getDirection(), light.getSpanAngle());
-        
-        
-        
+
         glColorMask(true, true, true, true);
         glStencilFunc(GL_EQUAL, 2, 2);
         glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 
-        Point2D.Float lightLocation = getScaledPoint(light.getLocation());
+        Vector2f lightLocation = getScaledPoint(light.getLocation());
         Color lightColor = light.getColor();
 
         lightShader.bind();
-        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"),  light.getPower());
-        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"),  lightLocation.x, Display.getHeight() -  lightLocation.y + 15);
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, Display.getHeight() - lightLocation.y + 15);
         glUniform3f(glGetUniformLocation(lightShader.getProgramID(), "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX);
         AABB aabb = light.getAABB();
         glBegin(GL_QUADS);
         {
-            glVertex2f(scaleX*aabb.getMinX()+cameraOffSetX, scaleY*aabb.getMinY()+cameraOffSetY);
-            glVertex2f(scaleX*aabb.getMaxX()+cameraOffSetX, scaleY*aabb.getMinY()+cameraOffSetY);
-            glVertex2f(scaleX*aabb.getMaxX()+cameraOffSetX, scaleY*aabb.getMaxY()+cameraOffSetY);
-            glVertex2f(scaleX*aabb.getMinX()+cameraOffSetX, scaleY*aabb.getMaxY()+cameraOffSetY);
+            glVertex2f(scaleX * aabb.getMinX() + cameraOffSetX, scaleY * aabb.getMinY() + cameraOffSetY);
+            glVertex2f(scaleX * aabb.getMaxX() + cameraOffSetX, scaleY * aabb.getMinY() + cameraOffSetY);
+            glVertex2f(scaleX * aabb.getMaxX() + cameraOffSetX, scaleY * aabb.getMaxY() + cameraOffSetY);
+            glVertex2f(scaleX * aabb.getMinX() + cameraOffSetX, scaleY * aabb.getMaxY() + cameraOffSetY);
         }
         glEnd();
+        glDisable(GL_BLEND);
+        glDisable(GL_STENCIL_TEST);
+        glClear(GL_STENCIL_BUFFER_BIT);
         lightShader.unbind();
+
+    }
+    
+    public void drawLightProperly(LightArea area,Light light) {
+        if(area.getNumVertices()==0){
+            return;
+        }
+        Vector2f lightLocation = getScaledPoint(light.getLocation());
+        Color lightColor = light.getColor();
+        
+        lightShader.bind();
+        
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, Display.getHeight() - lightLocation.y + 15);
+        glUniform3f(glGetUniformLocation(lightShader.getProgramID(), "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX);
+        
+        glColor3f(1.0f,0,0);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE);
+        glBindVertexArray(area.getVao());
+        glEnableVertexAttribArray(0);
+	glDrawElements(GL11.GL_TRIANGLES, area.getNumVertices(), GL11.GL_UNSIGNED_INT, 0);
+	glDisableVertexAttribArray(0);
+	glBindVertexArray(0);
+        glDisable(GL_BLEND);
+        lightShader.unbind();
+        
 
     }
 
@@ -490,7 +586,6 @@ public class Renderer {
     public void unbindTexture() {
         glBindTexture(GL_TEXTURE_2D, 0);
     }
-
     public void bindTexture(Texture tex) {
         glBindTexture(GL_TEXTURE_2D, tex.getTextureID());
     }
@@ -505,13 +600,13 @@ public class Renderer {
         glBindTexture(GL_TEXTURE_2D, textureBuffer);
         glBegin(GL_QUADS);
         {
-            glTexCoord2f(0f, 0f);
-            glVertex2f(0, 0);
-            glTexCoord2f(1f, 0f);
-            glVertex2f(core.getWidth(), 0);
-            glTexCoord2f(1f, 1f);
-            glVertex2f(core.getWidth(), core.getHeight());
             glTexCoord2f(0f, 1f);
+            glVertex2f(0, 0);
+            glTexCoord2f(1f, 1f);
+            glVertex2f(core.getWidth(), 0);
+            glTexCoord2f(1f, 0f);
+            glVertex2f(core.getWidth(), core.getHeight());
+            glTexCoord2f(0f, 0f);
             glVertex2f(0, core.getHeight());
         }
         glEnd();
@@ -530,8 +625,10 @@ public class Renderer {
         float width = mat.getWidth();
         float height = mat.getHeight();
 
-        Point2D.Float location = mat.getLocation();
-
+        Vector2f location = mat.getLocation();
+        
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glBegin(GL_QUADS);
         {
             glTexCoord2f(0, 0);
@@ -565,7 +662,7 @@ public class Renderer {
 
     public void drawRotatedMaterial(Material mat, int angle) {
         glPushMatrix();
-        glTranslatef( mat.getLocation().x * scaleX + cameraOffSetX,  mat.getLocation().y * scaleY + cameraOffSetY, 0);
+        glTranslatef(mat.getLocation().x * scaleX + cameraOffSetX, mat.getLocation().y * scaleY + cameraOffSetY, 0);
         glRotatef(angle, 0, 0, 1);
         setTextures(true);
         bindTexture(mat.getTexture());
@@ -591,5 +688,25 @@ public class Renderer {
         unbindTexture();
         setTextures(false);
         glPopMatrix();
+    }
+    
+    private void shrunkLight(ArrayList<Vector2f> points, Vector2f center,float radius){
+        
+        Vector2f shrunkDirection = new Vector2f();
+        float distance;
+        for(Vector2f point: points){
+            distance = GeometryUtil.getDistance(point, center);
+            if(distance>2*radius){
+                shrunkDirection.x = center.x - point.x;
+                shrunkDirection.y = center.y - point.y;
+                shrunkDirection.normalize();
+                shrunkDirection.multiply(distance-2*radius);
+                
+                point.x = point.x + shrunkDirection.x;
+                point.y = point.y + shrunkDirection.y;
+            }
+        }
+        
+        
     }
 }

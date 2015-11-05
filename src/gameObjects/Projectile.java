@@ -15,10 +15,12 @@ import utils.ObjectType;
 public abstract class Projectile extends DynamicGameObject{
     
     protected ExplodingGameObject explosive;
-
-    public Projectile(int x, int y) {
+    protected boolean toBeRemoved;
+    
+    public Projectile(float x, float y) {
         super(x, y, ObjectType.PROJECTILE);
         explosive = null;
+        toBeRemoved = false;
     }
 
     public ExplodingGameObject getExplosive() {
@@ -28,6 +30,13 @@ public abstract class Projectile extends DynamicGameObject{
     public void setExplosive(ExplodingGameObject explosive) {
         this.explosive = explosive;
     }
-
     
+    public void setToBeRemoved(boolean cond){
+        toBeRemoved = cond;
+    }
+    
+    @Override
+    public boolean isDead(){
+        return toBeRemoved;
+    }
 }
