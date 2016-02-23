@@ -8,7 +8,7 @@ package engine;
 import render.Renderer;
 import components.ObjectManager;
 import components.Physics;
-import components.SoundManager;
+import components.sound.SoundManager;
 import gameObjects.GameObject;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,7 +28,6 @@ public class Core implements Runnable {
     private Window window;
     private Input input;
     private Physics physics;
-    private int width = 1920, height = 1080;
     
     private String title = "My engine v1.0";
     private ObjectManager objManager;
@@ -44,21 +43,19 @@ public class Core implements Runnable {
     }
 
     public void init() {
-        System.out.println("first");
         
-        
-        
-        
+        int width = 1920;
+        int height = 1080;
+        window = new Window(width,height);
         thread = new Thread(this);
         objManager = new ObjectManager(this);
-        window = new Window(this);
+        
         
         input = new Input(this);
         renderer = new Renderer(this);
         physics = new Physics(this);
         soundManager = new SoundManager();
-        //widthScale = 1.0f;
-        //heightScale = 1.0f;
+
     }
 
     public void start() {
@@ -143,27 +140,13 @@ public class Core implements Runnable {
     }
 
 
-    public void setSize(int width, int height) {
-        //window.setSize(width, height);
 
-        this.width = width;
-        this.height = height;
-        //window = new Window(this);
-        //input = new Input(this);
-        //renderer = new Renderer(this);
-    }
 
     public void setTitle(String title) {
         this.title = title;
     }
 
-    public int getWidth() {
-        return width;
-    }
 
-    public int getHeight() {
-        return height;
-    }
 
     public String getTitle() {
         return title;

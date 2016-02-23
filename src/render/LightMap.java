@@ -5,12 +5,13 @@
  */
 package render;
 
+import components.AABB;
 import engine.Core;
+import gameObjects.GameObject;
 import gameObjects.LivingObject;
-import gameObjects.StaticGameObject;
-import java.awt.Color;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import math.Line2f;
 import math.Vector2f;
 
@@ -23,7 +24,6 @@ import static org.lwjgl.opengl.GL20.*;
 import static render.Renderer.CIRCLE_ACCURACY;
 import math.GeometryUtil;
 import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 
 /**
@@ -47,8 +47,8 @@ public class LightMap {
     public LightMap(Renderer renderer, Core core) {
         this.renderer = renderer;
         this.core = core;
-        width = core.getWidth();
-        height = core.getHeight();
+        width = core.getWindow().getWidth();
+        height = core.getWindow().getHeight();
     }
 
     public int getWidth() {
@@ -90,20 +90,31 @@ public class LightMap {
         if(area.getNumVertices()==0){
             return;
         }
-        Vector2f lightLocation = renderer.getScaledPoint(light.getLocation());
+        Vector2f lightLocation = light.getLocation();
+        
+        float cameraPosX = core.getObjectManager().getCamera().getX();
+        float cameraPosY = core.getObjectManager().getCamera().getY();
+        float scaleX = core.getObjectManager().getCamera().getWidthScale();
+        float scaleY = core.getObjectManager().getCamera().getHeightScale();
+        float screenSizeX = core.getObjectManager().getCamera().getWidth();
+        float screenSizeY = core.getObjectManager().getCamera().getHeight();
         
         lightShader.bind();
-        
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
-        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, Display.getHeight() - lightLocation.y);
-        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), renderer.getScale());
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "halfRadius"), light.getRadius()*0.5f);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, lightLocation.y);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "cameraCenter"), cameraPosX ,cameraPosY);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "scale"),scaleX,scaleY);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "screenSize"),screenSizeX,screenSizeY);
         
         glColor3f(1.0f,0,0);
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE, GL_ONE);
+        
         glBindVertexArray(area.getVao());
         glEnableVertexAttribArray(0);
 	glDrawElements(GL11.GL_TRIANGLES, area.getNumVertices(), GL11.GL_UNSIGNED_INT, 0);
+        
 	glDisableVertexAttribArray(0);
 	glBindVertexArray(0);
         glDisable(GL_BLEND);
@@ -121,15 +132,12 @@ public class LightMap {
     public void drawDirectedPartCircle(float cx, float cy, float r, Vector2f direction, float spanAngle) {
         float spanAngleRadians = (float) (spanAngle * Math.PI / 180);
         float startAngle = (float) (Math.atan2(direction.y, direction.x) - spanAngleRadians / 2);
+       
+
         
-        float scaleX = renderer.getScale();
-        float scaleY = renderer.getScale();
-        float cameraOffSetX = renderer.getCameraOffSetX();
-        float cameraOffSetY = renderer.getCameraOffSetY();
-        
-        cx = scaleX * cx + cameraOffSetX;
-        cy = scaleY * cy + cameraOffSetY;
-        r = scaleX * r;
+        cx =  cx;
+        cy =  cy;
+        r =  r;
         float step = (float) (spanAngle * Math.PI / 180 / CIRCLE_ACCURACY);
         float x =  (float)(r * Math.cos(startAngle));
         float y = (float)(r * Math.sin(startAngle));
@@ -189,10 +197,7 @@ public class LightMap {
         glClear(GL_STENCIL_BUFFER_BIT);
         glColorMask(false, false, false, false);
 
-        float scaleX = renderer.getScale();
-        float scaleY = renderer.getScale();
-        float cameraOffSetX = renderer.getCameraOffSetX();
-        float cameraOffSetY = renderer.getCameraOffSetY();
+
 
         glColorMask(false, false, false, false);
         glStencilFunc(GL_EQUAL, 1, 1);
@@ -201,7 +206,7 @@ public class LightMap {
         glBegin(GL_POLYGON);
         {
             for (Vector2f point : visibility) {
-                glVertex2f( scaleX * point.x + cameraOffSetX, scaleY * point.y + cameraOffSetY);
+                glVertex2f( point.x,  point.y);
             }
         }
         glEnd();
@@ -212,19 +217,21 @@ public class LightMap {
         glColorMask(true, true, true, true);
         glStencilFunc(GL_EQUAL, 1, 1);
         glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
-
+        
+        glLoadIdentity();
         glBegin(GL_QUADS);
         {
             glVertex2f(0, 0);
-            glVertex2f(core.getWidth(), 0);
-            glVertex2f(core.getWidth(), core.getHeight());
-            glVertex2f(0, core.getHeight());
+            glVertex2f(width, 0);
+            glVertex2f(core.getWindow().getWidth(), core.getWindow().getHeight());
+            glVertex2f(0, core.getWindow().getHeight());
         }
         glEnd();
         glUseProgram(0);
         glClear(GL_STENCIL_BUFFER_BIT);
         glDisable(GL_STENCIL_TEST);
         removeFrameBuffer();
+        core.getObjectManager().getCamera().restore();
     }
 
     public void drawVisibilityPolygon(Vector2f center) {
@@ -232,17 +239,16 @@ public class LightMap {
         renderer.unbindTexture();
         renderer.setTextures(false);
 
-        float scaleX = renderer.getScale();
-        float scaleY = renderer.getScale();
-        float cameraOffSetX = renderer.getCameraOffSetX();
-        float cameraOffSetY = renderer.getCameraOffSetY();
+
 
         glColor3f(0.0f, 0.0f, 0.0f);
-        ArrayList<StaticGameObject> staticObjects = core.getObjectManager().getStaticObjects();
+        AABB camAABB = core.getObjectManager().getCamera().getVisibleArea();
+        HashSet<GameObject> staticObjects = core.getObjectManager().getRayCollisionTree().getObjectsInRange(camAABB);
+        
         Line2f lineOfSight = new Line2f();
         lineOfSight.setX1(center.x);
         lineOfSight.setY1(center.y);
-        for (StaticGameObject so : staticObjects) {
+        for (GameObject so : staticObjects) {
 
 
             for (Line2f line1 : so.getLines()) {
@@ -261,10 +267,10 @@ public class LightMap {
                         glDisable(GL_STENCIL_TEST);
                         glBegin(GL_QUADS);
                         {
-                            glVertex2f( (line1.getX1() + v.x) * scaleX + cameraOffSetX,  (line1.getY1() + v.y) * scaleY + cameraOffSetY);
-                            glVertex2f( (line1.getX2()+ v2.x) * scaleX + cameraOffSetX, (line1.getY2() + v2.y) * scaleY + cameraOffSetY);
-                            glVertex2f( (line1.getX2()) * scaleX + cameraOffSetX, (line1.getY2()) * scaleY + cameraOffSetY);
-                            glVertex2f( (line1.getX1()) * scaleX + cameraOffSetX,  (line1.getY1()) * scaleY + cameraOffSetY);
+                            glVertex2f( (line1.getX1() + v.x) ,  (line1.getY1() + v.y) );
+                            glVertex2f( (line1.getX2()+ v2.x) , (line1.getY2() + v2.y) );
+                            glVertex2f( (line1.getX2()) , (line1.getY2()) );
+                            glVertex2f( (line1.getX1()) ,  (line1.getY1()));
                         }
                         glEnd();
                     }
@@ -284,10 +290,10 @@ public class LightMap {
 
                         glBegin(GL_QUADS);
                         {
-                            glVertex2f( (line1.getX1() + v.x) * scaleX + cameraOffSetX,  (line1.getY1() + v.y) * scaleY + cameraOffSetY);
-                            glVertex2f( (line1.getX2()+ v2.x) * scaleX + cameraOffSetX,  (line1.getY2() + v2.y) * scaleY + cameraOffSetY);
-                            glVertex2f( (line1.getX2()) * scaleX + cameraOffSetX,  (line1.getY2()) * scaleY + cameraOffSetY);
-                            glVertex2f( (line1.getX1()) * scaleX + cameraOffSetX, (line1.getY1()) * scaleY + cameraOffSetY);
+                            glVertex2f( (line1.getX1() + v.x) ,  (line1.getY1() + v.y));
+                            glVertex2f( (line1.getX2()+ v2.x) ,  (line1.getY2() + v2.y));
+                            glVertex2f( (line1.getX2()) ,  (line1.getY2()));
+                            glVertex2f( (line1.getX1()) , (line1.getY1()));
                         }
                         glEnd();
                     }
@@ -304,6 +310,9 @@ public class LightMap {
         //Vector2f pos = new Vector2f(core.getObjectManager().getPlayer().getPosition().x,core.getObjectManager().getPlayer().getPosition().y);
         //glUniform2f(glGetUniformLocation(blurShader.getProgramID(), "playerView"),  pos.x,  pos.y);
         glUniform2f(glGetUniformLocation(blurShader.getProgramID(), "resolution"), width,height);
+        float width = core.getObjectManager().getCamera().getWidth();
+        float height = core.getObjectManager().getCamera().getHeight();
+        glLoadIdentity();
         //Vector2f pos = new Vector2f(core.getObjectManager().getPlayer().getPosition
         renderer.setTextures(true);
         glBindTexture(GL_TEXTURE_2D, frameBuffer);
@@ -343,6 +352,7 @@ public class LightMap {
         renderer.setTextures(false);
         removeFrameBuffer();
         blurShader.unbind();
+        core.getObjectManager().getCamera().restore();
     }
 
     public void clear() {

@@ -38,8 +38,8 @@ public class Player extends LivingObject{
         weapon = null;
         aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
         light = new Light(this);
-        light.setRadius(200);
-        light.setPower(0.9f);
+        light.setRadius(90);
+        light.setPower(1);
         direction = new Vector2f(0,0);
     }
     
@@ -109,6 +109,7 @@ public class Player extends LivingObject{
         }
         
         aabb.reset(position.x-5,position.y-5,position.x+5,position.y+5);
+        System.out.println("Player pos: "+ position);
     }
     
     public void addWeapon(Weapon w){

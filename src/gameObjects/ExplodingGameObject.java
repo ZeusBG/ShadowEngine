@@ -41,6 +41,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         light = new Light(this);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
         light.setColor(c);
+        light.setRadius(50);
         
         currentRadius = 0;
         exploded = false;
@@ -53,6 +54,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         currentRadius = 0;
         timeExploded = System.currentTimeMillis();
         light = new Light(this);
+        light.setRadius(50);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
         light.setColor(c);
         

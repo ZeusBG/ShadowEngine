@@ -1,26 +1,26 @@
 uniform vec2 lightLocation;
 uniform vec3 lightColor;
 uniform float power;
-uniform float screenHeight;
-uniform float scale;
-uniform float radius;
+uniform vec2 scale;
+uniform vec2 screenSize;
+uniform vec2 cameraCenter;
+uniform float halfRadius;
 
 void main() {
-	vec2 position;
-        position.x = gl_FragCoord.x/1920;
-        position.y = gl_FragCoord.y/1080;
-        float distance = length(lightLocation - gl_FragCoord.xy);
-        distance/=scale;
+		vec2 position;
+        position.x = gl_FragCoord.x/scale.x - cameraCenter.x;
+        position.y = (screenSize.y - gl_FragCoord.y/scale.y) - cameraCenter.y;
+		
+        float distance = length(lightLocation - position);
+		
         float attenuation;
-        
 
-
-        if(distance<50)
-            attenuation = power*0.001;
+        if(distance<halfRadius)
+            attenuation = power*0.0005;
         else 
-            attenuation = power*0.001-(distance-50)/110000.0;
+            attenuation = power*0.0005-(distance-halfRadius)/110000.0;
         
-        
+
         
 	vec4 color = vec4(attenuation, attenuation, attenuation,0.5) * vec4(lightColor, 1);
 

@@ -250,7 +250,10 @@ public class QuadTree<T extends GameObject> {
                 }
             }
             else{
-                objectsInRange.addAll(objects);  
+                for(GameObject obj: objects){
+                    if(obj.getAabb().intersect(aabb))
+                        objectsInRange.add(obj);
+                }
             }
             return objectsInRange;
             

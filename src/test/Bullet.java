@@ -18,10 +18,10 @@ public class Bullet extends Projectile {
 
     public Bullet(float x, float y) {
         super(x, y);
-        speed=60;
+        speed=0;
         light = new Light(this);
         light.setSpanAngle(360);
-        light.setRadius(160);
+        light.setRadius(130);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
         light.setColor(c);
         explosive = new Explosion1();

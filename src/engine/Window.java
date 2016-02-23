@@ -12,25 +12,30 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
+import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
 import org.lwjgl.opengl.PixelFormat;
+import static org.lwjgl.util.glu.Project.gluPerspective;
 
 /**
  *
  * @author Zeus
  */
 public class Window {
-    
-    public Window(Core core)
+    private int width;
+    private int height;
+    public Window(int width,int height)
     {
-        
+        this.width = width;
+        this.height = height;
         try {
-            Display.setDisplayMode(new DisplayMode(core.getWidth(), core.getHeight()));
-            Display.setTitle("Shadow Engine");
+            //Display.setDisplayMode(new DisplayMode(width,height));
+            //Display.setTitle("Shadow Engine");
+            Display.setFullscreen(true);
             Display.create(new PixelFormat(0, 16, 1));
 
         } catch (LWJGLException e) {
@@ -50,11 +55,22 @@ public class Window {
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, core.getWidth(), core.getHeight(), 0, -1, 1);
+        glOrtho(0, width, height, 0, -10, 10);
         glMatrixMode(GL_MODELVIEW);
         
         
     }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+    
+    
+    
     public void update()
     {
         

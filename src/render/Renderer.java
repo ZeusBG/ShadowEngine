@@ -45,15 +45,14 @@ public class Renderer {
     private Core core;
     public static final int CIRCLE_ACCURACY = 30;
 
-    private float cameraOffSetX;
-    private float cameraOffSetY;
-    private float scaleX;
-    private float scaleY;
     private Shader lightShader;
     private LightMap lightMap;
     private Texture tex;//for test until Z-index is added 
-    private Texture floor;
+    private Texture floor;//again for test
     private Material mat;
+    private boolean shadows = true;
+    private boolean shadowBlur = false;
+    private boolean light = true;
 
     public Renderer(Core core) {
         this.core = core;
@@ -78,42 +77,31 @@ public class Renderer {
 
         ObjectManager objectsToRender = core.getObjectManager();
 
-        //get offsets and scales from the camera
-        cameraOffSetX = core.getObjectManager().getCamera().getX();
-        cameraOffSetY = core.getObjectManager().getCamera().getY();
-
-        scaleX = core.getObjectManager().getCamera().getWidthScale();
-        scaleY = core.getObjectManager().getCamera().getHeightScale();
-
-        cameraOffSetX *= scaleX;
-        cameraOffSetY *= scaleY;
-
-        //just for test because there isnt a z-index
-        
-
         drawMaterial(mat);
- 
-        //later will remove this random glEnables :D
-        
 
         //draws light visibility polygons in normal buffer and in lightMap buffer
-        castShadows();
+        if(light)
+            castShadows();
 
         glColor3f(1.0f, 0.0f, 0.0f);
+        glLoadIdentity();
         glBegin(GL_QUADS);
         {
-            glVertex2f(300, 300);
-            glVertex2f(350, 300);
-            glVertex2f(350, 350);
-            glVertex2f(300, 350);
+            glVertex3f(100, 100,1f);
+            glVertex3f(100, 120,1f);
+            glVertex3f(120, 120,1f);
+            glVertex3f(120, 100,1f);
+            
         }
         glEnd();
-
-        lightMap.blurShadows();
-       // lightMap.blurShadows();
-        //lightMap.blurShadows();
-        //lightMap.blurShadows();
-
+        objectsToRender.getCamera().restore();
+        glColor3f(1.0f,1.0f,1.0f);
+        if(shadowBlur){
+            lightMap.blurShadows();
+            lightMap.blurShadows();
+            lightMap.blurShadows();
+            lightMap.blurShadows();
+        }
 
         
         
@@ -126,23 +114,13 @@ public class Renderer {
                 drawMaterial(obj.getMaterial());
             } else {
                 obj.render(this);
-            }
-            
-            /*if(obj.getLight()!=null){
-                glColor3f(1.0f,0,0);
-                AABB lightAABB = obj.getLight().getAABB();
-                drawRect(lightAABB.getMinX(),lightAABB.getMinY(),2*obj.getLight().getRadius(),2*obj.getLight().getRadius());
-                System.out.println(lightAABB);
-            }*/
-            
+            }     
             objectsRendered++;
         }
         
-        if (core.getObjectManager().getPlayer() != null) {
-            //core.getObjectManager().getPlayer().render(this);
-        }
+        if(light)
+            drawLightMap();
         
-        drawLightMap();
         for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
             if(!obj.getAabb().intersect(visibleArea))
                 continue;
@@ -154,43 +132,31 @@ public class Renderer {
             objectsRendered++;
         }
         System.out.println("objectsRendered: "+objectsRendered);
+        if(shadows){
+            lightMap.clear();
+            //draws the visibility polygon for the player
+            //so that he cant see behind walls and behind his back
+            
+            lightMap.drawVisibilityTriangle(objectsToRender.getPlayer());
+            lightMap.drawVisibilityPolygon(new Vector2f(core.getObjectManager().getPlayer().getPosition().x,core.getObjectManager().getPlayer().getPosition().y));
+            if(shadowBlur){
+                lightMap.blurShadows();
+                lightMap.blurShadows();
+                lightMap.blurShadows();
+                lightMap.blurShadows();
+            }
 
-
-        lightMap.clear();
-        //draws the visibility polygon for the player
-        //so that he cant see behind walls and behind his back
-        lightMap.drawVisibilityTriangle(objectsToRender.getPlayer());
-        lightMap.drawVisibilityPolygon(new Vector2f(core.getObjectManager().getPlayer().getPosition().x,core.getObjectManager().getPlayer().getPosition().y));
-        lightMap.blurShadows();
-        //lightMap.blurShadows();
-        //lightMap.blurShadows();
-        //lightMap.blurShadows();
-                
-        drawLightMap();
-                
+            drawLightMap();
+        }
         //core.getPhysics().getCollisionTree().drawTree(this);
         //core.getObjectManager().getRayCollisionTree().drawTree(this);
         core.getObjectManager().getPlayer().render(this);
         glColor3f(1f,0f,0f);
-        /*
-        {
-            glVertex2f(visibleArea.getMinX(),visibleArea.getMinY());
-            glVertex2f(visibleArea.getMaxX(),visibleArea.getMinY());
-            glVertex2f(visibleArea.getMaxX(),visibleArea.getMaxY());
-            glVertex2f(visibleArea.getMinX(),visibleArea.getMaxY());
-            glVertex2f(visibleArea.getMinX(),visibleArea.getMinY());
-        }
-        glEnd();//remove glEnd() for drun effect !
-                */
-        //glBegin(GL_LINE_LOOP);
+
         Display.update();
         Display.sync(30);
 
         clear();
-    }
-
-    public float getScale() {
-        return scaleX;
     }
 
     private void initialize() {
@@ -199,9 +165,6 @@ public class Renderer {
     }
 
     public void drawCircle(float cx, float cy, float r) {
-        cx = scaleX * cx + cameraOffSetX;
-        cy = scaleY * cy + cameraOffSetY;
-        r = scaleX * r;
 
         float step = 2.0f * 3.1415926f / CIRCLE_ACCURACY;
         float theta = 0;
@@ -223,9 +186,6 @@ public class Renderer {
         float spanAngleRadians = (float) (spanAngle * Math.PI / 180);
         float startAngle = (float) (Math.atan2(direction.y, direction.x) - spanAngleRadians / 2);
 
-        cx = scaleX * cx + cameraOffSetX;
-        cy = scaleY * cy + cameraOffSetY;
-        r = scaleX * r;
         float step = (float) (spanAngle * Math.PI / 180 / CIRCLE_ACCURACY);
         float x = (float) (r * Math.cos(startAngle));
         float y = (float) (r * Math.sin(startAngle));
@@ -264,7 +224,6 @@ public class Renderer {
         
         drawSight();
         
-        
 
     }
 
@@ -273,13 +232,16 @@ public class Renderer {
         for (GameObject obj : core.getObjectManager().getAllObjects()) {
             
             Light light = obj.getLight();
+            //object doesnt emmit light
             if (light == null) {
                 continue;
             }
+            //if light is out of the camera's range
             if(!light.getAABB().intersect(core.getObjectManager().getCamera().getVisibleArea()))
                 continue;
+            
             LightArea area = new LightArea();
-            Vector2f pos = getScaledPoint(light.getLocation());
+            Vector2f pos = light.getLocation();
             lightCounter++;
             //gets the points for the visibility polygon from the rayCollisionTree in object manager
             ArrayList<Vector2f> points = findIntersectionPoints(light);
@@ -288,17 +250,16 @@ public class Renderer {
                 drawLine(light.getLocation().x, light.getLocation().y, points.get(i).x, points.get(i).y);
             }
             */
-            shrunkLight(points, light.getLocation(),light.getRadius());//so that there wont be a lot of overdraw
+            //shrunkLight(points, light.getLocation(),light.getRadius());//so that there wont be a lot of overdraw
             
             
-            ArrayList<Vector2f> scaledPoints = new ArrayList<>();
-            for(int i=0;i<points.size();i++){
-                scaledPoints.add(getScaledPoint(points.get(i)));
-            }
-            //uses these points to draw the visibility polygon in the lightmap and in the gmae buffer
-            area.generateTriangles(scaledPoints, pos);
+            
+            //uses these points to draw the visibility polygon in the lightmap and in the game buffer
+            shrunkLight(points, pos,light.getRadius());
+            area.generateTriangles(points, pos);
+            
             lightMap.addLight(area,light);
-            //shrunkLight(scaledPoints, pos,light.getRadius());
+            
             
             glColor3f(1.0f,1.0f,1.0f);
             drawLightProperly(area,light);
@@ -307,12 +268,6 @@ public class Renderer {
         System.out.println("number of lights rendered: "+lightCounter);
     }
 
-    public Vector2f getScaledPoint(Vector2f p) {
-        Vector2f scaled = new Vector2f();
-        scaled.x = scaleX * p.x + cameraOffSetX;
-        scaled.y = scaleY * p.y + cameraOffSetY;
-        return scaled;
-    }
 
     public ArrayList<Vector2f> findIntersectionPoints(Light lightSrc) {
 
@@ -336,10 +291,10 @@ public class Renderer {
         }
         
         Vector2f lightCenter = lightSrc.getLocation();
-        float step = (float)(2*Math.PI/8.0f);
+        float step = (float)(2*Math.PI/16.0f);
         float start = 0;
         Vector2f tmp;
-        for(int i=0;i<8;i++){
+        for(int i=0;i<16;i++){
             tmp = new Vector2f();
             tmp.x = lightCenter.x+(float)Math.cos(start);
             tmp.y = lightCenter.y+(float)Math.sin(start);
@@ -374,12 +329,12 @@ public class Renderer {
         x = p.y - lightSource.y;
 
         float newX, newY;
-        newX = p.x - x * 0.001f;
-        newY = p.y + y * 0.001f;
+        newX = p.x - x * 0.01f;
+        newY = p.y + y * 0.01f;
         sPoints.add(new Vector2f(newX, newY));
 
-        newX = p.x + x * 0.001f;
-        newY = p.y - y * 0.001f;
+        newX = p.x + x * 0.01f;
+        newY = p.y - y * 0.01f;
         sPoints.add(new Vector2f(newX, newY));
 
     }
@@ -388,8 +343,8 @@ public class Renderer {
 
         glBegin(GL_LINE_LOOP);
         {
-            glVertex2f(scaleX * x1 + cameraOffSetX, scaleY * y1 + cameraOffSetY);
-            glVertex2f(scaleX * x2 + cameraOffSetX, scaleY * y2 + cameraOffSetY);
+            glVertex3f(x1, y1,0f);
+            glVertex3f(x2, y2,0f);
         }
         glEnd();
 
@@ -417,9 +372,9 @@ public class Renderer {
     public void drawTriangle(Vector2f a, Vector2f b, Vector2f c) {
         glBegin(GL_QUADS);
         {
-            glVertex2f(scaleX * a.x + cameraOffSetX, scaleY * a.y + cameraOffSetY);
-            glVertex2f(scaleX * b.x + cameraOffSetX, scaleY * b.y + cameraOffSetY);
-            glVertex2f(scaleX * c.x + cameraOffSetX, scaleY * c.y + cameraOffSetY);
+            glVertex2f( a.x,  a.y);
+            glVertex2f( b.x,  b.y);
+            glVertex2f( c.x,  c.y);
         }
         glEnd();
     }
@@ -434,7 +389,7 @@ public class Renderer {
         glBegin(GL_POLYGON);
         {
             for (Vector2f p : points) {
-                glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
+                glVertex2f(p.x,p.y);
             }
         }
         glEnd();
@@ -446,9 +401,9 @@ public class Renderer {
         glBegin(GL_QUADS);
         {
             glVertex2f(0, 0);
-            glVertex2f(core.getWidth(), 0);
-            glVertex2f(core.getWidth(), core.getHeight());
-            glVertex2f(0, core.getHeight());
+            glVertex2f(0, core.getWindow().getHeight());
+            glVertex2f(core.getWindow().getWidth(), core.getWindow().getHeight());
+            glVertex2f(core.getWindow().getWidth(), 0);
         }
         glEnd();
         //glUseProgram(0);
@@ -462,7 +417,7 @@ public class Renderer {
 
         glBegin(GL_POLYGON);
         for (Vector2f p : points) {
-            glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
+            glVertex2f( p.x,  p.y);
         }
         glEnd();
 
@@ -473,9 +428,9 @@ public class Renderer {
         glBegin(GL_QUADS);
         {
             glVertex2f(0, 0);
-            glVertex2f(core.getWidth(), 0);
-            glVertex2f(core.getWidth(), core.getHeight());
-            glVertex2f(0, core.getHeight());
+            glVertex2f(0, core.getWindow().getHeight());
+            glVertex2f(core.getWindow().getWidth(), core.getWindow().getHeight());
+            glVertex2f(core.getWindow().getWidth(), 0);
         }
         glEnd();
         glUseProgram(0);
@@ -497,7 +452,7 @@ public class Renderer {
         glBegin(GL_POLYGON);
         {
             for (Vector2f p : points) {
-                glVertex2f(scaleX * p.x + cameraOffSetX, scaleY * p.y + cameraOffSetY);
+                glVertex2f( p.x, p.y );
             }
         }
         glEnd();
@@ -511,21 +466,21 @@ public class Renderer {
         glStencilFunc(GL_EQUAL, 2, 2);
         glStencilOp(GL_ZERO, GL_ZERO, GL_ZERO);
 
-        Vector2f lightLocation = getScaledPoint(light.getLocation());
+        Vector2f lightLocation = light.getLocation();
         Color lightColor = light.getColor();
 
         lightShader.bind();
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
-        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, Display.getHeight() - lightLocation.y + 15);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, lightLocation.y );
         glUniform3f(glGetUniformLocation(lightShader.getProgramID(), "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
-        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX);
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), 1920/400);//SCALEX !!!
         AABB aabb = light.getAABB();
         glBegin(GL_QUADS);
         {
-            glVertex2f(scaleX * aabb.getMinX() + cameraOffSetX, scaleY * aabb.getMinY() + cameraOffSetY);
-            glVertex2f(scaleX * aabb.getMaxX() + cameraOffSetX, scaleY * aabb.getMinY() + cameraOffSetY);
-            glVertex2f(scaleX * aabb.getMaxX() + cameraOffSetX, scaleY * aabb.getMaxY() + cameraOffSetY);
-            glVertex2f(scaleX * aabb.getMinX() + cameraOffSetX, scaleY * aabb.getMaxY() + cameraOffSetY);
+            glVertex2f(aabb.getMinX(), aabb.getMinY());
+            glVertex2f(aabb.getMaxX(), aabb.getMinY());
+            glVertex2f(aabb.getMaxX(), aabb.getMaxY());
+            glVertex2f(aabb.getMinX(), aabb.getMaxY());
         }
         glEnd();
         glDisable(GL_BLEND);
@@ -539,15 +494,26 @@ public class Renderer {
         if(area.getNumVertices()==0){
             return;
         }
-        Vector2f lightLocation = getScaledPoint(light.getLocation());
+        Vector2f lightLocation = light.getLocation();
         Color lightColor = light.getColor();
         
         lightShader.bind();
         
+        float screenSizeX = core.getObjectManager().getCamera().getWidth();
+        float screenSizeY = core.getObjectManager().getCamera().getHeight();
+        float scaleX = core.getObjectManager().getCamera().getWidthScale();
+        float scaleY = core.getObjectManager().getCamera().getHeightScale();
+        float cameraPosX = core.getObjectManager().getCamera().getX();
+        float cameraPosY = core.getObjectManager().getCamera().getY();
+        
+        
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
-        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, Display.getHeight() - lightLocation.y + 15);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "lightLocation"), lightLocation.x, lightLocation.y );
         glUniform3f(glGetUniformLocation(lightShader.getProgramID(), "lightColor"), lightColor.getRed(), lightColor.getGreen(), lightColor.getBlue());
-        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "scale"), scaleX, scaleY);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "screenSize"), screenSizeX, screenSizeY);
+        glUniform2f(glGetUniformLocation(lightShader.getProgramID(), "cameraCenter"),cameraPosX,cameraPosY);
+        glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "halfRadius"),light.getRadius()*0.5f);
         
         glColor3f(1.0f,0,0);
         glEnable(GL_BLEND);
@@ -575,13 +541,6 @@ public class Renderer {
         }
     }
 
-    public float getCameraOffSetX() {
-        return cameraOffSetX;
-    }
-
-    public float getCameraOffSetY() {
-        return cameraOffSetY;
-    }
 
     public void unbindTexture() {
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -594,22 +553,32 @@ public class Renderer {
         int textureBuffer = lightMap.getFrameBuffer();
         glEnable(GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
-
+        
+        float width = core.getObjectManager().getCamera().getWidth();
+        float height = core.getObjectManager().getCamera().getHeight();
+        
         glColor3f(1.0f, 1.0f, 1.0f);
         setTextures(true);
         glBindTexture(GL_TEXTURE_2D, textureBuffer);
+        
+        glLoadIdentity();
+
         glBegin(GL_QUADS);
         {
             glTexCoord2f(0f, 1f);
             glVertex2f(0, 0);
-            glTexCoord2f(1f, 1f);
-            glVertex2f(core.getWidth(), 0);
-            glTexCoord2f(1f, 0f);
-            glVertex2f(core.getWidth(), core.getHeight());
             glTexCoord2f(0f, 0f);
-            glVertex2f(0, core.getHeight());
+            glVertex2f(0, height);
+            
+            glTexCoord2f(1f, 0f);
+            glVertex2f(width,height);
+            glTexCoord2f(1f, 1f);
+            glVertex2f(width, 0);
         }
         glEnd();
+        
+        core.getObjectManager().getCamera().restore();
+        
         setTextures(false);
         unbindTexture();
         glDisable(GL_BLEND);
@@ -620,8 +589,8 @@ public class Renderer {
         setTextures(true);
         bindTexture(mat.getTexture());
         glColor3f(1.0f, 1.0f, 1.0f);
-        float matScaleX = mat.getScaleX();
-        float matScaleY = mat.getScaleY();
+        float matScaleX = mat.getScaleX();//if the texture is not 2^n x 2^n
+        float matScaleY = mat.getScaleY();//if the texture is not 2^n x 2^n
         float width = mat.getWidth();
         float height = mat.getHeight();
 
@@ -632,13 +601,13 @@ public class Renderer {
         glBegin(GL_QUADS);
         {
             glTexCoord2f(0, 0);
-            glVertex2f(location.x * scaleX + cameraOffSetX, location.y * scaleY + cameraOffSetY);
-            glTexCoord2f(matScaleX, 0);
-            glVertex2f((location.x + width) * scaleX + cameraOffSetX, location.y * scaleY + cameraOffSetY);
-            glTexCoord2f(matScaleX, matScaleY);
-            glVertex2f((location.x + width) * scaleX + cameraOffSetX, (location.y + height) * scaleY + cameraOffSetY);
+            glVertex3f(location.x , location.y ,1);
             glTexCoord2f(0, matScaleY);
-            glVertex2f(location.x * scaleX + cameraOffSetX, (location.y + height) * scaleY + cameraOffSetY);
+            glVertex3f((location.x) , location.y+height,1);
+            glTexCoord2f(matScaleX, matScaleY);
+            glVertex3f((location.x + width), (location.y + height),1);
+            glTexCoord2f(matScaleX, 0);
+            glVertex3f(location.x + width, (location.y ),1);
         }
         glEnd();
 
@@ -650,11 +619,11 @@ public class Renderer {
 
         glBegin(GL_LINE_LOOP);
         {
-            glVertex2f(x * scaleX + cameraOffSetX, y * scaleY + cameraOffSetY);
-            glVertex2f((x + width) * scaleX + cameraOffSetX, y * scaleY + cameraOffSetY);
-            glVertex2f((x + width) * scaleX + cameraOffSetX, (y + height) * scaleY + cameraOffSetY);
-            glVertex2f(x * scaleX + cameraOffSetX, (y + height) * scaleY + cameraOffSetY);
-            glVertex2f(x * scaleX + cameraOffSetX, y * scaleY + cameraOffSetY);
+            glVertex2f(x , y );
+            glVertex2f((x + width), y );
+            glVertex2f((x + width) , (y + height));
+            glVertex2f(x , (y + height));
+            glVertex2f(x , y );
         }
         glEnd();
 
@@ -662,26 +631,26 @@ public class Renderer {
 
     public void drawRotatedMaterial(Material mat, int angle) {
         glPushMatrix();
-        glTranslatef(mat.getLocation().x * scaleX + cameraOffSetX, mat.getLocation().y * scaleY + cameraOffSetY, 0);
+        glTranslatef(mat.getLocation().x, mat.getLocation().y , 0);
         glRotatef(angle, 0, 0, 1);
         setTextures(true);
         bindTexture(mat.getTexture());
         glColor3f(1.0f, 1.0f, 1.0f);
         float matScaleX = mat.getScaleX();
         float matScaleY = mat.getScaleY();
-        float halfWidth = mat.getWidth() / 2 * scaleX;
-        float halfHeight = mat.getHeight() / 2 * scaleY;
+        float halfWidth = mat.getWidth() / 2 ;
+        float halfHeight = mat.getHeight() / 2 ;
 
         glBegin(GL_QUADS);
         {
-            glTexCoord2f(0, 0);
-            glVertex2f(-halfWidth, -halfHeight);
-            glTexCoord2f(matScaleX, 0);
-            glVertex2f(halfWidth, -halfHeight);
-            glTexCoord2f(matScaleX, matScaleY);
-            glVertex2f(halfWidth, halfHeight);
-            glTexCoord2f(0, matScaleY);
-            glVertex2f(-halfWidth, halfHeight);
+            glTexCoord3f(0, 0,0);
+            glVertex3f(-halfWidth, -halfHeight,0);
+            glTexCoord3f(matScaleX, 0,0);
+            glVertex3f(halfWidth, -halfHeight,0);
+            glTexCoord3f(matScaleX, matScaleY,0);
+            glVertex3f(halfWidth, halfHeight,0);
+            glTexCoord3f(0, matScaleY,0);
+            glVertex3f(-halfWidth, halfHeight,0);
         }
         glEnd();
 
@@ -696,11 +665,11 @@ public class Renderer {
         float distance;
         for(Vector2f point: points){
             distance = GeometryUtil.getDistance(point, center);
-            if(distance>2*radius){
+            if(distance>radius*1.5f){
                 shrunkDirection.x = center.x - point.x;
                 shrunkDirection.y = center.y - point.y;
                 shrunkDirection.normalize();
-                shrunkDirection.multiply(distance-2*radius);
+                shrunkDirection.multiply(distance-1.2f*radius);
                 
                 point.x = point.x + shrunkDirection.x;
                 point.y = point.y + shrunkDirection.y;
