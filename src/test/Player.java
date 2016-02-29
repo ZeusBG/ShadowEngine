@@ -28,7 +28,7 @@ public class Player extends LivingObject{
     public Player(ObjectType type) {
         super(type);
         speed = 500;
-        aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
+        geometry.getAabb().reset(position.x-5,position.y-5,position.x+5,position.y+5);
         
     }
     
@@ -36,9 +36,9 @@ public class Player extends LivingObject{
         super(ObjectType.PLAYER);
         crosshair = new Vector2f();
         weapon = null;
-        aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
+        geometry.getAabb().reset(position.x-5,position.y-5,position.x+5,position.y+5);
         light = new Light(this);
-        light.setRadius(90);
+        light.setRadius(150);
         light.setPower(1);
         direction = new Vector2f(0,0);
     }
@@ -93,11 +93,11 @@ public class Player extends LivingObject{
         
         if(core.getInput().isKeyPressed(Keyboard.KEY_O)){
             //core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.8f);
-            core.getObjectManager().getCamera().zoomIn();
+            core.getScene().getCamera().zoomIn();
         }
         
         if(core.getInput().isKeyPressed(Keyboard.KEY_P)){
-            core.getObjectManager().getCamera().zoomOut();
+            core.getScene().getCamera().zoomOut();
             //core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 1.0f);
         }
         
@@ -108,7 +108,7 @@ public class Player extends LivingObject{
             core.getSoundManager().stop(Sounds.MOVEMENT_PLAYER);
         }
         
-        aabb.reset(position.x-5,position.y-5,position.x+5,position.y+5);
+        geometry.getAabb().reset(position.x-5,position.y-5,position.x+5,position.y+5);
         System.out.println("Player pos: "+ position);
     }
     

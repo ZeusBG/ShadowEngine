@@ -45,7 +45,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         
         currentRadius = 0;
         exploded = false;
-        aabb = new AABB(x-1,y-1,x+1,y+1);
+        geometry.setAabb(new AABB(x-1,y-1,x+1,y+1));
         explosionRange = new AABB(x-1,y-1,x+1,y+1);
     }
     

@@ -6,7 +6,7 @@
 package engine;
 
 import render.Renderer;
-import components.ObjectManager;
+import components.Scene;
 import components.Physics;
 import components.sound.SoundManager;
 import gameObjects.GameObject;
@@ -29,13 +29,14 @@ public class Core implements Runnable {
     private Input input;
     private Physics physics;
     
-    private String title = "My engine v1.0";
-    private ObjectManager objManager;
+    
+    private Scene scene;
     private Renderer renderer;
     private SoundManager soundManager;
     private long timeStarted;
-
-    private float frameCap = 1.0f / 30.0f;
+    
+    private float FPSCap = 60;
+    private float timeStep = 1.0f / FPSCap;
     private boolean isRunning = false;
 
     public Core(AbstractGame game) {
@@ -48,9 +49,9 @@ public class Core implements Runnable {
         int height = 1080;
         window = new Window(width,height);
         thread = new Thread(this);
-        objManager = new ObjectManager(this);
-        
-        
+
+        scene = new Scene(this,1600,1200);
+
         input = new Input(this);
         renderer = new Renderer(this);
         physics = new Physics(this);
@@ -79,11 +80,11 @@ public class Core implements Runnable {
         isRunning = true;
 
         double FPSCounter;
-
-        double newCycleTime = 0;
-        double lastTime = System.nanoTime() / 1000000000.0;
+        double currentTime = 0;
+        double previousTime = System.nanoTime() / 1000000000.0;
         double passedTime = 0;
         double unprocessedTime = 0;
+        
         long testTime;
         int count = 0;
         while (isRunning) {
@@ -93,21 +94,24 @@ public class Core implements Runnable {
                 System.exit(0);
             FPSCounter = System.nanoTime();
             boolean render = false;
-
-            newCycleTime = System.nanoTime() / 1000000000.0;
-            passedTime = newCycleTime - lastTime;
-            lastTime = newCycleTime;
+            
+            
+            currentTime = System.nanoTime() / 1000000000.0;
+            passedTime = currentTime - previousTime;
+            previousTime = currentTime;
             unprocessedTime += passedTime;
+            
             input.update();
-            while (unprocessedTime >= frameCap) {
+            while (unprocessedTime >= timeStep) {
                 count++;
                 testTime = System.currentTimeMillis();
+                scene.update();
+                scene.update(timeStep);
+                physics.update(timeStep);
+                game.update(timeStep);
                 
-                physics.update( frameCap);
-                game.update(frameCap);
-                objManager.update();
 
-                unprocessedTime -= frameCap;
+                unprocessedTime -= timeStep;
                 render = true;
                 //if(count>1)//for debuggin only
                  //   break;
@@ -119,14 +123,12 @@ public class Core implements Runnable {
                 System.out.println("FPS: " + (int)(1000/((System.nanoTime() - FPSCounter) / 1000000)));
             } else {
                 try {
-                    System.out.println("sleeping for: "+ (frameCap-passedTime)*1000);
+                    System.out.println("sleeping for: "+ (timeStep-passedTime)*1000);
                     Thread.sleep(1);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
-
         }
 
     }
@@ -135,29 +137,14 @@ public class Core implements Runnable {
         return physics;
     }
 
-    public void handleInput() {
 
-    }
-
-
-
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-
-
-    public String getTitle() {
-        return title;
-    }
 
     public Window getWindow() {
         return window;
     }
 
-    public ObjectManager getObjectManager() {
-        return objManager;
+    public Scene getScene() {
+        return scene;
     }
 
     public Input getInput() {
@@ -165,7 +152,7 @@ public class Core implements Runnable {
     }
 
     public void addObject(GameObject obj) {
-        objManager.addObject(obj);
+        scene.addObject(obj);
     }
 
     public SoundManager getSoundManager() {

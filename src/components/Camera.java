@@ -30,8 +30,7 @@ public class Camera {
     private float width, height;
     private Core core;
     private boolean dynamic = false;
-    private float widthScale = 1.0f;
-    private float heightScale = 1.0f;
+    private Vector2f scale;
     private AABB visibleArea;
 
  
@@ -43,8 +42,9 @@ public class Camera {
         cameraCenter = new Vector2f(0, 0);
         cameraSpeed = 10;
         this.core = core;
-        widthScale = core.getWindow().getWidth()/ width;
-        heightScale = core.getWindow().getHeight() / height;
+        scale = new Vector2f();
+        scale.x = core.getWindow().getWidth()/ width;
+        scale.y = core.getWindow().getHeight() / height;
         visibleArea = new AABB();
         initCamera();
     }
@@ -52,6 +52,7 @@ public class Camera {
     public Camera(int x, int y, int width, int height) {
         offset = new Vector2f(x, y);
         cameraCenter = new Vector2f(x + width / 2, y + height / 2);
+        scale = new Vector2f();
         this.width = width;
         this.height = height;
         cameraSpeed = 10;
@@ -109,8 +110,8 @@ public class Camera {
     }
 
     public void refreshScale() {
-        widthScale = core.getWindow().getWidth() / width;
-        heightScale = core.getWindow().getHeight() / height;
+        scale.x = core.getWindow().getWidth() / width;
+        scale.y = core.getWindow().getHeight() / height;
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -157,8 +158,8 @@ public class Camera {
 
     public void setCore(Core core) {
         this.core = core;
-        widthScale = core.getWindow().getWidth()/ width;
-        heightScale = core.getWindow().getHeight() / height;
+        scale.x = core.getWindow().getWidth()/ width;
+        scale.y = core.getWindow().getHeight() / height;
     }
 
     public float getX() {
@@ -186,19 +187,19 @@ public class Camera {
     }
     
     public float getWidthScale() {
-        return widthScale;
+        return scale.x;
     }
 
     public void setWidthScale(float widthScale) {
-        this.widthScale = widthScale;
+        this.scale.x = widthScale;
     }
 
     public float getHeightScale() {
-        return heightScale;
+        return scale.y;
     }
 
     public void setHeightScale(float heightScale) {
-        this.heightScale = heightScale;
+        this.scale.y = heightScale;
     }
     
     public void setCameraSpeed(float cameraSpeed) {
@@ -207,6 +208,10 @@ public class Camera {
         }
     }
 
+    public Vector2f getScale() {
+        return scale;
+    }
+    
     public boolean isDynamic() {
         return dynamic;
     }

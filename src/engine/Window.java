@@ -28,14 +28,15 @@ import static org.lwjgl.util.glu.Project.gluPerspective;
 public class Window {
     private int width;
     private int height;
+    private String title = "Shadow Engine";
     public Window(int width,int height)
     {
         this.width = width;
         this.height = height;
         try {
-            //Display.setDisplayMode(new DisplayMode(width,height));
-            //Display.setTitle("Shadow Engine");
-            Display.setFullscreen(true);
+            Display.setDisplayMode(new DisplayMode(width,height));
+            Display.setTitle("title");
+            //Display.setFullscreen(true);
             Display.create(new PixelFormat(0, 16, 1));
 
         } catch (LWJGLException e) {
@@ -57,7 +58,6 @@ public class Window {
         glLoadIdentity();
         glOrtho(0, width, height, 0, -10, 10);
         glMatrixMode(GL_MODELVIEW);
-        
         
     }
 

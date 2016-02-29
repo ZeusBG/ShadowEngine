@@ -15,7 +15,7 @@ import utils.ObjectType;
 
 /*This is the class for all the dynamic game objects - player, npc, etc.*/
 public abstract class DynamicGameObject extends GameObject{
-    protected Vector2f orientation;
+    
     protected Vector2f direction;
     protected float speed;
     protected Vector2f nextPosition;

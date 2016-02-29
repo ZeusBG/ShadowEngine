@@ -6,16 +6,22 @@
 package gameObjects;
 
 import components.AABB;
+import components.Geometry;
 import components.emitter.Emitter;
 import engine.Core;
 import render.Renderer;
 import java.util.ArrayList;
 import math.Line2f;
 import math.Vector2f;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform2f;
 import render.Light;
 import render.Material;
+import render.Shader;
 import utils.ObjectState;
 import utils.ObjectType;
+import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 
 /**
  *
@@ -24,17 +30,17 @@ import utils.ObjectType;
 public abstract class GameObject {
     protected Core core;
     protected Vector2f position;
+    protected Vector2f orientation;
     protected ObjectType type;
     protected ObjectState ObjState;
-    protected AABB aabb;
-    protected ArrayList<Vector2f> points;
-    protected ArrayList<Line2f> lines;
+    protected Geometry geometry;
     private static long IDGEN;
     private long id;
     protected Light light;
     protected Material material;//later it will have arrayList of components
     protected Emitter emitter;
     protected int zIndex;
+    protected Shader shader;
     
     
     public GameObject(float x, float y,ObjectType type){
@@ -42,11 +48,10 @@ public abstract class GameObject {
         this.type = type;
         position = new Vector2f(x,y);
         ObjState = new ObjectState();
-        points = new ArrayList<>();
-        lines = new ArrayList<>();
-        aabb = new AABB();
+        geometry = new Geometry();
         light = null;
         zIndex = 0;
+        orientation = new Vector2f(1,0);
     }
     
     public void addEmitter(Emitter em){
@@ -90,11 +95,7 @@ public abstract class GameObject {
     }
 
     public AABB getAabb() {
-        return aabb;
-    }
-
-    public void setAabb(AABB aabb) {
-        this.aabb = aabb;
+        return geometry.getAabb();
     }
 
     public int getzIndex() {
@@ -106,11 +107,11 @@ public abstract class GameObject {
     }
     
     public ArrayList<Vector2f> getPoints(){
-        return points;
+        return geometry.getPoints();
     }
 
     public ArrayList<Line2f> getLines() {
-        return lines;
+        return geometry.getLines();
     }
 
     public Material getMaterial() {
@@ -122,11 +123,7 @@ public abstract class GameObject {
     }
     
     public void addPoint(Vector2f point){
-        if(!points.isEmpty()){
-            lines.add(new Line2f(points.get(points.size()-1),point));
-        }
-        points.add(point);
-        aabb.update(point);
+        geometry.addPoint(point);
     }
     
     
@@ -162,7 +159,7 @@ public abstract class GameObject {
     }
     
     protected void dispose(){
-        core.getObjectManager().removeObject(this);
+        core.getScene().removeObject(this);
     }
     
     public boolean isCollidableWith(GameObject object){
@@ -203,7 +200,35 @@ public abstract class GameObject {
     public boolean isDead(){
         return false;
     }
+
+    public Geometry getGeometry() {
+        return geometry;
+    }
     
+    public void prepareShader(){
+        
+        if(shader ==null){
+            return;
+        }
+        
+        int programId = shader.getProgramID();
+        
+        shader.bind();
+        
+        Vector2f offset = position;
+        Vector2f cameraOffset = core.getScene().getCamera().getPosition();
+        Vector2f scale = geometry.getScale();
+        float rotAngle = orientation.getAngleInRadians();
+        Vector2f resolutionScale = core.getScene().getCamera().getScale();
+        
+        glUniform2f(glGetUniformLocation(programId, "objectOffset"), offset.x,offset.y);
+        glUniform2f(glGetUniformLocation(programId, "cameraOffset"),cameraOffset.x,cameraOffset.y);
+        glUniform2f(glGetUniformLocation(programId, "scale"),scale.x,scale.y);
+        glUniform2f(glGetUniformLocation(programId, "resolutionScale"),resolutionScale.x,resolutionScale.y);
+        glUniform1f(glGetUniformLocation(programId, "rotAngle"),rotAngle);
+        
+        
+    }
     
     
     public abstract void update(float dt);

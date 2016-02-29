@@ -6,11 +6,11 @@
 package test;
 
 import components.emitter.BulletEmitter;
-import components.emitter.Emitter;
 import gameObjects.GameObject;
 import render.Renderer;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
+import java.util.ArrayList;
 import math.Line2f;
 import math.Vector2f;
 
@@ -28,15 +28,19 @@ public class StaticObject extends StaticGameObject {
     @Override
     public void update(float dt) {
         //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        //geometry.rotate(1.1f);
     }
 
     @Override
     public void render(Renderer r) {
+        
+        ArrayList<Vector2f> points = geometry.getPoints();
+        
         r.setColor(Color.BLUE);
         for (int i = 0; i < points.size() - 1; i++) {
             r.drawLine((int) points.get(i).x, (int) points.get(i).y, (int) points.get(i + 1).x, (int) points.get(i + 1).y);
         }
-
+        
         r.setColor(Color.WHITE);
     }
 
@@ -54,7 +58,7 @@ public class StaticObject extends StaticGameObject {
             
             emitter.setPosition(hitPoint);
             emitter.setNextPosition(hitPoint);
-            emitter.setInterval(lineHit.asVector().getPerpendicularCloserTo(other.getPosition(), hitPoint), 160);
+            emitter.setInterval(lineHit.getNormal(), 160);
             emitter.spawnParticles(10);
             
         }

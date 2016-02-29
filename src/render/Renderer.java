@@ -6,7 +6,7 @@
 package render;
 
 import components.AABB;
-import components.ObjectManager;
+import components.Scene;
 import engine.Core;
 import gameObjects.DynamicGameObject;
 import gameObjects.GameObject;
@@ -51,7 +51,7 @@ public class Renderer {
     private Texture floor;//again for test
     private Material mat;
     private boolean shadows = true;
-    private boolean shadowBlur = false;
+    private boolean shadowBlur = true;
     private boolean light = true;
 
     public Renderer(Core core) {
@@ -61,7 +61,7 @@ public class Renderer {
         lightMap.init();
         glEnable(GL_TEXTURE_2D);
         tex = null;
-        try {
+        try {//only for testing stuff
             tex = TextureLoader.getTexture("JPEG", new FileInputStream(new File("res/textures/car.jpg")));
             floor = TextureLoader.getTexture("JPEG", new FileInputStream(new File("res/textures/plates6_512x512.jpg")));
         } catch (IOException ex) {
@@ -75,7 +75,7 @@ public class Renderer {
 
     public void render() {
 
-        ObjectManager objectsToRender = core.getObjectManager();
+        Scene scene = core.getScene();
 
         drawMaterial(mat);
 
@@ -94,7 +94,7 @@ public class Renderer {
             
         }
         glEnd();
-        objectsToRender.getCamera().restore();
+        scene.getCamera().restore();
         glColor3f(1.0f,1.0f,1.0f);
         if(shadowBlur){
             lightMap.blurShadows();
@@ -105,9 +105,9 @@ public class Renderer {
 
         
         
-        AABB visibleArea = core.getObjectManager().getCamera().getVisibleArea();
+        AABB visibleArea = core.getScene().getCamera().getVisibleArea();
         int objectsRendered = 0;
-        for (DynamicGameObject obj : core.getObjectManager().getDynamicObjects()) {
+        for (DynamicGameObject obj : core.getScene().getDynamicObjects()) {
             if(!obj.getAabb().intersect(visibleArea))
                 continue;
             if (obj.getMaterial() != null ) {
@@ -121,7 +121,7 @@ public class Renderer {
         if(light)
             drawLightMap();
         
-        for (StaticGameObject obj : core.getObjectManager().getStaticObjects()) {
+        for (StaticGameObject obj : core.getScene().getStaticObjects()) {
             if(!obj.getAabb().intersect(visibleArea))
                 continue;
             if (obj.getMaterial() != null) {
@@ -137,8 +137,8 @@ public class Renderer {
             //draws the visibility polygon for the player
             //so that he cant see behind walls and behind his back
             
-            lightMap.drawVisibilityTriangle(objectsToRender.getPlayer());
-            lightMap.drawVisibilityPolygon(new Vector2f(core.getObjectManager().getPlayer().getPosition().x,core.getObjectManager().getPlayer().getPosition().y));
+            lightMap.drawVisibilityTriangle(scene.getPlayer());
+            lightMap.drawVisibilityPolygon(new Vector2f(core.getScene().getPlayer().getPosition().x,core.getScene().getPlayer().getPosition().y));
             if(shadowBlur){
                 lightMap.blurShadows();
                 lightMap.blurShadows();
@@ -150,11 +150,11 @@ public class Renderer {
         }
         //core.getPhysics().getCollisionTree().drawTree(this);
         //core.getObjectManager().getRayCollisionTree().drawTree(this);
-        core.getObjectManager().getPlayer().render(this);
+        core.getScene().getPlayer().render(this);
         glColor3f(1f,0f,0f);
 
         Display.update();
-        Display.sync(30);
+        Display.sync(60);
 
         clear();
     }
@@ -229,7 +229,7 @@ public class Renderer {
 
     private void drawSight() {
         int lightCounter = 0;
-        for (GameObject obj : core.getObjectManager().getAllObjects()) {
+        for (GameObject obj : core.getScene().getAllObjects()) {
             
             Light light = obj.getLight();
             //object doesnt emmit light
@@ -237,7 +237,7 @@ public class Renderer {
                 continue;
             }
             //if light is out of the camera's range
-            if(!light.getAABB().intersect(core.getObjectManager().getCamera().getVisibleArea()))
+            if(!light.getAABB().intersect(core.getScene().getCamera().getVisibleArea()))
                 continue;
             
             LightArea area = new LightArea();
@@ -255,7 +255,11 @@ public class Renderer {
             
             
             //uses these points to draw the visibility polygon in the lightmap and in the game buffer
+            //for(int i=0;i<points.size();i++){
+            //    drawLine(pos.x, pos.y, points.get(i).x, points.get(i).y);
+            //}
             shrunkLight(points, pos,light.getRadius());
+            
             area.generateTriangles(points, pos);
             
             lightMap.addLight(area,light);
@@ -274,8 +278,8 @@ public class Renderer {
         Vector2f lightSource = new Vector2f(lightSrc.getOwner().getPosition().x,lightSrc.getOwner().getPosition().y);
         ArrayList<Vector2f> intersectionPoints = new ArrayList<>(500);
         ArrayList<Vector2f> sPoints = new ArrayList<>(500);
-        HashSet<GameObject> objects = core.getObjectManager().getRayCollisionTree().getObjectsInRange(lightSrc.getAABB());
-        ArrayList<StaticGameObject> allObjects = core.getObjectManager().getStaticObjects();
+        HashSet<GameObject> objects = core.getScene().getRayCollisionTree().getObjectsInRange(lightSrc.getAABB());
+        ArrayList<StaticGameObject> allObjects = core.getScene().getStaticObjects();
         
 
         for (GameObject s : objects) {
@@ -284,23 +288,24 @@ public class Renderer {
             }
             for (Vector2f cPoint : s.getPoints()) {
                 Ray tmpRay = new Ray(lightSource, cPoint);
-                if (cPoint.equals(core.getObjectManager().getRayCollisionTree().intersect(tmpRay, objects))) {
+                if (cPoint.equals(core.getScene().getRayCollisionTree().intersect(tmpRay, objects))) {
                     addSecondaryPoints(cPoint, lightSource, sPoints);
                 }
             }
         }
         
+        int acc = 15;
         Vector2f lightCenter = lightSrc.getLocation();
-        float step = (float)(2*Math.PI/16.0f);
+        float step = (float)(2*Math.PI/(float)acc);
         float start = 0;
         Vector2f tmp;
-        for(int i=0;i<16;i++){
+        for(int i=0;i<acc;i++){
             tmp = new Vector2f();
             tmp.x = lightCenter.x+(float)Math.cos(start);
             tmp.y = lightCenter.y+(float)Math.sin(start);
             
             Ray tmpRay = new Ray(lightCenter, tmp);
-            Vector2f intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null);
+            Vector2f intersection = core.getScene().getRayCollisionTree().intersect(tmpRay, null);
             if(intersection!=null){
                 intersectionPoints.add(intersection);
             }
@@ -310,7 +315,7 @@ public class Renderer {
         
         for (Vector2f cPoint : sPoints) {
             Ray tmpRay = new Ray(lightSource, cPoint);
-            Vector2f intersection = core.getObjectManager().getRayCollisionTree().intersect(tmpRay, null);
+            Vector2f intersection = core.getScene().getRayCollisionTree().intersect(tmpRay, null);
             if (intersection != null) {
                 intersectionPoints.add(intersection);
             }
@@ -329,12 +334,12 @@ public class Renderer {
         x = p.y - lightSource.y;
 
         float newX, newY;
-        newX = p.x - x * 0.01f;
-        newY = p.y + y * 0.01f;
+        newX = p.x - x * 0.001f;
+        newY = p.y + y * 0.001f;
         sPoints.add(new Vector2f(newX, newY));
 
-        newX = p.x + x * 0.01f;
-        newY = p.y - y * 0.01f;
+        newX = p.x + x * 0.001f;
+        newY = p.y - y * 0.001f;
         sPoints.add(new Vector2f(newX, newY));
 
     }
@@ -353,7 +358,7 @@ public class Renderer {
     public void drawRay(float x1, float y1, float x2, float y2) {
 
         Ray r = new Ray(x1, y1, x2, y2);
-        Vector2f endPoint = core.getObjectManager().getRayCollisionTree().intersect(r, null);
+        Vector2f endPoint = core.getScene().getRayCollisionTree().intersect(r, null);
 
         if (endPoint != null) {
             drawLine(x1, y1, (int) endPoint.x, (int) endPoint.y);
@@ -370,7 +375,7 @@ public class Renderer {
     }
 
     public void drawTriangle(Vector2f a, Vector2f b, Vector2f c) {
-        glBegin(GL_QUADS);
+        glBegin(GL_TRIANGLES);
         {
             glVertex2f( a.x,  a.y);
             glVertex2f( b.x,  b.y);
@@ -499,12 +504,12 @@ public class Renderer {
         
         lightShader.bind();
         
-        float screenSizeX = core.getObjectManager().getCamera().getWidth();
-        float screenSizeY = core.getObjectManager().getCamera().getHeight();
-        float scaleX = core.getObjectManager().getCamera().getWidthScale();
-        float scaleY = core.getObjectManager().getCamera().getHeightScale();
-        float cameraPosX = core.getObjectManager().getCamera().getX();
-        float cameraPosY = core.getObjectManager().getCamera().getY();
+        float screenSizeX = core.getScene().getCamera().getWidth();
+        float screenSizeY = core.getScene().getCamera().getHeight();
+        float scaleX = core.getScene().getCamera().getWidthScale();
+        float scaleY = core.getScene().getCamera().getHeightScale();
+        float cameraPosX = core.getScene().getCamera().getX();
+        float cameraPosY = core.getScene().getCamera().getY();
         
         
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
@@ -530,7 +535,8 @@ public class Renderer {
     }
 
     private void initLightShader(String path) {
-        lightShader = new Shader(path);
+        lightShader = new Shader();
+        lightShader.loadShaderFromFile(path, GL_FRAGMENT_SHADER);
     }
 
     public void setTextures(boolean enable) {
@@ -554,8 +560,8 @@ public class Renderer {
         glEnable(GL_BLEND);
         glBlendFunc(GL_DST_COLOR, GL_ZERO);
         
-        float width = core.getObjectManager().getCamera().getWidth();
-        float height = core.getObjectManager().getCamera().getHeight();
+        float width = core.getScene().getCamera().getWidth();
+        float height = core.getScene().getCamera().getHeight();
         
         glColor3f(1.0f, 1.0f, 1.0f);
         setTextures(true);
@@ -577,7 +583,7 @@ public class Renderer {
         }
         glEnd();
         
-        core.getObjectManager().getCamera().restore();
+        core.getScene().getCamera().restore();
         
         setTextures(false);
         unbindTexture();

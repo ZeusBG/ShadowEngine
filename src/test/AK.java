@@ -10,6 +10,7 @@ import render.Renderer;
 import gameObjects.LivingObject;
 import gameObjects.Projectile;
 import gameObjects.Weapon;
+import java.awt.Color;
 import java.util.ArrayList;
 import math.Vector2f;
 
@@ -18,7 +19,9 @@ import math.Vector2f;
  * @author Zeus
  */
 public class AK extends Weapon {
-
+    
+    private Vector2f previousOrientation;
+    
     public AK(int x, int y, LivingObject owner) {
         super(x, y, owner);
         fireRate = 100;
@@ -32,7 +35,8 @@ public class AK extends Weapon {
         fireRate = 800;
         timePerProjectile = 60000 / (double) fireRate;
         position = new Vector2f();
-        aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
+        previousOrientation = new Vector2f();
+        geometry.setAabb(new AABB(position.x-5,position.y-5,position.x+5,position.y+5));
         for (int i = 0; i < clipSize; i++) {
             ammonition.add(new Bullet(0, 0));
         }
@@ -43,13 +47,19 @@ public class AK extends Weapon {
     @Override
     public void update(float dt) {
         if (owner != null) {
+            previousOrientation.x = orientation.x;
+            previousOrientation.y = orientation.y;
+
             orientation = owner.getOrientation();
-            position.x = owner.getPosition().x;
+            
+            float angle = previousOrientation.dotProduct(orientation);
+            
+            position.x = owner.getPosition().x-10;
             position.y = owner.getPosition().y;
 
             nextPosition.x = owner.getNextPosition().x;
             nextPosition.y = owner.getNextPosition().y;
-            aabb = new AABB(position.x-5,position.y-5,position.x+5,position.y+5);
+            geometry.setAabb(new AABB(position.x-5,position.y-5,position.x+5,position.y+5));
         }
     }
 
@@ -62,6 +72,7 @@ public class AK extends Weapon {
                 position.y + 5 * orientation.x);
         Vector2f p3 = new Vector2f(position.x + 5 * orientation.y,
                 position.y - 5 * orientation.x);
+        r.setColor(Color.red);
         r.drawTriangle(p1,p2,p3);
     }
 

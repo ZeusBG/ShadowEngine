@@ -36,8 +36,9 @@ public class Emitter extends DynamicGameObject implements IParticle {
         this.lifeTime = lifeTime;
         timeSpawned = System.currentTimeMillis();
         particles = new ArrayList<>();
-        aabb = new AABB();
+        AABB aabb = new AABB();
         aabb.reset(position.x, position.y, position.x, position.y);
+        geometry.setAabb(aabb);
         
     }
     
@@ -49,7 +50,7 @@ public class Emitter extends DynamicGameObject implements IParticle {
         particles = new ArrayList();
         lifeTime = 0.1f;
         speed = 0;
-        aabb = new AABB();
+        geometry.setAabb(new AABB());
     }
     
     @Override
@@ -63,7 +64,7 @@ public class Emitter extends DynamicGameObject implements IParticle {
         if(!isDead()){
             position.x = position.x+direction.x*speed*dt;
             position.y = position.y+direction.y*speed*dt;
-            aabb.reset(position.x, position.y, position.x, position.y);
+            geometry.getAabb().reset(position.x, position.y, position.x, position.y);
             for(int i=0;i<particles.size();i++){
                 particles.get(i).update(core, dt);
             }

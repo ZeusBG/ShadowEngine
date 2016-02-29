@@ -22,7 +22,7 @@ import utils.ObjectType;
  * @author Zeus
  * 
  */
-public class ObjectManager {
+public class Scene {
     
     /*other managares here later */
     private Core core;
@@ -34,11 +34,12 @@ public class ObjectManager {
     private ArrayList<Projectile> projectiles;
     private ArrayList<Line2f> lines;
     private ArrayList<Vector2f> staticObjPoints;
+    private Vector2f size;
     private QuadTree rayCollisionTree;
     
     private Camera camera;
     
-    public ObjectManager(Core core){
+    public Scene(Core core, float width, float height){
         this.core = core;
         staticObjects = new ArrayList<>();
         dynamicObjects = new ArrayList<>();
@@ -46,8 +47,9 @@ public class ObjectManager {
         projectiles = new ArrayList<>();
         lines = new ArrayList<>();
         staticObjPoints = new ArrayList<>();
+        size = new Vector2f(width,height);
         //should be map.getWidth() and map.getHeight() nut there isnt a map for now
-        rayCollisionTree = new QuadTree<StaticGameObject>(3,8,new AABB(0,0,1600,1200));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
+        rayCollisionTree = new QuadTree<StaticGameObject>(3,8,new AABB(0,0,width,height));//should be map.getWidth() and map.getHeight() nut there isnt a map for now
         allObjects = new ArrayList<>();
         camera = new Camera(0,0,400,225);
         camera.setCore(core);
@@ -82,10 +84,9 @@ public class ObjectManager {
         staticObjects.add((StaticGameObject)obj);
         StaticGameObject tmp = (StaticGameObject) obj;
         Line2f tmpLine = null;
-        for(int i=0;i<tmp.getPoints().size()-1;i++){
-            tmpLine = new Line2f(tmp.getPoints().get(i),tmp.getPoints().get(i+1));
-            lines.add(tmpLine);
-            staticObjPoints.add(tmp.getPoints().get(i));
+        for(int i=0;i<tmp.getLines().size();i++){
+            lines.add(tmp.getLines().get(i));
+            //staticObjPoints.add(tmp.getPoints().get(i));
         }
         staticObjPoints.add(tmp.getPoints().get(tmp.getPoints().size()-1));
         
@@ -100,6 +101,15 @@ public class ObjectManager {
     
     public ArrayList<Line2f> getLines(){
         return lines;
+    }
+    
+    public void update(float delta){
+        
+        rayCollisionTree = new QuadTree<StaticGameObject>(3,8,new AABB(-1000,-1000,2600,2200));
+        for(StaticGameObject s : staticObjects){
+            rayCollisionTree.insert(s);
+        }
+        
     }
     
     public void addObject(GameObject obj){
@@ -156,6 +166,16 @@ public class ObjectManager {
         }
         
     }
+
+    public Vector2f getSize() {
+        return size;
+    }
+
+    public void setSize(Vector2f size) {
+        this.size = size;
+    }
+    
+    
     
     
     

@@ -34,14 +34,10 @@ import static org.lwjgl.opengl.GL20.glValidateProgram;
 public class Shader {
     private int programID;
     
-    public Shader(String file){
-        loadShaderFromFile(file);
-    }
-    
-    public void loadShaderFromFile(String path){
+    public void loadShaderFromFile(String path,int type){
         int fragmentShader;
         programID = glCreateProgram();
-        fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+        fragmentShader = glCreateShader(type);
         StringBuilder fragmentShaderSource = new StringBuilder();
 
         try {

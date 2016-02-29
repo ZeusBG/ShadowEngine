@@ -18,7 +18,7 @@ public class Bullet extends Projectile {
 
     public Bullet(float x, float y) {
         super(x, y);
-        speed=0;
+        speed=50;
         light = new Light(this);
         light.setSpanAngle(360);
         light.setRadius(130);
@@ -30,9 +30,11 @@ public class Bullet extends Projectile {
 
     @Override
     public void update(float dt) {
-        aabb.reset(position.x,position.y,position.x,position.y);
+        geometry.getAabb().reset(position.x,position.y,position.x,position.y);
         nextPosition.x = position.x + speed * dt * direction.x;
         nextPosition.y = position.y + speed * dt * direction.y;
+
+        
     }
 
     @Override

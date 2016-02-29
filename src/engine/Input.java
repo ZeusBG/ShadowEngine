@@ -72,11 +72,11 @@ public class Input{
     }
     
      public float getMouseX(){
-        return (float)(mouseX/core.getObjectManager().getCamera().getWidthScale() - core.getObjectManager().getCamera().getX());
+        return (float)(mouseX/core.getScene().getCamera().getWidthScale() - core.getScene().getCamera().getX());
     }
     
     public float getMouseY(){
-        return (float)(mouseY/core.getObjectManager().getCamera().getHeightScale() - core.getObjectManager().getCamera().getY());
+        return (float)(mouseY/core.getScene().getCamera().getHeightScale() - core.getScene().getCamera().getY());
     }
     
 }

@@ -200,10 +200,9 @@ public class QuadTree<T extends GameObject> {
             
             for (GameObject obj : objects) {
                 
-                if(!obj.isRenderable())
+                if(!obj.isRenderable() || (collidableObjects != null && !collidableObjects.contains(obj)))
                     continue;
-                if(collidableObjects != null && !collidableObjects.contains(obj) )
-                    continue;
+                
                 
                 if (cachedObjects.get(obj) != null) {
                     Vector2f tmpPoint = cachedObjects.get(obj);
