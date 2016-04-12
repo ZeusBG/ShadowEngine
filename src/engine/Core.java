@@ -5,7 +5,12 @@
  */
 package engine;
 
-import render.Renderer;
+import components.Camera;
+import components.GameState;
+import static components.GameState.MENU;
+import static components.GameState.PAUSED;
+import static components.GameState.RUNNING;
+import engine.render.Renderer;
 import components.Scene;
 import components.Physics;
 import components.sound.SoundManager;
@@ -15,7 +20,6 @@ import java.util.logging.Logger;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
-
 
 /**
  *
@@ -28,15 +32,19 @@ public class Core implements Runnable {
     private Window window;
     private Input input;
     private Physics physics;
-    
-    
+    private Camera camera;
+    private Timer timer;
     private Scene scene;
     private Renderer renderer;
     private SoundManager soundManager;
     private long timeStarted;
+    private GameState gameState;
+    private long timeLastPaused = 0;
+    private final long minPausePeriod = 1000;
+    
     
     private float FPSCap = 60;
-    private float timeStep = 1.0f / FPSCap;
+    private float timeStep = 1.0f / FPSCap ;
     private boolean isRunning = false;
 
     public Core(AbstractGame game) {
@@ -44,18 +52,23 @@ public class Core implements Runnable {
     }
 
     public void init() {
-        
-        int width = 1920;
-        int height = 1080;
-        window = new Window(width,height);
+
         thread = new Thread(this);
 
-        scene = new Scene(this,1600,1200);
+        int width = 1920;
+        int height = 1080;
+        window = new Window(width, height);
+
+        scene = new Scene(this, 1600, 1200);
+        camera = new Camera(0, 0, 400, 225);
+        camera.setCore(this);
+        camera.setDynamic(true);
 
         input = new Input(this);
         renderer = new Renderer(this);
         physics = new Physics(this);
         soundManager = new SoundManager();
+        timer = new Timer();
 
     }
 
@@ -63,9 +76,9 @@ public class Core implements Runnable {
         if (isRunning) {
             return;
         }
-
+        
         timeStarted = System.currentTimeMillis();
-        thread.run();
+        thread.run();//this is wrong, should use thread.start() will fix later
     }
 
     public void stop() {
@@ -78,66 +91,89 @@ public class Core implements Runnable {
     @Override
     public void run() {
         isRunning = true;
+        gameState = RUNNING;
+        timer.start();
+        
+        while (isRunning) {
+            
+            if(gameState == RUNNING){
+                gameLoop();
+            }
+            else if(gameState == PAUSED){
+                pauseLoop();
+            }
+            else{
+                mainMenuLoop();
+            }
+        }
+    }
+    
+    private void gameLoop(){
+        isRunning = true;
 
         double FPSCounter;
-        double currentTime = 0;
-        double previousTime = System.nanoTime() / 1000000000.0;
-        double passedTime = 0;
         double unprocessedTime = 0;
         
-        long testTime;
-        int count = 0;
-        while (isRunning) {
-            count=0;
-            //count=0;
-            if(Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Display.isCloseRequested())
+        boolean render = false;
+        timer.reset();
+
+        while (gameState == RUNNING) {
+            if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE) || Display.isCloseRequested()) {
                 System.exit(0);
+            }
             FPSCounter = System.nanoTime();
-            boolean render = false;
-            
-            
-            currentTime = System.nanoTime() / 1000000000.0;
-            passedTime = currentTime - previousTime;
-            previousTime = currentTime;
-            unprocessedTime += passedTime;
-            
+            render = false;
+
+            timer.update();
+            unprocessedTime += timer.getDeltaInSeconds();
             input.update();
+            
             while (unprocessedTime >= timeStep) {
-                count++;
-                testTime = System.currentTimeMillis();
-                scene.update();
+                
                 scene.update(timeStep);
                 physics.update(timeStep);
                 game.update(timeStep);
-                
+                camera.update();
 
                 unprocessedTime -= timeStep;
                 render = true;
-                //if(count>1)//for debuggin only
-                 //   break;
-                //System.out.println("Test time per cycle: "+(System.currentTimeMillis()-testTime));
             }
-            //System.out.println("count is "+count);
             if (render) {
                 game.render(renderer);
-                System.out.println("FPS: " + (int)(1000/((System.nanoTime() - FPSCounter) / 1000000)));
+                System.out.println("FPS: " + (int) (1000 / ((System.nanoTime() - FPSCounter) / 1000000)));
             } else {
-                try {
-                    System.out.println("sleeping for: "+ (timeStep-passedTime)*1000);
-                    Thread.sleep(1);
-                } catch (InterruptedException ex) {
-                    Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
-                }
+                sleepThread(1);
             }
+            
         }
-
     }
+    
+    private void pauseLoop(){
+        boolean paused = true;
+        timer.pause();
+        sleepThread(200);
+        while(paused){
+            input.update();
+            if(input.isKeyPressed(Keyboard.KEY_F)){
+                paused = false;
+                
+                gameState = RUNNING;
+                System.err.println("game unpaused !");
 
+            }
+            sleepThread(32);
+        }
+        timeLastPaused = System.currentTimeMillis();
+        timer.unPause();
+    }
+    
+    private void mainMenuLoop(){
+        
+    }
+    
     public Physics getPhysics() {
         return physics;
     }
-
-
 
     public Window getWindow() {
         return window;
@@ -153,10 +189,44 @@ public class Core implements Runnable {
 
     public void addObject(GameObject obj) {
         scene.addObject(obj);
+        obj.setCore(this);
     }
 
     public SoundManager getSoundManager() {
         return soundManager;
     }
+
+    public Camera getCamera() {
+        return camera;
+    }
     
+    public float getTime(){
+        return timer.getCurrentTime();
+    }
+    
+    public long getCurrentTimeMillis(){
+        return timer.getCurrentTimeMillis();
+    }
+    
+    public void pauseGame(){
+        if(System.currentTimeMillis() - timeLastPaused < minPausePeriod)
+            return;
+        gameState = PAUSED;
+    }
+    
+    public void resumeGame(){
+        gameState = RUNNING;
+    }
+    
+    public void goToMainMenu(){
+        gameState = MENU;
+    }
+    
+    private void sleepThread(int millis){
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Core.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

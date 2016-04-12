@@ -5,7 +5,6 @@
  */
 package engine;
 
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -14,69 +13,110 @@ import org.lwjgl.opengl.Display;
  *
  * @author Zeus
  */
-public class Input{
+public class Input {
+
     private Core core;
     private boolean keys[];
     private boolean previousKeys[];
-    
+
     private boolean mouseButtons[];
     private boolean previousMouseButtons[];
     
-    private float mouseX,mouseY;
-    
-    public Input(Core core){
+    private float transformedMouseX,transformedMouseY;
+    private float mouseX, mouseY;
+
+    public Input(Core core) {
         this.core = core;
         keys = new boolean[256];
         previousKeys = new boolean[256];
-        mouseButtons = new boolean[5];
-        previousMouseButtons = new boolean[5];
-        
-        System.out.println("Mouse: "+Mouse.isCreated());
-    }
-    
-    public void update(){
-        previousKeys = keys.clone();
-        previousMouseButtons = mouseButtons.clone();
-        mouseX = Mouse.getX();
-        mouseY = Display.getHeight()-Mouse.getY();
-        
+        mouseButtons = new boolean[256];
+        previousMouseButtons = new boolean[256];
     }
 
-    
-    
-    
-    
-    public boolean isKeyJustPressed(int code){
-        return Keyboard.isKeyDown(code);
-    }
-    
-    public boolean isKeyJustReleased(int code){
-        return !Keyboard.isKeyDown(code);
-    }
-    
-    public boolean isKeyPressed(int code){
+    public void update() {
+        previousKeys = keys.clone();
+        previousMouseButtons = mouseButtons.clone();
         
-        return Keyboard.isKeyDown(code);
+        Display.processMessages();
+        updateKeyboard();
+        updateMouse();
+
+        
     }
     
-    public boolean isKeyReleased(int code){
-        return !Keyboard.isKeyDown(code);
+    private void updateKeyboard(){
+        while (Keyboard.next()) {
+            if (Keyboard.getEventKeyState()) {
+                int key = Keyboard.getEventKey();
+                keys[key] = true;
+            } else {
+                int key = Keyboard.getEventKey();
+                keys[key] = false;
+            }
+        }
     }
     
-    public boolean isMouseButtonPressed(int button){
-        return Mouse.isButtonDown(button);
+    private void updateMouse(){
+        while (Mouse.next()) {
+            if (Mouse.getEventButtonState()) {
+                int button = Mouse.getEventButton();
+
+                if (button >= 0) {
+                    mouseButtons[button] = true;
+                }
+            } else {
+                int button = Mouse.getEventButton();
+
+                if (button >= 0) {
+                    mouseButtons[button] = false;
+                }
+            }
+        }
+        mouseX = Mouse.getX();
+        mouseY = Display.getHeight() - Mouse.getY();
+        
+        transformedMouseX = (mouseX / core.getCamera().getWidthScale() - core.getCamera().getX());
+        transformedMouseY = (mouseY / core.getCamera().getHeightScale() - core.getCamera().getY());
     }
     
-    public boolean isMouseButtonReleased(int button){
-        return !Mouse.isButtonDown(button);
+    public boolean isKeyJustPressed(int code) {
+        return keys[code] && !previousKeys[code];
     }
-    
-     public float getMouseX(){
-        return (float)(mouseX/core.getScene().getCamera().getWidthScale() - core.getScene().getCamera().getX());
+
+    public boolean isKeyJustReleased(int code) {
+        return !keys[code] && previousKeys[code];
     }
-    
-    public float getMouseY(){
-        return (float)(mouseY/core.getScene().getCamera().getHeightScale() - core.getScene().getCamera().getY());
+
+    public boolean isKeyPressed(int code) {
+        return keys[code];
     }
-    
+
+    public boolean isKeyReleased(int code) {
+        return !keys[code];
+    }
+
+    public boolean isMouseButtonPressed(int button) {
+        return mouseButtons[button];
+    }
+
+    public boolean isMouseButtonReleased(int button) {
+        return !mouseButtons[button];
+    }
+
+    public boolean isMouseButtonJustPressed(int button) {
+        return mouseButtons[button] && !previousMouseButtons[button];
+    }
+
+    public boolean isMouseButtonJustReleased(int button) {
+        return !mouseButtons[button] && previousMouseButtons[button];
+    }
+
+    public float getMouseX() {
+        return transformedMouseX;
+    }
+
+    public float getMouseY() {
+        return transformedMouseY;
+    }
+
 }

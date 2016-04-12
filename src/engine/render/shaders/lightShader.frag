@@ -7,7 +7,7 @@ uniform vec2 cameraCenter;
 uniform float halfRadius;
 
 void main() {
-		vec2 position;
+        vec2 position;
         position.x = gl_FragCoord.x/scale.x - cameraCenter.x;
         position.y = (screenSize.y - gl_FragCoord.y/scale.y) - cameraCenter.y;
 		

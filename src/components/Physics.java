@@ -33,7 +33,6 @@ public class Physics {
     private int treeMaxDepth;
     private int treeMaxCapacity;
     private int collisionChecks;
-    //private HashMap<GameObject, Boolean> checkedProjectiles;
     //private long timeResolvedCollision;
     //private long timeInsertedObjects;
     private boolean firstTime = true;
@@ -65,7 +64,6 @@ public class Physics {
     }
 
     public void update(float _dt) {
-        //checkedProjectiles = new HashMap<>();
         //timeResolvedCollision = System.currentTimeMillis();
         //timeInsertedObjects = System.currentTimeMillis();
         collisionChecks = 0;
@@ -80,7 +78,7 @@ public class Physics {
             }
         }
 
-        System.out.println("Number of objects in the game: " + core.getScene().getAllObjects().size());
+        //System.out.println("Number of objects in the game: " + core.getScene().getAllObjects().size());
 
         this.dt = _dt;
         updateObjects();
@@ -133,12 +131,12 @@ public class Physics {
 
         Vector2f intersection = getClosestIntersection(p, projectilePath, objects);
         if (intersection != null) {
-            Vector2f explosionSpawnPoint = new Vector2f();
-            explosionSpawnPoint.x = intersection.x - projectile.getDirection().x;
-            explosionSpawnPoint.y = intersection.y - projectile.getDirection().y;
+            
 
             if (projectile.getExplosive() != null) {
-
+                Vector2f explosionSpawnPoint = new Vector2f();
+                explosionSpawnPoint.x = intersection.x - projectile.getDirection().x;
+                explosionSpawnPoint.y = intersection.y - projectile.getDirection().y;
                 core.getScene().addObject(new Explosion1(explosionSpawnPoint.x, explosionSpawnPoint.y));
             }
             p.setToBeRemoved(true);

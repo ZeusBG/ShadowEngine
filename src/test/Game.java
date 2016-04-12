@@ -8,11 +8,11 @@ package test;
 import components.emitter.Emitter;
 import engine.AbstractGame;
 import engine.Core;
-import render.Renderer;
+import engine.render.Renderer;
 import gameObjects.Weapon;
 import math.Vector2f;
 import org.newdawn.slick.opengl.Texture;
-import render.Material;
+import engine.render.Material;
 
 /**
  *
@@ -39,7 +39,7 @@ public class Game extends AbstractGame{
     private void test(Core core){
         Player player = new Player();
         player.setPosition(new Vector2f(170,150));
-        player.setNextPosition(new Vector2f(170,150));
+
         core.addObject(player);
         Weapon wep = new AK(0,0,null);
         core.addObject(wep);
@@ -49,18 +49,18 @@ public class Game extends AbstractGame{
         
         RandomBot bot = new RandomBot();
         bot.setPosition(new Vector2f(160,160));
-        bot.setNextPosition(new Vector2f(160,160));
+       
         //core.addObject(bot);
         wep = new AK(0,0,null);
-        //core.addObject(wep);
+        core.addObject(wep);
         bot.addWeapon(wep);
         
         bot = new RandomBot();
         bot.setPosition(new Vector2f(360,160));
-        bot.setNextPosition(new Vector2f(360,160));
+       
         //core.addObject(bot);
         wep = new AK(0,0,null);
-        //core.addObject(wep);
+        core.addObject(wep);
         bot.addWeapon(wep);
         
         
@@ -111,7 +111,7 @@ public class Game extends AbstractGame{
         w = new StaticObject(0,0);
         
         
-        core.getScene().getCamera().setTarget(player);
+        core.getCamera().setTarget(player);
     }
     
     @Override

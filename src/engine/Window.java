@@ -7,19 +7,18 @@ package engine;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import math.Vector2f;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
-import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
 import static org.lwjgl.opengl.GL11.glOrtho;
 import org.lwjgl.opengl.PixelFormat;
-import static org.lwjgl.util.glu.Project.gluPerspective;
 
 /**
  *
@@ -28,11 +27,13 @@ import static org.lwjgl.util.glu.Project.gluPerspective;
 public class Window {
     private int width;
     private int height;
+    private Vector2f resolution;
     private String title = "Shadow Engine";
     public Window(int width,int height)
     {
         this.width = width;
         this.height = height;
+        resolution = new Vector2f(width,height);
         try {
             Display.setDisplayMode(new DisplayMode(width,height));
             Display.setTitle("title");
@@ -67,6 +68,10 @@ public class Window {
 
     public int getHeight() {
         return height;
+    }
+
+    public Vector2f getResolution() {
+        return resolution;
     }
     
     

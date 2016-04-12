@@ -5,14 +5,16 @@
  */
 package test;
 
-import components.AABB;
-import render.Renderer;
+import engine.render.Renderer;
 import gameObjects.LivingObject;
 import gameObjects.Weapon;
 import java.awt.Color;
 import math.Vector2f;
 import org.lwjgl.input.Keyboard;
-import render.Light;
+import org.lwjgl.opengl.GL20;
+import engine.render.Light;
+import engine.render.Shader.PlayerShader;
+import engine.render.TexturedQuad;
 import utils.ObjectType;
 import utils.Sounds;
 
@@ -29,7 +31,8 @@ public class Player extends LivingObject{
         super(type);
         speed = 500;
         geometry.getAabb().reset(position.x-5,position.y-5,position.x+5,position.y+5);
-        
+        texQuad = new TexturedQuad(core.getWindow().getResolution(),new Vector2f(50,50));
+        texQuad.loadTexture("../res/textures/char.png", "PNG");
     }
     
     public Player(){
@@ -41,6 +44,15 @@ public class Player extends LivingObject{
         light.setRadius(150);
         light.setPower(1);
         direction = new Vector2f(0,0);
+        texQuad = new TexturedQuad(new Vector2f(400,225) ,new Vector2f(50,50));
+        texQuad.loadTexture("res/textures/ship2.png", "png");
+        texQuad.setScale(new Vector2f(1,1));
+        
+        String vShader = "src/engine/render/shaders/defaultQuadVShader.vert";
+        String fShader = "src/engine/render/shaders/defaultQuadFShader.frag";
+        PlayerShader shader = new PlayerShader(vShader,fShader);
+        shader.bindAttributeLocations();
+        texQuad.setShader(shader);
     }
     
     
@@ -69,22 +81,18 @@ public class Player extends LivingObject{
         
         if(core.getInput().isKeyPressed(Keyboard.KEY_W)){
             direction.y -= 1;
-            nextPosition.y = position.y-2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(Keyboard.KEY_S)){
             direction.y += 1;
-            nextPosition.y = position.y+2;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(Keyboard.KEY_A)){
-            direction.x -=1;
-            nextPosition.x = position.x-2;
+            direction.x -= 1;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         if(core.getInput().isKeyPressed(Keyboard.KEY_D)){
-            direction.x+=1;
-            nextPosition.x = position.x+2;
+            direction.x += 1;
             core.getSoundManager().play(Sounds.MOVEMENT_PLAYER);
         }
         direction.normalize();
@@ -93,11 +101,11 @@ public class Player extends LivingObject{
         
         if(core.getInput().isKeyPressed(Keyboard.KEY_O)){
             //core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 0.8f);
-            core.getScene().getCamera().zoomIn();
+            core.getCamera().zoomIn();
         }
         
         if(core.getInput().isKeyPressed(Keyboard.KEY_P)){
-            core.getScene().getCamera().zoomOut();
+            core.getCamera().zoomOut();
             //core.getSoundManager().changeVolume(Sounds.MOVEMENT_PLAYER, 1.0f);
         }
         
@@ -108,8 +116,16 @@ public class Player extends LivingObject{
             core.getSoundManager().stop(Sounds.MOVEMENT_PLAYER);
         }
         
+        if(core.getInput().isKeyPressed(Keyboard.KEY_F)){
+            core.pauseGame();
+        }
+        
         geometry.getAabb().reset(position.x-5,position.y-5,position.x+5,position.y+5);
-        System.out.println("Player pos: "+ position);
+
+        texQuad.setSRT(new Vector2f(1,1),-orientation.getAngle() , position);
+        texQuad.setCameraOffset(core.getCamera().getPosition());
+        weapon.getGeometry().rotateAround(position, -orientation.getAngle());
+        texQuad.setResolution(core.getCamera().getSize());
     }
     
     public void addWeapon(Weapon w){
@@ -134,6 +150,7 @@ public class Player extends LivingObject{
             r.drawLine(crosshair.x, crosshair.y+2, crosshair.x, crosshair.y+6);
             r.drawLine(crosshair.x+2, crosshair.y, crosshair.x+6, crosshair.y);
         }
+        texQuad.renderQuad();
     }
     
 }

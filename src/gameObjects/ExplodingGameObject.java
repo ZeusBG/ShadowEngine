@@ -8,8 +8,8 @@ package gameObjects;
 import components.AABB;
 import java.awt.Color;
 import java.util.HashMap;
-import render.Light;
-import render.Renderer;
+import engine.render.Light;
+import engine.render.Renderer;
 import utils.ObjectType;
 
 /**
@@ -52,7 +52,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     public void explode(){
         exploded = true;
         currentRadius = 0;
-        timeExploded = System.currentTimeMillis();
+        timeExploded = core.getCurrentTimeMillis();
         light = new Light(this);
         light.setRadius(50);
         Color c = new Color((float)Math.random(),(float)Math.random(),(float)Math.random());
@@ -63,7 +63,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
     public void update(float dt){
         if(exploded){
             damageDealtTo = new HashMap<>();
-            if(System.currentTimeMillis()-timeExploded>lifeTime*1000){
+            if(core.getCurrentTimeMillis()-timeExploded>lifeTime*1000){
                 dispose();
                 light=null;
                 return;
@@ -76,7 +76,7 @@ public abstract class ExplodingGameObject extends DynamicGameObject{
         }
         
         else{
-            if(System.currentTimeMillis()-timeSpawned>1000*timer){
+            if(core.getCurrentTimeMillis()-timeSpawned>1000*timer){
                 explode();
             }
         }

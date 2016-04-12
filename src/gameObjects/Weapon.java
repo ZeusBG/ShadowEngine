@@ -95,7 +95,7 @@ public abstract class Weapon extends DynamicGameObject{
     
     public boolean canFire(){
         //System.out.printf("%f vs %f\n",System.currentTimeMillis()-timeLastFired,timePerProjectile);
-        return System.currentTimeMillis()-timeLastFired>timePerProjectile && System.currentTimeMillis()-timeStartedReloading>reloadTime*1000;
+        return core.getCurrentTimeMillis()-timeLastFired>timePerProjectile && core.getCurrentTimeMillis()-timeStartedReloading>reloadTime*1000;
     }
     
     public void fireSound(){
@@ -112,9 +112,8 @@ public abstract class Weapon extends DynamicGameObject{
                 orientation.normalize();
                 p.setDirection(orientation);
                 core.addObject(p);
-                
                 ammonition.remove(ammonition.size()-1);
-                timeLastFired = System.currentTimeMillis();
+                timeLastFired = core.getCurrentTimeMillis();
                 //core.getSoundManager().play(Sounds.AK47_SHOT);
  
             }
@@ -126,22 +125,21 @@ public abstract class Weapon extends DynamicGameObject{
         
     }
     public void reload() {
-        System.out.println("reloading");
-        timeStartedReloading = System.currentTimeMillis();
+        timeStartedReloading = core.getCurrentTimeMillis();
         if(currentAmmo<=0){
-            System.out.println("No Ammo !!");
             return;
         }
         
         int bullets;
-        if(currentAmmo<30){
+        if(currentAmmo<clipSize){
             bullets=currentAmmo;
             currentAmmo = 0;
         }
         else{ 
-            bullets=30;
-            currentAmmo-=30;
+            bullets=clipSize;
+            currentAmmo-=clipSize;
         }
+        
         for(int i=0;i<bullets;i++){
             ammonition.add(new Bullet(0,0));
             

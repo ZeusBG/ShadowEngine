@@ -7,9 +7,7 @@ package components;
 
 import engine.Core;
 import gameObjects.DynamicGameObject;
-import java.util.Random;
 import math.Vector2f;
-import org.lwjgl.opengl.GL11;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
@@ -27,24 +25,25 @@ public class Camera {
     private Vector2f offset;
     private Vector2f cameraCenter;
     private float cameraSpeed;
-    private float width, height;
+    private Vector2f size;
     private Core core;
     private boolean dynamic = false;
     private Vector2f scale;
     private AABB visibleArea;
-
+    
  
 
     public Camera(Core core) {
         offset = new Vector2f(0, 0);
-        width = 0;
-        height = 0;
+        size = new Vector2f();
+        size.x = 0;
+        size.y = 0;
         cameraCenter = new Vector2f(0, 0);
         cameraSpeed = 10;
         this.core = core;
         scale = new Vector2f();
-        scale.x = core.getWindow().getWidth()/ width;
-        scale.y = core.getWindow().getHeight() / height;
+        scale.x = core.getWindow().getWidth()/ size.x;
+        scale.y = core.getWindow().getHeight() / size.y;
         visibleArea = new AABB();
         initCamera();
     }
@@ -53,8 +52,9 @@ public class Camera {
         offset = new Vector2f(x, y);
         cameraCenter = new Vector2f(x + width / 2, y + height / 2);
         scale = new Vector2f();
-        this.width = width;
-        this.height = height;
+        size = new Vector2f();
+        size.x = width;
+        size.y = height;
         cameraSpeed = 10;
         visibleArea = new AABB(x, y, x + width, y + height);
         initCamera();
@@ -63,7 +63,7 @@ public class Camera {
     private void initCamera(){
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, width, height, 0, -10, 10);
+        glOrtho(0, size.x, size.y, 0, -10, 10);
         glMatrixMode(GL_MODELVIEW);
     }
 
@@ -74,48 +74,47 @@ public class Camera {
 
         if (dynamic) {
 
-            offset.x = -(targetX + core.getInput().getMouseX()) / 2 + width / 2;
-            offset.y =  -(targetY + core.getInput().getMouseY()) / 2 + height / 2;
+            offset.x = -(targetX + core.getInput().getMouseX()) / 2 + size.x / 2;
+            offset.y =  -(targetY + core.getInput().getMouseY()) / 2 + size.y / 2;
             
-            cameraCenter.x = -offset.x + width/2;
-            cameraCenter.y = offset.y + height/2;
+            cameraCenter.x = -offset.x + size.x/2;
+            cameraCenter.y = offset.y + size.y/2;
             
-            visibleArea.reset(-offset.x, -offset.y, -offset.x  + width , -offset.y  + height );
+            visibleArea.reset(-offset.x, -offset.y, -offset.x  + size.x , -offset.y  + size.y );
 
         } else {
             
             cameraCenter.x += (targetX - cameraCenter.x) * cameraSpeed / 100.0;
             cameraCenter.y += (targetY - cameraCenter.y) * cameraSpeed / 100.0;
             
-            offset.x = -(cameraCenter.x - width / 2);
-            offset.y = -(cameraCenter.y - height / 2);
+            offset.x = -(cameraCenter.x - size.x / 2);
+            offset.y = -(cameraCenter.y - size.y / 2);
             
-            visibleArea.reset(-offset.x, -offset.y, -offset.x  + width , -offset.y  + height);
+            visibleArea.reset(-offset.x, -offset.y, -offset.x  + size.x , -offset.y  + size.y);
         }
-        
         restore();
         
     }
     
     public void zoomIn() {
-        width *= 0.99;
-        height *= 0.99;
+        size.x *= 0.99;
+        size.y *= 0.99;
         refreshScale();
     }
-
+    
     public void zoomOut() {
-        width /= 0.99;
-        height /= 0.99;
+        size.x /= 0.99;
+        size.y /= 0.99;
         refreshScale();
     }
 
     public void refreshScale() {
-        scale.x = core.getWindow().getWidth() / width;
-        scale.y = core.getWindow().getHeight() / height;
+        scale.x = core.getWindow().getWidth() / size.x;
+        scale.y = core.getWindow().getHeight() / size.y;
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        glOrtho(0, width, height, 0, -100, 100);
+        glOrtho(0, size.x, size.y, 0, -100, 100);
         glMatrixMode(GL_MODELVIEW);
     }
     
@@ -153,13 +152,13 @@ public class Camera {
     }
 
     public float getWidth() {
-        return width;
+        return size.x;
     }
 
     public void setCore(Core core) {
         this.core = core;
-        scale.x = core.getWindow().getWidth()/ width;
-        scale.y = core.getWindow().getHeight() / height;
+        scale.x = core.getWindow().getWidth()/ size.x;
+        scale.y = core.getWindow().getHeight() / size.y;
     }
 
     public float getX() {
@@ -171,15 +170,15 @@ public class Camera {
     }
 
     public void setWidth(int width) {
-        this.width = width;
+        this.size.x = width;
     }
 
     public float getHeight() {
-        return height;
+        return size.y;
     }
 
     public void setHeight(int height) {
-        this.height = height;
+        this.size.y = height;
     }
 
     public float getCameraSpeed() {
@@ -212,7 +211,17 @@ public class Camera {
         return scale;
     }
     
+    public Vector2f getSize(){
+        return size;
+    }
+    
     public boolean isDynamic() {
         return dynamic;
     }
+
+    public Vector2f getCameraCenter() {
+        return cameraCenter;
+    }
+    
+    
 }

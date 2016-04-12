@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package render;
+package engine.render;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -127,6 +127,13 @@ public class LightArea {
 
     public int getVao() {
         return vao;
+    }
+    
+    @Override
+    public void finalize(){
+        glDeleteVertexArrays(vao);
+        for(Integer vbo : vbos)
+            glDeleteBuffers(vbo);
     }
     
     public int getNumVertices(){

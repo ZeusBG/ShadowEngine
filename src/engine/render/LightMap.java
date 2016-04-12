@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package render;
+package engine.render;
 
+import engine.render.Shader.Shader;
 import components.AABB;
 import engine.Core;
 import gameObjects.GameObject;
@@ -21,7 +22,7 @@ import static org.lwjgl.opengl.GL11.*;
 
 
 import static org.lwjgl.opengl.GL20.*;
-import static render.Renderer.CIRCLE_ACCURACY;
+import static engine.render.Renderer.CIRCLE_ACCURACY;
 import math.GeometryUtil;
 import static org.lwjgl.opengl.ARBVertexArrayObject.glBindVertexArray;
 import org.lwjgl.opengl.GL11;
@@ -73,9 +74,9 @@ public class LightMap {
 
     public void init() {
         lightShader = new Shader();
-        lightShader.loadShaderFromFile("src/render/shaders/lightMapShader.frag", GL_FRAGMENT_SHADER);
+        lightShader.loadShaderFromFile("src/engine/render/shaders/lightMapShader.frag", GL_FRAGMENT_SHADER);
         blurShader = new Shader();
-        blurShader.loadShaderFromFile("src/render/shaders/lightBlur.frag", GL_FRAGMENT_SHADER);
+        blurShader.loadShaderFromFile("src/engine/render/shaders/lightBlur.frag", GL_FRAGMENT_SHADER);
 
         frameBuffer = FrameBuffer.getFrameBuffer(width, height);
         tmpFrameBuffer = FrameBuffer.getFrameBuffer(width, height);
@@ -94,12 +95,12 @@ public class LightMap {
         }
         Vector2f lightLocation = light.getLocation();
         
-        float cameraPosX = core.getScene().getCamera().getX();
-        float cameraPosY = core.getScene().getCamera().getY();
-        float scaleX = core.getScene().getCamera().getWidthScale();
-        float scaleY = core.getScene().getCamera().getHeightScale();
-        float screenSizeX = core.getScene().getCamera().getWidth();
-        float screenSizeY = core.getScene().getCamera().getHeight();
+        float cameraPosX = core.getCamera().getX();
+        float cameraPosY = core.getCamera().getY();
+        float scaleX = core.getCamera().getWidthScale();
+        float scaleY = core.getCamera().getHeightScale();
+        float screenSizeX = core.getCamera().getWidth();
+        float screenSizeY = core.getCamera().getHeight();
         
         lightShader.bind();
         glUniform1f(glGetUniformLocation(lightShader.getProgramID(), "power"), light.getPower());
@@ -233,7 +234,7 @@ public class LightMap {
         glClear(GL_STENCIL_BUFFER_BIT);
         glDisable(GL_STENCIL_TEST);
         removeFrameBuffer();
-        core.getScene().getCamera().restore();
+        core.getCamera().restore();
     }
 
     public void drawVisibilityPolygon(Vector2f center) {
@@ -244,7 +245,7 @@ public class LightMap {
 
 
         glColor3f(0.0f, 0.0f, 0.0f);
-        AABB camAABB = core.getScene().getCamera().getVisibleArea();
+        AABB camAABB = core.getCamera().getVisibleArea();
         HashSet<GameObject> staticObjects = core.getScene().getRayCollisionTree().getObjectsInRange(camAABB);
         
         Line2f lineOfSight = new Line2f();
@@ -312,8 +313,8 @@ public class LightMap {
         //Vector2f pos = new Vector2f(core.getObjectManager().getPlayer().getPosition().x,core.getObjectManager().getPlayer().getPosition().y);
         //glUniform2f(glGetUniformLocation(blurShader.getProgramID(), "playerView"),  pos.x,  pos.y);
         glUniform2f(glGetUniformLocation(blurShader.getProgramID(), "resolution"), width,height);
-        float width = core.getScene().getCamera().getWidth();
-        float height = core.getScene().getCamera().getHeight();
+        float width = core.getCamera().getWidth();
+        float height = core.getCamera().getHeight();
         glLoadIdentity();
         //Vector2f pos = new Vector2f(core.getObjectManager().getPlayer().getPosition
         renderer.setTextures(true);
@@ -354,7 +355,7 @@ public class LightMap {
         renderer.setTextures(false);
         removeFrameBuffer();
         blurShader.unbind();
-        core.getScene().getCamera().restore();
+        core.getCamera().restore();
     }
 
     public void clear() {

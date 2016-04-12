@@ -6,7 +6,7 @@
 package components.emitter;
 
 import engine.Core;
-import render.Renderer;
+import engine.render.Renderer;
 
 /**
  *

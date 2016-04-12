@@ -5,8 +5,8 @@
  */
 package engine;
 
-import render.Renderer;
-import render.TextureHolder;
+import engine.render.Renderer;
+import engine.render.TextureHolder;
 
 /**
  *

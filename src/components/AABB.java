@@ -149,10 +149,10 @@ public class AABB {
             center.x =minX+(maxX-minX)/2.0f;
             center.y = minY+(maxY-minY)/2.0f;
             
-        lines[0].setX1(minX); lines[0].setY1(minY); lines[0].setX2(maxX); lines[0].setY2(minY);
-        lines[1].setX1(maxX); lines[1].setY1(minY); lines[1].setX2(maxX); lines[1].setY2(maxY);
-        lines[2].setX1(maxX); lines[2].setY1(maxY); lines[2].setX2(minX); lines[2].setY2(maxY);
-        lines[3].setX1(minX); lines[3].setY1(maxY); lines[3].setX2(minX); lines[3].setY2(minY);
+            lines[0].setX1(minX); lines[0].setY1(minY); lines[0].setX2(maxX); lines[0].setY2(minY);
+            lines[1].setX1(maxX); lines[1].setY1(minY); lines[1].setX2(maxX); lines[1].setY2(maxY);
+            lines[2].setX1(maxX); lines[2].setY1(maxY); lines[2].setX2(minX); lines[2].setY2(maxY);
+            lines[3].setX1(minX); lines[3].setY1(maxY); lines[3].setX2(minX); lines[3].setY2(minY);
         }
         
     }

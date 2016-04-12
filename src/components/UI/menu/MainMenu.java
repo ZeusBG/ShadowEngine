@@ -8,7 +8,7 @@ package components.UI.menu;
 import engine.AbstractGame;
 import engine.Core;
 import java.util.Stack;
-import render.Renderer;
+import engine.render.Renderer;
 
 /**
  *

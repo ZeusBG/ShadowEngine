@@ -7,7 +7,7 @@ package test;
 
 import components.emitter.BulletEmitter;
 import gameObjects.GameObject;
-import render.Renderer;
+import engine.render.Renderer;
 import gameObjects.StaticGameObject;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -43,7 +43,10 @@ public class StaticObject extends StaticGameObject {
         
         r.setColor(Color.WHITE);
     }
-
+    public void rotate(float angle){
+        geometry.rotate(angle);
+        
+    }
     @Override
     public void reactionOnHit(GameObject other, Vector2f hitPoint, Line2f lineHit) {
         Vector2f v = new Vector2f(hitPoint);

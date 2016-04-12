@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package render;
+package engine.render;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,14 +19,12 @@ import org.newdawn.slick.opengl.TextureLoader;
  * @author Zeus
  */
 public class TextureHolder {
-    private HashMap<String,Texture> textures;
+    private static HashMap<String,Texture> textures = new HashMap();
     
-    public TextureHolder(){
-        textures = new HashMap<>();
-    }
     
-    public Texture get(String name,String type, String path){
+    public static Texture get(String name,String type, String path){
         if(textures.get(name)!=null){
+            System.out.println();
             return textures.get(name);
         }
         else{

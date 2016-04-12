@@ -12,7 +12,7 @@ import gameObjects.Weapon;
 import java.awt.Color;
 import java.util.ArrayList;
 import math.Line2f;
-import render.Renderer;
+import engine.render.Renderer;
 import math.GeometryUtil;
 
 
@@ -39,6 +39,7 @@ public class RandomBot extends NPC{
             
             
             orientation.reset(position,player.getPosition());
+            orientation.normalize();
             if(weapon.isClipEmpty()){
                 weapon.reload();
                 
@@ -51,8 +52,8 @@ public class RandomBot extends NPC{
     @Override
     public void render(Renderer r) {
         
-        r.setColor(Color.ORANGE);
-        r.drawCircle(position.x,position.y,5);
+       // r.setColor(Color.ORANGE);
+       // r.drawCircle(position.x,position.y,5);
 
     }
     

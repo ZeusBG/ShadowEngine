@@ -10,7 +10,7 @@ import engine.Core;
 import gameObjects.DynamicGameObject;
 import java.util.ArrayList;
 import math.Vector2f;
-import render.Renderer;
+import engine.render.Renderer;
 import utils.ObjectType;
 
 /**
@@ -34,7 +34,7 @@ public class Emitter extends DynamicGameObject implements IParticle {
         this.direction = direction;
         this.speed = speed;
         this.lifeTime = lifeTime;
-        timeSpawned = System.currentTimeMillis();
+        timeSpawned = core.getCurrentTimeMillis();
         particles = new ArrayList<>();
         AABB aabb = new AABB();
         aabb.reset(position.x, position.y, position.x, position.y);

@@ -9,19 +9,19 @@ import components.AABB;
 import components.Geometry;
 import components.emitter.Emitter;
 import engine.Core;
-import render.Renderer;
+import engine.render.Renderer;
 import java.util.ArrayList;
 import math.Line2f;
 import math.Vector2f;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import static org.lwjgl.opengl.GL20.glUniform1f;
 import static org.lwjgl.opengl.GL20.glUniform2f;
-import render.Light;
-import render.Material;
-import render.Shader;
+import engine.render.Light;
+import engine.render.Material;
+import engine.render.Shader.Shader;
 import utils.ObjectState;
 import utils.ObjectType;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
+import engine.render.TexturedQuad;
 
 /**
  *
@@ -34,6 +34,7 @@ public abstract class GameObject {
     protected ObjectType type;
     protected ObjectState ObjState;
     protected Geometry geometry;
+    protected TexturedQuad texQuad;
     private static long IDGEN;
     private long id;
     protected Light light;
@@ -52,6 +53,7 @@ public abstract class GameObject {
         light = null;
         zIndex = 0;
         orientation = new Vector2f(1,0);
+        texQuad = null;
     }
     
     public void addEmitter(Emitter em){
@@ -216,16 +218,17 @@ public abstract class GameObject {
         shader.bind();
         
         Vector2f offset = position;
-        Vector2f cameraOffset = core.getScene().getCamera().getPosition();
+        Vector2f cameraOffset = core.getCamera().getPosition();
         Vector2f scale = geometry.getScale();
         float rotAngle = orientation.getAngleInRadians();
-        Vector2f resolutionScale = core.getScene().getCamera().getScale();
+        Vector2f resolutionScale = core.getCamera().getScale();
         
         glUniform2f(glGetUniformLocation(programId, "objectOffset"), offset.x,offset.y);
         glUniform2f(glGetUniformLocation(programId, "cameraOffset"),cameraOffset.x,cameraOffset.y);
         glUniform2f(glGetUniformLocation(programId, "scale"),scale.x,scale.y);
         glUniform2f(glGetUniformLocation(programId, "resolutionScale"),resolutionScale.x,resolutionScale.y);
         glUniform1f(glGetUniformLocation(programId, "rotAngle"),rotAngle);
+        
         
         
     }

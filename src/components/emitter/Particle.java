@@ -8,7 +8,7 @@ package components.emitter;
 import engine.Core;
 import java.awt.Color;
 import math.Vector2f;
-import render.Renderer;
+import engine.render.Renderer;
 
 /**
  *
