@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package components.UI.menu;
+package UI;
 
-import components.AABB;
+import gameObjects.util.AABB;
 import java.awt.Color;
 import math.Vector2f;
 import engine.render.Renderer;
@@ -13,10 +13,7 @@ import engine.render.Renderer;
 /**
  *
  * @author Zeus
- *///trabva li da ima vruzka s qdroto ?
-//emitter vuv vseki obekt
-//rendering-a
-//game states
+ */
 public class RectangleButton extends AbstractButton{
     float x,y;
     float width;

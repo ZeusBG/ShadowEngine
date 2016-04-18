@@ -6,7 +6,7 @@
 package engine.render;
 
 import engine.render.Shader.Shader;
-import components.AABB;
+import gameObjects.util.AABB;
 import engine.Core;
 import gameObjects.GameObject;
 import gameObjects.LivingObject;

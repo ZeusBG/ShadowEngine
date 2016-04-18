@@ -6,8 +6,8 @@
 package engine.render;
 
 import engine.render.Shader.Shader;
-import components.AABB;
-import components.Scene;
+import gameObjects.util.AABB;
+import engine.Scene;
 import engine.Core;
 import gameObjects.DynamicGameObject;
 import gameObjects.GameObject;

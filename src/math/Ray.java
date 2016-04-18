@@ -5,7 +5,7 @@
  */
 package math;
 
-import components.AABB;
+import gameObjects.util.AABB;
 
 /**
  *

@@ -5,14 +5,11 @@
  */
 package engine;
 
-import components.Camera;
-import components.GameState;
-import static components.GameState.MENU;
-import static components.GameState.PAUSED;
-import static components.GameState.RUNNING;
+import static engine.GameState.MENU;
+import static engine.GameState.PAUSED;
+import static engine.GameState.RUNNING;
 import engine.render.Renderer;
-import components.Scene;
-import components.Physics;
+import engine.space.Physics;
 import components.sound.SoundManager;
 import gameObjects.GameObject;
 import java.util.logging.Level;

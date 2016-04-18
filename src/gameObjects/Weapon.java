@@ -8,7 +8,7 @@ package gameObjects;
 import java.util.ArrayList;
 import math.Vector2f;
 import test.Bullet;
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 
 
 /**

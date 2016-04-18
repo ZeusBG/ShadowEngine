@@ -3,19 +3,19 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gameObjects;
-
-import gameObjects.util.ObjectType;
+package engine;
 
 /**
  *
- * @author Zeus
+ * @author Nick
  */
-public abstract class NPC extends LivingObject{
+public enum GameState {
+    RUNNING(0),
+    PAUSED(1),
+    MENU(2);
     
-    
-    public NPC() {
-        super(ObjectType.NPC);
+    private final int state;
+    GameState(int state){
+        this.state = state;
     }
-    
 }

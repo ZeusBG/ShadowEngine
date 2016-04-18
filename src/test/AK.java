@@ -5,7 +5,7 @@
  */
 package test;
 
-import components.AABB;
+import gameObjects.util.AABB;
 import engine.render.Renderer;
 import gameObjects.LivingObject;
 import gameObjects.Projectile;

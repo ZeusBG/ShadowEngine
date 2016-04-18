@@ -15,7 +15,7 @@ import org.lwjgl.opengl.GL20;
 import engine.render.Light;
 import engine.render.Shader.PlayerShader;
 import engine.render.TexturedQuad;
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 import utils.Sounds;
 
 /**

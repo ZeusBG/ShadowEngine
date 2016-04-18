@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package components;
+package engine.space;
 
+import gameObjects.util.AABB;
 import gameObjects.GameObject;
 import java.awt.Color;
 import java.util.ArrayList;

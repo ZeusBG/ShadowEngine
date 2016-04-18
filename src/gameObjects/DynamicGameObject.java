@@ -6,7 +6,7 @@
 package gameObjects;
 
 import math.Vector2f;
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 
 /**
  *

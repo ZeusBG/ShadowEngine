@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package components;
+package gameObjects.util;
 
 import java.util.ArrayList;
 import math.Line2f;

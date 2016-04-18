@@ -3,8 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package components;
+package engine;
 
+import engine.space.QuadTree;
+import gameObjects.util.AABB;
 import engine.Core;
 import gameObjects.DynamicGameObject;
 import gameObjects.GameObject;
@@ -13,7 +15,7 @@ import gameObjects.Projectile;
 import gameObjects.StaticGameObject;
 import java.util.ArrayList;
 import math.Vector2f;
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 
 /**
  *

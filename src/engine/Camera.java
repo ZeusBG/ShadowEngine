@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package components;
+package engine;
 
+import gameObjects.util.AABB;
 import engine.Core;
 import gameObjects.DynamicGameObject;
 import math.Vector2f;

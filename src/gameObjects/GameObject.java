@@ -5,8 +5,8 @@
  */
 package gameObjects;
 
-import components.AABB;
-import components.Geometry;
+import gameObjects.util.AABB;
+import gameObjects.util.Geometry;
 import components.emitter.Emitter;
 import engine.Core;
 import engine.render.Renderer;
@@ -18,8 +18,8 @@ import static org.lwjgl.opengl.GL20.glUniform2f;
 import engine.render.Light;
 import engine.render.Material;
 import engine.render.Shader.Shader;
-import utils.ObjectState;
-import utils.ObjectType;
+import gameObjects.util.ObjectState;
+import gameObjects.util.ObjectType;
 import static org.lwjgl.opengl.GL20.glGetUniformLocation;
 import engine.render.TexturedQuad;
 

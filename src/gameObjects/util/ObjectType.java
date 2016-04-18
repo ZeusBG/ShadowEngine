@@ -3,13 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package utils;
+package gameObjects.util;
 
 /**
  *
  * @author Zeus
  */
-public enum AABBType {
-    Circle,
-    NON_CIRCLE
+public enum ObjectType {
+    PROJECTILE,
+    PLAYER,
+    NPC,
+    ITEM,
+    ENVIRONMENT,
+    EMMITER;
 }

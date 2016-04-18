@@ -6,7 +6,7 @@
 package gameObjects;
 
 
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 
 /**
  *

@@ -3,19 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package components;
+package UI.font;
+
+import engine.render.TexturedQuad;
 
 /**
  *
  * @author Nick
  */
-public enum GameState {
-    RUNNING(0),
-    PAUSED(1),
-    MENU(2);
+public class Character {
+    private TexturedQuad texQuad;
     
-    private final int state;
-    GameState(int state){
-        this.state = state;
-    }
 }

@@ -5,7 +5,7 @@
  */
 package engine.render;
 
-import components.AABB;
+import gameObjects.util.AABB;
 import gameObjects.DynamicGameObject;
 import java.awt.Color;
 import math.Vector2f;

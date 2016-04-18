@@ -5,12 +5,12 @@
  */
 package gameObjects;
 
-import components.AABB;
+import gameObjects.util.AABB;
 import java.awt.Color;
 import java.util.HashMap;
 import engine.render.Light;
 import engine.render.Renderer;
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 
 /**
  *

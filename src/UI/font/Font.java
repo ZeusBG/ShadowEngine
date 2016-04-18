@@ -3,19 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package gameObjects;
-
-import gameObjects.util.ObjectType;
+package UI.font;
 
 /**
  *
- * @author Zeus
+ * @author Nick
  */
-public abstract class NPC extends LivingObject{
-    
-    
-    public NPC() {
-        super(ObjectType.NPC);
-    }
+public class Font {
     
 }

@@ -5,13 +5,13 @@
  */
 package components.emitter;
 
-import components.AABB;
+import gameObjects.util.AABB;
 import engine.Core;
 import gameObjects.DynamicGameObject;
 import java.util.ArrayList;
 import math.Vector2f;
 import engine.render.Renderer;
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 
 /**
  *

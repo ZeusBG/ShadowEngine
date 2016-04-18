@@ -5,7 +5,7 @@
  */
 package math;
 
-import components.AABB;
+import gameObjects.util.AABB;
 import gameObjects.GameObject;
 import java.util.ArrayList;
 import math.Line2f;

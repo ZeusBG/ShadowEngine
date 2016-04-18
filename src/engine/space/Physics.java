@@ -3,8 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package components;
+package engine.space;
 
+import gameObjects.util.AABB;
 import engine.Core;
 import gameObjects.ExplodingGameObject;
 import gameObjects.GameObject;
@@ -17,7 +18,7 @@ import math.Line2f;
 import math.Vector2f;
 import test.Explosion1;
 import math.GeometryUtil;
-import utils.ObjectType;
+import gameObjects.util.ObjectType;
 
 /**
  *
