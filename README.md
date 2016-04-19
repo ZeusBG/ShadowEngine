@@ -1,6 +1,5 @@
 # ShadowEngine
 Game engine focused on 2D visibility using java and lwjgl.
-Soon it will be ready for android. Once i port it and the render class is not that messy and done for android using OpenGL ES, I will start working more on architecture, but University really slows me down :D
 
 This is the latest screenshot:
 
